@@ -17,7 +17,7 @@ public class Charity {
         // TODO code application logic here
         
         
-        System.out.println("testing");
+        System.out.println("testing2");
     }
     
 }
