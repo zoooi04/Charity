@@ -17,6 +17,7 @@ public class Charity {
         // TODO code application logic here
         
         //testing here
+        System.out.println("Test update");
     }
     
 }
