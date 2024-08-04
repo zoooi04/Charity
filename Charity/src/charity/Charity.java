@@ -18,6 +18,7 @@ public class Charity {
         
         // testing mearge
         System.out.println("new line added!!!");
+
     }
     
 }
