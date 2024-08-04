@@ -16,9 +16,7 @@ public class Charity {
     public static void main(String[] args) {
         // TODO code application logic here
         
-        
-        System.out.println("testing");
-        System.out.println("im huaiern alsdjflasdjfilasjdofasjdoipfjs");
+
     }
     
 }
