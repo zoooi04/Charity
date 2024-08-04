@@ -16,7 +16,9 @@ public class Charity {
     public static void main(String[] args) {
         // TODO code application logic here
         
-        // testing
+        // testing mearge
+        System.out.println("new line added!!!");
+
     }
     
 }
