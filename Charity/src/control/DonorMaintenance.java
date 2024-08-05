@@ -7,7 +7,7 @@ package control;
 import adt.ArrayList;
 import adt.ListInterface;
 import boundary.DonorMaintenanceUI;
-import dao.DonorDAO;
+import dao.DAO;
 import entity.Donor;
 import entity.Person;
 import utility.MessageUI;
@@ -20,7 +20,7 @@ public class DonorMaintenance implements ControlInterface {
 
     private ListInterface<Donor> donorList = new ArrayList<>();
     private PersonMaintenance personControl = new PersonMaintenance();
-    private DonorDAO donorDAO = new DonorDAO();
+    private DAO donorDAO = new DAO();
     private DonorMaintenanceUI donorUI = new DonorMaintenanceUI();
 
     public DonorMaintenance() {

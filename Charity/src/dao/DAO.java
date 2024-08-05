@@ -8,7 +8,7 @@ import java.io.*;
  *
  * @author Ooi Choon Chong
  */
-public class DonorDAO {
+public class DAO {
 
     public void saveToFile(ListInterface<Donor> donorList, String fileName) {
         File file = new File(fileName);
