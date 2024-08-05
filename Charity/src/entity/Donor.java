@@ -11,7 +11,7 @@ import java.time.LocalDate;
  *
  * @author Ooi Choon Chong
  */
-public class Donor extends Person{
+public class Donor extends Person {
     
     public enum Type{
         INDIVIDUAL,
