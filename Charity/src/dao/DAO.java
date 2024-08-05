@@ -8,11 +8,9 @@ import java.io.*;
  *
  * @author Ooi Choon Chong
  */
-public class DonorDAO {
+public class DAO {
 
-    private String fileName = "donor.dat"; // For security and maintainability, should not have filename hardcoded here.
-
-    public void saveToFile(ListInterface<Donor> donorList) {
+    public void saveToFile(ListInterface<Donor> donorList, String fileName) {
         File file = new File(fileName);
         try {
             ObjectOutputStream ooStream = new ObjectOutputStream(new FileOutputStream(file));
@@ -27,7 +25,7 @@ public class DonorDAO {
         }
     }
 
-    public ListInterface<Donor> retrieveFromFile() {
+    public ListInterface<Donor> retrieveFromFile(String fileName) {
         File file = new File(fileName);
         ListInterface<Donor> donorList = new ArrayList<>();
         try {
