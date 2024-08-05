@@ -19,8 +19,12 @@ public class DonorMaintenanceUI {
 
     public int getMenuChoice() {
         System.out.println("\nMAIN MENU");
-        System.out.println("1. Add new Donor");
-        System.out.println("2. List all Donor");
+        System.out.println("1. List all Donor");
+        System.out.println("2. Search Donor");
+        System.out.println("3. Add new Donor");
+        System.out.println("4. Delete Donor");
+        System.out.println("5. Edit Donor");
+        System.out.println("6. Donor Report");
         System.out.println("0. Quit");
         System.out.print("Enter choice: ");
         int choice = scanner.nextInt();

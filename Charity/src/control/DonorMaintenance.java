@@ -24,7 +24,7 @@ public class DonorMaintenance implements ControlInterface {
     private DonorMaintenanceUI donorUI = new DonorMaintenanceUI();
 
     public DonorMaintenance() {
-        donorList = donorDAO.retrieveFromFile();
+        donorList = donorDAO.retrieveFromFile("donor.dat");
     }
 
     // <editor-fold defaultstate="collapsed" desc="Driver">
@@ -37,11 +37,19 @@ public class DonorMaintenance implements ControlInterface {
                     MessageUI.displayExitMessage();
                     break;
                 case 1:
-                    create(donorList);
                     display(donorList);
                     break;
                 case 2:
+                    break;
+                case 3:
+                    create(donorList);
                     display(donorList);
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+                case 6:
                     break;
                 default:
                     MessageUI.displayInvalidChoiceMessage();
@@ -57,13 +65,25 @@ public class DonorMaintenance implements ControlInterface {
     }
 
     @Override
+    public boolean search(Object newEntry) {
+        if (newEntry instanceof ArrayList) {
+            
+            
+            
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean create(Object newEntry) {
         Person newPerson = new Person();
         if (newEntry instanceof ArrayList) {
             if (personControl.create(newPerson)) {
                 Donor newDonor = donorUI.inputDonorDetails(newPerson);
                 donorList.add(newDonor);
-                donorDAO.saveToFile(donorList);
+                donorDAO.saveToFile(donorList, "donor.dat");
             } else {
                 MessageUI.displayUnableCreateObjectMessage();
             }
@@ -75,17 +95,32 @@ public class DonorMaintenance implements ControlInterface {
 
     @Override
     public boolean remove(Object newEntry) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if (newEntry instanceof ArrayList) {
+
+        } else {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public boolean update(Object newEntry) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if (newEntry instanceof ArrayList) {
+
+        } else {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public boolean report(Object newEntry) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if (newEntry instanceof ArrayList) {
+
+        } else {
+            return false;
+        }
+        return true;
     }
     // </editor-fold>
 
@@ -105,4 +140,5 @@ public class DonorMaintenance implements ControlInterface {
         donorMaintenance.donorMaintenanceDriver();
     }
     // </editor-fold>
+
 }
