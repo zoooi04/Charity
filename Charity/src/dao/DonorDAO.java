@@ -10,7 +10,7 @@ import java.io.*;
  */
 public class DonorDAO {
 
-    private String fileName = "donor.txt"; // For security and maintainability, should not have filename hardcoded here.
+    private String fileName = "donor.dat"; // For security and maintainability, should not have filename hardcoded here.
 
     public void saveToFile(ListInterface<Donor> donorList) {
         File file = new File(fileName);
