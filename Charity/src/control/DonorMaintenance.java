@@ -63,7 +63,7 @@ public class DonorMaintenance implements ControlInterface {
             if (personControl.create(newPerson)) {
                 Donor newDonor = donorUI.inputDonorDetails(newPerson);
                 donorList.add(newDonor);
-                //donorDAO.saveToFile(donorList);
+                donorDAO.saveToFile(donorList);
             } else {
                 MessageUI.displayUnableCreateObjectMessage();
             }
@@ -89,6 +89,7 @@ public class DonorMaintenance implements ControlInterface {
     }
     // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="other support function">
     public String getAllDonor() {
         String outputStr = "";
         for (int i = 1; i <= donorList.getNumberOfEntries(); i++) {
@@ -96,6 +97,7 @@ public class DonorMaintenance implements ControlInterface {
         }
         return outputStr;
     }
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="main">
     public static void main(String[] args) {

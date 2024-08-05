@@ -16,8 +16,7 @@ public class PersonMaintenance implements ControlInterface {
 
     private PersonMaintenanceUI personUI = new PersonMaintenanceUI();
 
-    public PersonMaintenance() {
-    }
+    public PersonMaintenance() {}
 
     // <editor-fold defaultstate="collapsed" desc="CURD">
     @Override
@@ -73,4 +72,5 @@ public class PersonMaintenance implements ControlInterface {
         return true;
     }
     // </editor-fold>
+    
 }
