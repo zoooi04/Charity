@@ -15,4 +15,10 @@ public class MessageUI {
     System.out.println("\nExiting system");
   }
   
+  // CC START
+  public static void displayUnableCreateObjectMessage() {
+      System.out.println("\nUnable to create object");
+  }
+  // CC END
+  
 }

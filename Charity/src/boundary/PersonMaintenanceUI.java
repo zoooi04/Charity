@@ -13,23 +13,11 @@ public class PersonMaintenanceUI {
 
     Scanner scanner = new Scanner(System.in);
 
-    public int getMenuChoice() {
-        System.out.println("\nMAIN MENU");
-        System.out.println("1. Add new Person");
-        System.out.println("2. List all Person");
-        System.out.println("0. Quit");
-        System.out.print("Enter choice: ");
-        int choice = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println();
-        return choice;
-    }
-
     public void listAllPerson(String outputStr) {
         System.out.println("\nList of Person:\n" + outputStr);
     }
 
-    public void printDonorDetails(Person person) {
+    public void printPersonDetails(Person person) {
         System.out.println("Person Details");
         System.out.println("Person name: " + person.getName());
         System.out.println("Person Age: " + person.getAge());
@@ -45,6 +33,7 @@ public class PersonMaintenanceUI {
         return inputValue;
     }
 
+    // can be automated, not really needed
     public int inputPersonAge() {
         System.out.print("Enter person Age: ");
         int inputValue = scanner.nextInt();
@@ -53,8 +42,8 @@ public class PersonMaintenanceUI {
     }
 
     public LocalDate inputPersonBirthday() {
-        System.out.print("Enter person birthday: ");
-        System.out.print("Enter person birthday (Year): ");
+        System.out.print("Enter person birthday: \n");
+        System.out.print("Enter person birthday (Day): ");
         int inputValueDay = Integer.parseInt(scanner.nextLine());
         System.out.print("Enter person birthday (Month): ");
         int inputValueMonth = Integer.parseInt(scanner.nextLine());

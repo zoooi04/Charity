@@ -50,7 +50,7 @@ public class DonorMaintenanceUI {
         Donor.Type inputEnum = null;
 
         do {
-            System.out.print("Enter donor gender: ");
+            System.out.print("Enter donor Type(I/O/F): ");
             String inputValue = scanner.nextLine();
             switch (inputValue) {
                 case "i", "I" -> inputEnum = Donor.Type.INDIVIDUAL;
@@ -66,7 +66,7 @@ public class DonorMaintenanceUI {
         Donor.Category inputEnum = null;
 
         do {
-            System.out.print("Enter donor gender: ");
+            System.out.print("Enter donor category(G/V/U): ");
             String inputValue = scanner.nextLine();
             switch (inputValue) {
                 case "g", "G" -> inputEnum = Donor.Category.GOVERNMENT;
