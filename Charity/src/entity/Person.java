@@ -4,6 +4,7 @@
  */
 package entity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -11,14 +12,14 @@ import java.time.LocalDateTime;
  *
  * @author Ooi Choon Chong
  */
-public class Person {
-    
-    public enum Gender{
+public class Person implements Serializable { // Serialization is the process of converting an object's state into a byte stream, so it can be easily saved to a file
+
+    public enum Gender {
         MALE,
         FEMALE,
         OTHER
     }
-    
+
     private String name;
     private int age;
     private LocalDate birthday;
@@ -29,7 +30,7 @@ public class Person {
     private boolean isDeleted = false;
 
     public Person() {
-        
+
     }
 
     public Person(String name, int age, LocalDate birthday, Gender gender, String phoneNo) {
@@ -39,7 +40,7 @@ public class Person {
         this.gender = gender;
         this.phoneNo = phoneNo;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -106,13 +107,12 @@ public class Person {
 
     @Override
     public String toString() {
-        return String.format("%20s\n%20s\n%20s\n%20s\n%20s\n%20s\n", this.name, this.age, this.birthday, this.gender, this.phoneNo, this.registerDate);
+        return String.format("%-30s%-10s%-20s%-10s%-20s%-30s", this.name, this.age, this.birthday, this.gender, this.phoneNo, this.registerDate);
     }
-    
+
     @Override
     public int hashCode() {
         return super.hashCode();
     }
 
 }
-
