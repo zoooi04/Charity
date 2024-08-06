@@ -51,6 +51,9 @@ public class DonorMaintenance implements ControlInterface {
                     }
                     break;
                 case 4:
+                    if (remove(donorList)) {
+                        display(donorList);
+                    }
                     break;
                 case 5:
                     break;
@@ -84,9 +87,15 @@ public class DonorMaintenance implements ControlInterface {
                     if (entry instanceof Donor) {
                         Donor donor = (Donor) entry;
                         if (donorId.equals(donor.getId())) {
-                            Donor foundDonor = (Donor) newObject;
-                            foundDonor.updateFrom(donor);
                             found = true;
+                            if (newObject instanceof int[]) {
+                                int[] foundPosition = (int[]) newObject;
+                                foundPosition[0] = i;
+                            }
+                            if (newObject instanceof Donor) {
+                                Donor foundDonor = (Donor) newObject;
+                                foundDonor.updateFrom(donor);
+                            }
                         }
                     } else {
                         return false;
@@ -135,7 +144,10 @@ public class DonorMaintenance implements ControlInterface {
             ListInterface<?> listInterface = (ListInterface<?>) newEntry;
 
             if (listInterface instanceof ArrayList<?>) {
-
+                int[] position = {-1};
+                if (search(newEntry, position)) {
+                    listInterface.remove(position[0]);
+                }
             } else {
                 return false;
             }
