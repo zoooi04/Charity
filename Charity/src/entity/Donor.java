@@ -70,7 +70,7 @@ public class Donor extends Person implements Serializable { // Serialization is 
         this.category = category;
     }
 
-    public void updateFrom(Donor donor){
+    public void updateFrom(Donor donor) {
         this.setName(donor.getName());
         this.setAge(donor.getAge());
         this.setBirthday(donor.getBirthday());
@@ -81,7 +81,7 @@ public class Donor extends Person implements Serializable { // Serialization is 
         this.setType(donor.getType());
         this.setCategory(donor.getCategory());
     }
-    
+
     @Override
     public String toString() {
         return super.toString() + String.format("%-20s%-20s%-20s", this.id, this.type, this.category);
