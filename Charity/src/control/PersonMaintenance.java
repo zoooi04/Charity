@@ -22,12 +22,13 @@ public class PersonMaintenance implements ControlInterface {
     // <editor-fold defaultstate="collapsed" desc="CURD">
     @Override
     public void display(Object newEntry) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        System.out.println("Person does not have display, use it in child class");
     }
 
     @Override
-    public boolean search(Object newEntry) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public boolean search(Object newEntry, Object newObject) {
+        System.out.println("Person does not have search, use it in child class");
+        return true;
     }
 
     @Override
