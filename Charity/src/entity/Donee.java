@@ -8,6 +8,6 @@ package entity;
  *
  * @author Ooi Choon Chong
  */
-public class Donee extends Person{
-    
+public class Donee extends Person {
+
 }
