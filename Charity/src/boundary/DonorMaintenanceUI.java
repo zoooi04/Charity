@@ -44,6 +44,7 @@ public class DonorMaintenanceUI {
         System.out.println("Donor category: " + donor.getCategory());
     }
 
+    // <editor-fold defaultstate="collapsed" desc="input">
     public String inputDonorId() {
         System.out.print("Enter donor Id: ");
         String inputValue = scanner.nextLine();
@@ -57,10 +58,14 @@ public class DonorMaintenanceUI {
             System.out.print("Enter donor Type(I/O/F): ");
             String inputValue = scanner.nextLine();
             switch (inputValue) {
-                case "i", "I" -> inputEnum = Donor.Type.INDIVIDUAL;
-                case "o", "O" -> inputEnum = Donor.Type.ORGANISATION;
-                case "f", "F" -> inputEnum = Donor.Type.FAMILY;
-                default -> MessageUI.displayInvalidChoiceMessage();
+                case "i", "I" ->
+                    inputEnum = Donor.Type.INDIVIDUAL;
+                case "o", "O" ->
+                    inputEnum = Donor.Type.ORGANISATION;
+                case "f", "F" ->
+                    inputEnum = Donor.Type.FAMILY;
+                default ->
+                    MessageUI.displayInvalidChoiceMessage();
             }
         } while (inputEnum == null);
         return inputEnum;
@@ -73,19 +78,24 @@ public class DonorMaintenanceUI {
             System.out.print("Enter donor category(G/V/U): ");
             String inputValue = scanner.nextLine();
             switch (inputValue) {
-                case "g", "G" -> inputEnum = Donor.Category.GOVERNMENT;
-                case "v", "V" -> inputEnum = Donor.Category.PRIVATE;
-                case "u", "U" -> inputEnum = Donor.Category.PUBLIC;
-                default -> MessageUI.displayInvalidChoiceMessage();
+                case "g", "G" ->
+                    inputEnum = Donor.Category.GOVERNMENT;
+                case "v", "V" ->
+                    inputEnum = Donor.Category.PRIVATE;
+                case "u", "U" ->
+                    inputEnum = Donor.Category.PUBLIC;
+                default ->
+                    MessageUI.displayInvalidChoiceMessage();
             }
         } while (inputEnum == null);
         return inputEnum;
     }
+    // </editor-fold>
 
     public Donor inputDonorDetails(Person person) {
         String donorId = inputDonorId();
         Donor.Type donorType = inputDonorType();
-        Donor.Category donorCategory = inputDonorCategory();      
+        Donor.Category donorCategory = inputDonorCategory();
         System.out.println();
         return new Donor(donorId, donorType, donorCategory, person);
     }

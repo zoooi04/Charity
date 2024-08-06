@@ -40,10 +40,15 @@ public class DonorMaintenance implements ControlInterface {
                     display(donorList);
                     break;
                 case 2:
+                    Donor donor = new Donor();
+                    if (search(donorList, donor)) {
+                        System.out.println(donor);
+                    }
                     break;
                 case 3:
-                    create(donorList);
-                    display(donorList);
+                    if (create(donorList)) {
+                        display(donorList);
+                    }
                     break;
                 case 4:
                     break;
@@ -65,27 +70,58 @@ public class DonorMaintenance implements ControlInterface {
     }
 
     @Override
-    public boolean search(Object newEntry) {
-        if (newEntry instanceof ArrayList) {
-            
-            
-            
+    public boolean search(Object newEntry, Object newObject) {
+        boolean found = false;
+        if (newEntry instanceof ListInterface<?>) {
+            ListInterface<?> listInterface = (ListInterface<?>) newEntry;
+
+            if (listInterface instanceof ArrayList<?>) {
+                String donorId = donorUI.inputDonorId();
+
+                for (int i = 1; !found && i <= listInterface.getNumberOfEntries(); i++) {
+                    Object entry = listInterface.getEntry(i);
+
+                    if (entry instanceof Donor) {
+                        Donor donor = (Donor) entry;
+                        if (donorId.equals(donor.getId())) {
+                            Donor foundDonor = (Donor) newObject;
+                            foundDonor.updateFrom(donor);
+                            found = true;
+                        }
+                    } else {
+                        return false;
+                    }
+
+                }
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
-        return true;
+
+        if (!found) {
+            MessageUI.displayObjectNotFoundMessage();
+        }
+        return found;
     }
 
     @Override
     public boolean create(Object newEntry) {
         Person newPerson = new Person();
-        if (newEntry instanceof ArrayList) {
-            if (personControl.create(newPerson)) {
-                Donor newDonor = donorUI.inputDonorDetails(newPerson);
-                donorList.add(newDonor);
-                donorDAO.saveToFile(donorList, "donor.dat");
+        if (newEntry instanceof ListInterface<?>) {
+            ListInterface<?> listInterface = (ListInterface<?>) newEntry;
+
+            if (listInterface instanceof ArrayList<?>) {
+                if (personControl.create(newPerson)) {
+                    Donor newDonor = donorUI.inputDonorDetails(newPerson);
+                    ((ListInterface<Donor>) newEntry).add(newDonor);
+                    donorDAO.saveToFile((ListInterface<Donor>) newEntry, "donor.dat");
+                } else {
+                    MessageUI.displayUnableCreateObjectMessage();
+                }
             } else {
-                MessageUI.displayUnableCreateObjectMessage();
+                return false;
             }
         } else {
             return false;
@@ -95,8 +131,14 @@ public class DonorMaintenance implements ControlInterface {
 
     @Override
     public boolean remove(Object newEntry) {
-        if (newEntry instanceof ArrayList) {
+        if (newEntry instanceof ListInterface<?>) {
+            ListInterface<?> listInterface = (ListInterface<?>) newEntry;
 
+            if (listInterface instanceof ArrayList<?>) {
+
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
@@ -105,8 +147,14 @@ public class DonorMaintenance implements ControlInterface {
 
     @Override
     public boolean update(Object newEntry) {
-        if (newEntry instanceof ArrayList) {
+        if (newEntry instanceof ListInterface<?>) {
+            ListInterface<?> listInterface = (ListInterface<?>) newEntry;
 
+            if (listInterface instanceof ArrayList<?>) {
+
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
@@ -115,8 +163,14 @@ public class DonorMaintenance implements ControlInterface {
 
     @Override
     public boolean report(Object newEntry) {
-        if (newEntry instanceof ArrayList) {
+        if (newEntry instanceof ListInterface<?>) {
+            ListInterface<?> listInterface = (ListInterface<?>) newEntry;
 
+            if (listInterface instanceof ArrayList<?>) {
+
+            } else {
+                return false;
+            }
         } else {
             return false;
         }

@@ -27,6 +27,7 @@ public class PersonMaintenanceUI {
         System.out.println("Person egistration date:" + person.getRegisterDate());
     }
 
+    // <editor-fold defaultstate="collapsed" desc="input">
     public String inputPersonName() {
         System.out.print("Enter person name: ");
         String inputValue = scanner.nextLine();
@@ -60,10 +61,14 @@ public class PersonMaintenanceUI {
             System.out.print("Enter person gender: ");
             String inputValue = scanner.nextLine();
             switch (inputValue) {
-                case "m", "M" -> inputGender = Person.Gender.MALE;
-                case "f", "F" -> inputGender = Person.Gender.FEMALE;
-                case "o", "O" -> inputGender = Person.Gender.OTHER;
-                default -> MessageUI.displayInvalidChoiceMessage();
+                case "m", "M" ->
+                    inputGender = Person.Gender.MALE;
+                case "f", "F" ->
+                    inputGender = Person.Gender.FEMALE;
+                case "o", "O" ->
+                    inputGender = Person.Gender.OTHER;
+                default ->
+                    MessageUI.displayInvalidChoiceMessage();
             }
         } while (inputGender == null);
         return inputGender;
@@ -74,6 +79,7 @@ public class PersonMaintenanceUI {
         String inputValue = scanner.nextLine();
         return inputValue;
     }
+    // </editor-fold >
 
     public Person inputPersonDetails() {
         String personName = inputPersonName();
@@ -84,4 +90,5 @@ public class PersonMaintenanceUI {
         System.out.println();
         return new Person(personName, personAge, personBirthday, personGender, personPhoneNo);
     }
+
 }
