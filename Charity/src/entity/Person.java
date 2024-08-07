@@ -107,7 +107,13 @@ public class Person implements Serializable { // Serialization is the process of
 
     @Override
     public String toString() {
-        return String.format("%-30s%-10s%-20s%-10s%-20s%-30s", this.name, this.age, this.birthday, this.gender, this.phoneNo, this.registerDate);
+        String activeStatus = "";
+        if(this.isIsActive()){
+            activeStatus += "Active";
+        }else{
+            activeStatus += "De-activate";
+        }
+        return String.format("%-30s%-10s%-20s%-10s%-20s%-30s%-20s", this.name, this.age, this.birthday, this.gender, this.phoneNo, this.registerDate, activeStatus);
     }
 
     @Override

@@ -61,13 +61,49 @@ public class PersonMaintenance implements ControlInterface {
         return true;
     }
 
+    /**
+     *
+     * @param newEntry
+     * @return (false if select 0. Back), (true if select 99. Next Page)
+     */
     @Override
     public boolean update(Object newEntry) {
         if (newEntry instanceof Person) {
-        } else {
-            return false;
+            int choice = -1;
+            do {
+                choice = personUI.getUpdateMenuChoice();
+                switch (choice) {
+                    case 0:
+                        MessageUI.displayExitMessage();
+                        break;
+                    case 1:
+                        ((Person) newEntry).setName(personUI.inputPersonName());
+                        break;
+                    case 2:
+                        ((Person) newEntry).setAge(personUI.inputPersonAge());
+                        break;
+                    case 3:
+                        ((Person) newEntry).setBirthday(personUI.inputPersonBirthday());
+                        break;
+                    case 4:
+                        ((Person) newEntry).setGender(personUI.inputPersonGender());
+                        break;
+                    case 5:
+                        ((Person) newEntry).setPhoneNo(personUI.inputPersonPhoneNo());
+                        break;
+                    case 6:
+                        ((Person) newEntry).setIsActive(!((Person) newEntry).isIsActive());
+                        personUI.printPersonActivate((Person) newEntry);
+                        break;
+                    case 99:
+                        return true;
+                    default:
+                        MessageUI.displayInvalidChoiceMessage();
+                        break;
+                }
+            } while (choice != 0);
         }
-        return true;
+        return false;
     }
 
     @Override
