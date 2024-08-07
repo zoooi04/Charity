@@ -87,13 +87,12 @@ public class DonorMaintenance implements ControlInterface {
             ListInterface<?> listInterface = (ListInterface<?>) newEntry;
 
             if (listInterface instanceof ArrayList<?>) {
-
+                String inputDonorId = donorUI.inputDonorId();
                 for (int i = 1; !found && i <= listInterface.getNumberOfEntries(); i++) {
                     Object entry = listInterface.getEntry(i);
 
                     if (entry instanceof Donor) {
                         Donor donor = (Donor) entry;
-                        String inputDonorId = donorUI.inputDonorId();
                         if (inputDonorId.equals(donor.getId())) {
                             found = true;
                             if (newObject instanceof int[]) {
@@ -105,9 +104,6 @@ public class DonorMaintenance implements ControlInterface {
                             } else {
                                 return false;
                             }
-                        } else {
-                            MessageUI.displayObjectNotFoundMessage();
-                            return false;
                         }
                     } else {
                         // Nothing happen, continue loop
@@ -134,10 +130,11 @@ public class DonorMaintenance implements ControlInterface {
             ListInterface<?> listInterface = (ListInterface<?>) newEntry;
 
             if (listInterface instanceof ArrayList<?>) {
+                ArrayList<Donor> arrListDonor = (ArrayList<Donor>) listInterface;
                 if (personControl.create(newPerson)) {
                     Donor newDonor = donorUI.inputDonorDetails(newPerson);
-                    ((ListInterface<Donor>) newEntry).add(newDonor);
-                    donorDAO.saveToFile((ListInterface<Donor>) newEntry, "donor.dat");
+                    arrListDonor.add(newDonor);
+                    donorDAO.saveToFile(arrListDonor, "donor.dat");
                 } else {
                     MessageUI.displayUnableCreateObjectMessage();
                 }
@@ -211,7 +208,7 @@ public class DonorMaintenance implements ControlInterface {
                                         MessageUI.displayInvalidChoiceMessage();
                                         break;
                                 }
-                            } while (choice != 0);
+                            } while (choice != 0 && choice != 99);
                         } else {
                             confirm = true;
                         }
