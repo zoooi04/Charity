@@ -43,20 +43,27 @@ public class DonorMaintenance implements ControlInterface {
                 case 2:
                     Donor donor = new Donor();
                     if (search(donorList, donor)) {
+                        donorUI.printDonorHeader();
                         System.out.println(donor);
                     }
                     break;
                 case 3:
                     if (create(donorList)) {
+                        donorUI.printDonorHeader();
                         display(donorList);
                     }
                     break;
                 case 4:
                     if (remove(donorList)) {
+                        donorUI.printDonorHeader();
                         display(donorList);
                     }
                     break;
                 case 5:
+                    if (update(donorList)) {
+                        donorUI.printDonorHeader();
+                        display(donorList);
+                    }
                     break;
                 case 6:
                     break;
@@ -217,7 +224,7 @@ public class DonorMaintenance implements ControlInterface {
             } else {
                 return false;
             }
-        }else{
+        } else {
             return false;
         }
         return true;

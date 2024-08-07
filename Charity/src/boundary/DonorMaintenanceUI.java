@@ -45,7 +45,7 @@ public class DonorMaintenanceUI {
         return choice;
     }
     // </editor-fold>
-    
+
     // <editor-fold defaultstate="collapsed" desc="output">
     public void listAllDonor(String outputStr) {
         System.out.println(outputStr);
@@ -61,18 +61,19 @@ public class DonorMaintenanceUI {
     public void printDonorHeader() {
         String outputStr = "";
         outputStr += "\nList of Donor:\n";
-        outputStr += "\n" + "=".repeat(180) + "\n";
-        outputStr += String.format("%-30s%-10s%-20s%-10s%-20s%-30s%-20s%-20s%-20s",
+        outputStr += "\n" + "=".repeat(200) + "\n";
+        outputStr += String.format("%-30s%-10s%-20s%-10s%-20s%-30s%-20s%-20s%-20s%-20s",
                 "Name",
                 "Age",
                 "BirthDay",
                 "Gender",
                 "Phone Number",
                 "Register Date",
+                "Status",
                 "id",
                 "type",
                 "category");
-        outputStr += "\n" + "=".repeat(180) + "\n";
+        outputStr += "\n" + "=".repeat(200) + "\n";
         System.out.print(outputStr);
     }
     // </editor-fold>
@@ -88,15 +89,13 @@ public class DonorMaintenanceUI {
         Donor.Type inputEnum = null;
 
         do {
-            System.out.print("Enter donor Type(I/O/F): ");
+            System.out.print("Enter donor Type(I/O): ");
             String inputValue = scanner.nextLine();
             switch (inputValue) {
                 case "i", "I" ->
                     inputEnum = Donor.Type.INDIVIDUAL;
                 case "o", "O" ->
                     inputEnum = Donor.Type.ORGANISATION;
-                case "f", "F" ->
-                    inputEnum = Donor.Type.FAMILY;
                 default ->
                     MessageUI.displayInvalidChoiceMessage();
             }
