@@ -82,6 +82,15 @@ public class Donor extends Person implements Serializable { // Serialization is 
         this.setCategory(donor.getCategory());
     }
 
+    public void updateFrom(Person person) {
+        this.setName(person.getName());
+        this.setAge(person.getAge());
+        this.setBirthday(person.getBirthday());
+        this.setGender(person.getGender());
+        this.setPhoneNo(person.getPhoneNo());
+        this.setRegisterDate(person.getRegisterDate());
+    }
+
     @Override
     public String toString() {
         return super.toString() + String.format("%-20s%-20s%-20s", this.id, this.type, this.category);

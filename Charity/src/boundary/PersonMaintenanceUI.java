@@ -13,6 +13,25 @@ public class PersonMaintenanceUI {
 
     Scanner scanner = new Scanner(System.in);
 
+    // <editor-fold defaultstate="collapsed" desc="menu">
+    public int getUpdateMenuChoice() {
+        System.out.println("\nUPDATE MENU");
+        System.out.println("1. Name");
+        System.out.println("2. Age");
+        System.out.println("3. Birthday");
+        System.out.println("4. Gender");
+        System.out.println("5. Phone Number");
+        System.out.println("6. Activate / Deactivate");
+        System.out.println("99. Next Page");
+        System.out.println("0. Back");
+        System.out.print("Enter choice: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+        return choice;
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="output">
     public void listAllPerson(String outputStr) {
         System.out.println("\nList of Person:\n" + outputStr);
     }
@@ -26,6 +45,15 @@ public class PersonMaintenanceUI {
         System.out.println("Person phoneNo:" + person.getPhoneNo());
         System.out.println("Person egistration date:" + person.getRegisterDate());
     }
+
+    public void printPersonActivate(Person person) {
+        if(person.isIsActive()){
+            System.out.println("This person is now Activated");
+        }else{
+            System.out.println("This person is now De-activated");
+        }
+    }
+    // </editor-fold> 
 
     // <editor-fold defaultstate="collapsed" desc="input">
     public String inputPersonName() {

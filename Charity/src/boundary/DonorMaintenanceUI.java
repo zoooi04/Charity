@@ -17,6 +17,7 @@ public class DonorMaintenanceUI {
 
     Scanner scanner = new Scanner(System.in);
 
+    // <editor-fold defaultstate="collapsed" desc="menu">
     public int getMenuChoice() {
         System.out.println("\nMAIN MENU");
         System.out.println("1. List all Donor");
@@ -29,12 +30,25 @@ public class DonorMaintenanceUI {
         System.out.print("Enter choice: ");
         int choice = scanner.nextInt();
         scanner.nextLine();
-        System.out.println();
         return choice;
     }
 
+    public int getUpdateMenuChoice() {
+        System.out.println("\nUPDATE MENU");
+        System.out.println("1. Type");
+        System.out.println("2. Category");
+        System.out.println("99. Confirm");
+        System.out.println("0. Back");
+        System.out.print("Enter choice: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+        return choice;
+    }
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="output">
     public void listAllDonor(String outputStr) {
-        System.out.println("\nList of Donor:\n" + outputStr);
+        System.out.println(outputStr);
     }
 
     public void printDonorDetails(Donor donor) {
@@ -43,6 +57,25 @@ public class DonorMaintenanceUI {
         System.out.println("Donor type:" + donor.getType());
         System.out.println("Donor category: " + donor.getCategory());
     }
+
+    public void printDonorHeader() {
+        String outputStr = "";
+        outputStr += "\nList of Donor:\n";
+        outputStr += "\n" + "=".repeat(180) + "\n";
+        outputStr += String.format("%-30s%-10s%-20s%-10s%-20s%-30s%-20s%-20s%-20s",
+                "Name",
+                "Age",
+                "BirthDay",
+                "Gender",
+                "Phone Number",
+                "Register Date",
+                "id",
+                "type",
+                "category");
+        outputStr += "\n" + "=".repeat(180) + "\n";
+        System.out.print(outputStr);
+    }
+    // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="input">
     public String inputDonorId() {
@@ -96,7 +129,6 @@ public class DonorMaintenanceUI {
         String donorId = inputDonorId();
         Donor.Type donorType = inputDonorType();
         Donor.Category donorCategory = inputDonorCategory();
-        System.out.println();
         return new Donor(donorId, donorType, donorCategory, person);
     }
 
