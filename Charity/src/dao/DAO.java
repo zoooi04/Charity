@@ -7,14 +7,15 @@ import java.io.*;
 /**
  *
  * @author Ooi Choon Chong
+ * @param <T>
  */
-public class DAO {
+public class DAO<T> {
 
-    public void saveToFile(ListInterface<Donor> donorList, String fileName) {
+    public void saveToFile(ListInterface<T> entityList, String fileName) {
         File file = new File(fileName);
         try {
             ObjectOutputStream ooStream = new ObjectOutputStream(new FileOutputStream(file));
-            ooStream.writeObject(donorList);
+            ooStream.writeObject(entityList);
             ooStream.close();
         } catch (FileNotFoundException ex) {
             System.out.println("\nFile not found");
@@ -25,12 +26,12 @@ public class DAO {
         }
     }
 
-    public ListInterface<Donor> retrieveFromFile(String fileName) {
+    public ListInterface<T> retrieveFromFile(String fileName) {
         File file = new File(fileName);
-        ListInterface<Donor> donorList = new ArrayList<>();
+        ListInterface<T> entityList = new ArrayList<>();
         try {
             ObjectInputStream oiStream = new ObjectInputStream(new FileInputStream(file));
-            donorList = (ArrayList<Donor>) (oiStream.readObject());
+            entityList = (ArrayList<T>) (oiStream.readObject());
             oiStream.close();
         } catch (FileNotFoundException ex) {
             System.out.println("\nNo such file.");
@@ -41,7 +42,7 @@ public class DAO {
         } catch (Exception ex) {
             System.err.println("An unexpected error occurred: " + ex.getMessage());
         } finally {
-            return donorList;
+            return entityList;
         }
     }
 }

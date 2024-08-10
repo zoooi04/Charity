@@ -124,11 +124,10 @@ public class DonorMaintenanceUI {
     }
     // </editor-fold>
 
-    public Donor inputDonorDetails(Person person) {
-        String donorId = inputDonorId();
-        Donor.Type donorType = inputDonorType();
-        Donor.Category donorCategory = inputDonorCategory();
-        return new Donor(donorId, donorType, donorCategory, person);
+    public void inputDonorDetails(Donor donor) {
+        donor.setId(inputDonorId());
+        donor.setType(inputDonorType());
+        donor.setCategory(inputDonorCategory());
     }
 
 }

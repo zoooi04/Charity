@@ -7,7 +7,6 @@ package control;
 import adt.ArrayList;
 import adt.ListInterface;
 import boundary.DonorMaintenanceUI;
-import dao.DAO;
 import entity.Donor;
 import entity.Person;
 import utility.MessageUI;
@@ -16,15 +15,15 @@ import utility.MessageUI;
  *
  * @author Ooi Choon Chong
  */
-public class DonorMaintenance implements ControlInterface {
+public class DonorMaintenance extends PersonMaintenance<Donor> {
 
+    private final DonorMaintenanceUI donorUI = new DonorMaintenanceUI();
     private ListInterface<Donor> donorList = new ArrayList<>();
-    private PersonMaintenance personControl = new PersonMaintenance();
-    private DAO donorDAO = new DAO();
-    private DonorMaintenanceUI donorUI = new DonorMaintenanceUI();
+    private static final String FILENAME = "donor.dat";
 
     public DonorMaintenance() {
-        donorList = donorDAO.retrieveFromFile("donor.dat");
+        super(FILENAME);
+        donorList = (ListInterface<Donor>) getPersonList();
     }
 
     // <editor-fold defaultstate="collapsed" desc="Driver">
@@ -74,69 +73,74 @@ public class DonorMaintenance implements ControlInterface {
     }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="CURD">
-    @Override
-    public void display(Object newEntry) {
+    // <editor-fold defaultstate="collapsed" desc="CRUD">
+    public void display(ListInterface<Donor> newEntry) {
         donorUI.listAllDonor(getAllDonor());
     }
 
-    @Override
-    public boolean search(Object newEntry, Object newObject) {
+    public boolean search(ListInterface<Donor> newEntry, Object newObject) {
         boolean found = false;
-        if (newEntry instanceof ListInterface<?>) {
-            ListInterface<?> listInterface = (ListInterface<?>) newEntry;
+        if (newEntry instanceof ArrayList<?>) {
+            String inputDonorId = donorUI.inputDonorId();
+            for (int i = 1; !found && i <= newEntry.getNumberOfEntries(); i++) {
+                Object entry = newEntry.getEntry(i);
 
-            if (listInterface instanceof ArrayList<?>) {
-                String inputDonorId = donorUI.inputDonorId();
-                for (int i = 1; !found && i <= listInterface.getNumberOfEntries(); i++) {
-                    Object entry = listInterface.getEntry(i);
-
-                    if (entry instanceof Donor) {
-                        Donor donor = (Donor) entry;
-                        if (inputDonorId.equals(donor.getId())) {
-                            found = true;
-                            if (newObject instanceof int[]) {
-                                int[] foundPosition = (int[]) newObject;
-                                foundPosition[0] = i;
-                            } else if (newObject instanceof Donor) {
-                                Donor foundDonor = (Donor) newObject;
-                                foundDonor.updateFrom(donor);
-                            } else {
-                                return false;
-                            }
+                if (entry instanceof Donor) {
+                    Donor donor = (Donor) entry;
+                    if (inputDonorId.equals(donor.getId())) {
+                        found = true;
+                        if (newObject instanceof int[]) {
+                            int[] foundPosition = (int[]) newObject;
+                            foundPosition[0] = i;
+                        } else if (newObject instanceof Donor) {
+                            Donor foundDonor = (Donor) newObject;
+                            foundDonor.updateFrom(donor);
+                        } else {
+                            return false;
                         }
-                    } else {
-                        // Nothing happen, continue loop
                     }
-
+                } else {
+                    // Nothing happen, continue loop
                 }
-            } else {
-                return false;
+
             }
-        } /*Hash map interface*/ else {
+        } else {
             return false;
         }
-
         if (!found) {
             MessageUI.displayObjectNotFoundMessage();
         }
         return found;
     }
 
-    @Override
-    public boolean create(Object newEntry) {
-        Person newPerson = new Person();
-        if (newEntry instanceof ListInterface<?>) {
-            ListInterface<?> listInterface = (ListInterface<?>) newEntry;
+    public boolean create(ListInterface<Donor> newEntry) {
+        if (newEntry instanceof ArrayList<?>) {
+            ArrayList<Donor> arrListDonor = (ArrayList<Donor>) newEntry;
 
-            if (listInterface instanceof ArrayList<?>) {
-                ArrayList<Donor> arrListDonor = (ArrayList<Donor>) listInterface;
-                if (personControl.create(newPerson)) {
-                    Donor newDonor = donorUI.inputDonorDetails(newPerson);
-                    arrListDonor.add(newDonor);
-                    donorDAO.saveToFile(arrListDonor, "donor.dat");
+            Donor newDonor = new Donor();
+            if (super.create(newDonor)) {
+                donorUI.inputDonorDetails(newDonor);
+                arrListDonor.add(newDonor);
+                saveDonorList();
+                return true;
+            } else {
+                MessageUI.displayUnableCreateObjectMessage();
+            }
+        }
+        return false;
+    }
+
+    // likedlist / hashmap
+    public boolean remove(ListInterface<Donor> newEntry) {
+        if (newEntry instanceof ArrayList<?>) {
+            int[] position = {-1};
+            if (search(newEntry, position)) {
+                Object entry = newEntry.getEntry(position[0]);
+                if (entry instanceof Donor) {
+                    Donor paramDonor = (Donor) entry;
+                    paramDonor.setIsDeleted(true);
                 } else {
-                    MessageUI.displayUnableCreateObjectMessage();
+                    return false;
                 }
             } else {
                 return false;
@@ -147,25 +151,42 @@ public class DonorMaintenance implements ControlInterface {
         return true;
     }
 
-    @Override   // likedlist / hashmap
-    public boolean remove(Object newEntry) {
-        if (newEntry instanceof ListInterface<?>) {
-            ListInterface<?> listInterface = (ListInterface<?>) newEntry;
-
-            if (listInterface instanceof ArrayList<?>) {
-                int[] position = {-1};
-                if (search(newEntry, position)) {
-                    Object entry = listInterface.getEntry(position[0]);
-                    if (entry instanceof Donor) {
-                        Donor paramDonor = (Donor) entry;
-                        paramDonor.setIsDeleted(true);
+    public boolean update(ListInterface<Donor> newEntry) {
+        if (newEntry instanceof ArrayList<?>) {
+            int[] position = {-1};
+            if (search(newEntry, position)) {
+                boolean confirm = false;
+                do {
+                    Donor updateDonor = (Donor) newEntry.getEntry(position[0]);
+                    if (super.update(updateDonor)) {
+                        int choice;
+                        do {
+                            choice = donorUI.getUpdateMenuChoice();
+                            switch (choice) {
+                                case 0:
+                                    MessageUI.displayExitMessage();
+                                    break;
+                                case 1:
+                                    updateDonor.setType(donorUI.inputDonorType());
+                                    break;
+                                case 2:
+                                    updateDonor.setCategory(donorUI.inputDonorCategory());
+                                    break;
+                                case 99:
+                                    confirm = true;
+                                    break;
+                                default:
+                                    MessageUI.displayInvalidChoiceMessage();
+                                    break;
+                            }
+                        } while (choice != 0 && choice != 99);
                     } else {
-                        return false;
+                        confirm = true;
                     }
-                } else {
-                    return false;
-                }
+                } while (!confirm);
+                saveDonorList();
             } else {
+                MessageUI.displayObjectNotFoundMessage();
                 return false;
             }
         } else {
@@ -174,72 +195,8 @@ public class DonorMaintenance implements ControlInterface {
         return true;
     }
 
-    @Override
-    public boolean update(Object newEntry) {
-        if (newEntry instanceof ListInterface<?>) {
-            ListInterface<?> listInterface = (ListInterface<?>) newEntry;
+    public boolean report(ListInterface<Donor> newEntry) {
 
-            if (listInterface instanceof ArrayList<?>) {
-                int[] position = {-1};
-                if (search(newEntry, position)) {
-                    boolean confirm = false;
-                    do {
-                        Person updatePerson = (Person) ((ListInterface<?>) newEntry).getEntry(position[0]);
-                        if (personControl.update(updatePerson)) {
-                            Donor updateDonor = (Donor) ((ListInterface<?>) newEntry).getEntry(position[0]);
-                            updateDonor.updateFrom(updatePerson);
-                            int choice;
-                            do {
-                                choice = donorUI.getUpdateMenuChoice();
-                                switch (choice) {
-                                    case 0:
-                                        MessageUI.displayExitMessage();
-                                        break;
-                                    case 1:
-                                        updateDonor.setType(donorUI.inputDonorType());
-                                        break;
-                                    case 2:
-                                        updateDonor.setCategory(donorUI.inputDonorCategory());
-                                        break;
-                                    case 99:
-                                        confirm = true;
-                                        break;
-                                    default:
-                                        MessageUI.displayInvalidChoiceMessage();
-                                        break;
-                                }
-                            } while (choice != 0 && choice != 99);
-                        } else {
-                            confirm = true;
-                        }
-                    } while (!confirm);
-                    donorDAO.saveToFile((ListInterface<Donor>) newEntry, "donor.dat");
-                } else {
-                    MessageUI.displayObjectNotFoundMessage();
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean report(Object newEntry) {
-        if (newEntry instanceof ListInterface<?>) {
-            ListInterface<?> listInterface = (ListInterface<?>) newEntry;
-
-            if (listInterface instanceof ArrayList<?>) {
-
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
         return true;
     }
     // </editor-fold>
@@ -254,12 +211,24 @@ public class DonorMaintenance implements ControlInterface {
         }
         return outputStr;
     }
+//    private void refreshDisplay() {
+//        donorUI.printDonorHeader();
+//        display(donorList);
+//    }
+
+    public void saveDonorList() {
+        super.saveListToFile(donorList, FILENAME);
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="main">
     public static void main(String[] args) {
-        DonorMaintenance donorMaintenance = new DonorMaintenance();
-        donorMaintenance.donorMaintenanceDriver();
+        try {
+            DonorMaintenance donorMaintenance = new DonorMaintenance();
+            donorMaintenance.donorMaintenanceDriver();
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred: " + e.getMessage());
+        }
     }
     // </editor-fold>
 

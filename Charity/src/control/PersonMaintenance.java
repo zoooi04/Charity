@@ -4,45 +4,57 @@
  */
 package control;
 
+import adt.ListInterface;
 import boundary.PersonMaintenanceUI;
+import dao.DAO;
 import entity.Person;
 import utility.MessageUI;
 
 /**
  *
  * @author Ooi Choon Chong
+ * @param <T>
  */
-public class PersonMaintenance implements ControlInterface {
+public class PersonMaintenance<T extends Person> implements ControlInterface<T> {
 
-    private PersonMaintenanceUI personUI = new PersonMaintenanceUI();
+    protected final PersonMaintenanceUI personUI = new PersonMaintenanceUI();
+    ListInterface<T> personList;
+    private final DAO dao = new DAO();
 
     public PersonMaintenance() {
     }
 
+    public PersonMaintenance(String filename) {
+        personList = (ListInterface<T>) dao.retrieveFromFile(filename);
+    }
+
+    protected ListInterface<T> getPersonList() {
+        return personList;
+    }
+
     // <editor-fold defaultstate="collapsed" desc="CURD">
     @Override
-    public void display(Object newEntry) {
+    public void display(T newEntry) {
         System.out.println("Person does not have display, use it in child class");
     }
 
     @Override
-    public boolean search(Object newEntry, Object newObject) {
+    public boolean search(T newEntry, T newObject) {
         System.out.println("Person does not have search, use it in child class");
         return true;
     }
 
     @Override
-    public boolean create(Object newEntry) {
+    public boolean create(T newEntry) {
         if (newEntry instanceof Person) {
-            Person person = (Person) newEntry;
             Person createdPerson = personUI.inputPersonDetails();
             if (createdPerson != null) {
-                person.setName(createdPerson.getName());
-                person.setAge(createdPerson.getAge());
-                person.setBirthday(createdPerson.getBirthday());
-                person.setGender(createdPerson.getGender());
-                person.setPhoneNo(createdPerson.getPhoneNo());
-                person.setRegisterDate(createdPerson.getRegisterDate());
+                newEntry.setName(createdPerson.getName());
+                newEntry.setAge(createdPerson.getAge());
+                newEntry.setBirthday(createdPerson.getBirthday());
+                newEntry.setGender(createdPerson.getGender());
+                newEntry.setPhoneNo(createdPerson.getPhoneNo());
+                newEntry.setRegisterDate(createdPerson.getRegisterDate());
             } else {
                 MessageUI.displayUnableCreateObjectMessage();
             }
@@ -53,7 +65,7 @@ public class PersonMaintenance implements ControlInterface {
     }
 
     @Override
-    public boolean remove(Object newEntry) {
+    public boolean remove(T newEntry) {
         if (newEntry instanceof Person) {
         } else {
             return false;
@@ -67,7 +79,7 @@ public class PersonMaintenance implements ControlInterface {
      * @return (false if select 0. Back), (true if select 99. Next Page)
      */
     @Override
-    public boolean update(Object newEntry) {
+    public boolean update(T newEntry) {
         if (newEntry instanceof Person) {
             int choice = -1;
             do {
@@ -77,22 +89,22 @@ public class PersonMaintenance implements ControlInterface {
                         MessageUI.displayExitMessage();
                         break;
                     case 1:
-                        ((Person) newEntry).setName(personUI.inputPersonName());
+                        newEntry.setName(personUI.inputPersonName());
                         break;
                     case 2:
-                        ((Person) newEntry).setAge(personUI.inputPersonAge());
+                        newEntry.setAge(personUI.inputPersonAge());
                         break;
                     case 3:
-                        ((Person) newEntry).setBirthday(personUI.inputPersonBirthday());
+                        newEntry.setBirthday(personUI.inputPersonBirthday());
                         break;
                     case 4:
-                        ((Person) newEntry).setGender(personUI.inputPersonGender());
+                        newEntry.setGender(personUI.inputPersonGender());
                         break;
                     case 5:
-                        ((Person) newEntry).setPhoneNo(personUI.inputPersonPhoneNo());
+                        newEntry.setPhoneNo(personUI.inputPersonPhoneNo());
                         break;
                     case 6:
-                        ((Person) newEntry).setIsActive(!((Person) newEntry).isIsActive());
+                        newEntry.setIsActive(!((Person) newEntry).isIsActive());
                         personUI.printPersonActivate((Person) newEntry);
                         break;
                     case 99:
@@ -107,7 +119,7 @@ public class PersonMaintenance implements ControlInterface {
     }
 
     @Override
-    public boolean report(Object newEntry) {
+    public boolean report(T newEntry) {
         if (newEntry instanceof Person) {
         } else {
             return false;
@@ -115,5 +127,9 @@ public class PersonMaintenance implements ControlInterface {
         return true;
     }
     // </editor-fold>
+
+    public void saveListToFile(ListInterface<T> list, String fileName) {
+        dao.saveToFile(list, fileName);
+    }
 
 }
