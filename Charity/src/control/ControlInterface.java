@@ -11,11 +11,11 @@ package control;
  */
 public interface ControlInterface<T> {
     
-    public void     display(T newEntry);              // show
-    public boolean  search(T newEntry, T newObject);  // find
     public boolean  create(T newEntry);               // add
     public boolean  remove(T newEntry);               // delete
     public boolean  update(T newEntry);               // edit (active inActive)
+    public boolean  search(T newEntry, T newObject);  // find
+    public void     display(T newEntry);              // show
     public boolean  report(T newEntry);               // report
     
 }

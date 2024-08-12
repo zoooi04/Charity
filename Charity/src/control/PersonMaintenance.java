@@ -34,17 +34,6 @@ public class PersonMaintenance<T extends Person> implements ControlInterface<T> 
 
     // <editor-fold defaultstate="collapsed" desc="CURD">
     @Override
-    public void display(T newEntry) {
-        System.out.println("Person does not have display, use it in child class");
-    }
-
-    @Override
-    public boolean search(T newEntry, T newObject) {
-        System.out.println("Person does not have search, use it in child class");
-        return true;
-    }
-
-    @Override
     public boolean create(T newEntry) {
         if (newEntry instanceof Person) {
             Person createdPerson = personUI.inputPersonDetails();
@@ -116,6 +105,17 @@ public class PersonMaintenance<T extends Person> implements ControlInterface<T> 
             } while (choice != 0);
         }
         return false;
+    }
+
+    @Override
+    public void display(T newEntry) {
+        System.out.println("Person does not have display, use it in child class");
+    }
+
+    @Override
+    public boolean search(T newEntry, T newObject) {
+        System.out.println("Person does not have search, use it in child class");
+        return true;
     }
 
     @Override
