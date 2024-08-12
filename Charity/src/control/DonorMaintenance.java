@@ -74,45 +74,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="CRUD">
-    public void display(ListInterface<Donor> newEntry) {
-        donorUI.listAllDonor(getAllDonor());
-    }
-
-    public boolean search(ListInterface<Donor> newEntry, Object newObject) {
-        boolean found = false;
-        if (newEntry instanceof ArrayList<?>) {
-            String inputDonorId = donorUI.inputDonorId();
-            for (int i = 1; !found && i <= newEntry.getNumberOfEntries(); i++) {
-                Object entry = newEntry.getEntry(i);
-
-                if (entry instanceof Donor) {
-                    Donor donor = (Donor) entry;
-                    if (inputDonorId.equals(donor.getId())) {
-                        found = true;
-                        if (newObject instanceof int[]) {
-                            int[] foundPosition = (int[]) newObject;
-                            foundPosition[0] = i;
-                        } else if (newObject instanceof Donor) {
-                            Donor foundDonor = (Donor) newObject;
-                            foundDonor.updateFrom(donor);
-                        } else {
-                            return false;
-                        }
-                    }
-                } else {
-                    // Nothing happen, continue loop
-                }
-
-            }
-        } else {
-            return false;
-        }
-        if (!found) {
-            MessageUI.displayObjectNotFoundMessage();
-        }
-        return found;
-    }
-
+    // Add a new donor
     public boolean create(ListInterface<Donor> newEntry) {
         if (newEntry instanceof ArrayList<?>) {
             ArrayList<Donor> arrListDonor = (ArrayList<Donor>) newEntry;
@@ -130,7 +92,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
         return false;
     }
 
-    // likedlist / hashmap
+    // Remove a donor
     public boolean remove(ListInterface<Donor> newEntry) {
         if (newEntry instanceof ArrayList<?>) {
             int[] position = {-1};
@@ -151,6 +113,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
         return true;
     }
 
+    // Update donors details
     public boolean update(ListInterface<Donor> newEntry) {
         if (newEntry instanceof ArrayList<?>) {
             int[] position = {-1};
@@ -195,6 +158,57 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
         return true;
     }
 
+    // Search donor details
+    public boolean search(ListInterface<Donor> newEntry, Object newObject) {
+        boolean found = false;
+        if (newEntry instanceof ArrayList<?>) {
+            String inputDonorId = donorUI.inputDonorId();
+            for (int i = 1; !found && i <= newEntry.getNumberOfEntries(); i++) {
+                Object entry = newEntry.getEntry(i);
+
+                if (entry instanceof Donor) {
+                    Donor donor = (Donor) entry;
+                    if (inputDonorId.equals(donor.getId())) {
+                        found = true;
+                        if (newObject instanceof int[]) {
+                            int[] foundPosition = (int[]) newObject;
+                            foundPosition[0] = i;
+                        } else if (newObject instanceof Donor) {
+                            Donor foundDonor = (Donor) newObject;
+                            foundDonor.updateFrom(donor);
+                        } else {
+                            return false;
+                        }
+                    }
+                } else {
+                    // Nothing happen, continue loop
+                }
+
+            }
+        } else {
+            return false;
+        }
+        if (!found) {
+            MessageUI.displayObjectNotFoundMessage();
+        }
+        return found;
+    }
+
+    // Display (general)
+    public void display(ListInterface<Donor> newEntry) {
+        donorUI.listAllDonor(getAllDonor());
+    }
+
+    // List donors with all the donations made
+    // not yet implement 
+    // donor event
+    //       event
+    //       event
+    // donor event
+    //       event
+    
+    
+    // Generate summary reports / Filter donor based on criteria
     public boolean report(ListInterface<Donor> newEntry) {
 
         return true;
