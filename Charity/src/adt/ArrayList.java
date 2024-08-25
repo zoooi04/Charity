@@ -1,8 +1,8 @@
 package adt;
 
 /**
- * @author Frank M. Carrano
- * @version 2.0
+ * @author Ooi Choon Chong
+ * @version 3.0
  */
 import java.io.Serializable;
 
@@ -23,23 +23,18 @@ public class ArrayList<T> implements ListInterface<T>, Serializable {
 
     @Override
     public boolean add(T newEntry) {
-        if (isArrayFull()) {
-            doubleArray();
-        }
-
-        array[numberOfEntries] = newEntry;
-        numberOfEntries++;
+        ensureCapacity();
+        array[numberOfEntries++] = newEntry;
         return true;
     }
 
+    // <editor-fold defaultstate="collapsed" desc="abstract method">
     @Override
     public boolean add(int newPosition, T newEntry) {
         boolean isSuccessful = true;
 
         if ((newPosition >= 1) && (newPosition <= numberOfEntries + 1)) {
-            if (isArrayFull()) {
-                doubleArray();
-            }
+            ensureCapacity();
             makeRoom(newPosition);
             array[newPosition - 1] = newEntry;
             numberOfEntries++;
@@ -54,7 +49,7 @@ public class ArrayList<T> implements ListInterface<T>, Serializable {
     public T remove(int givenPosition) {
         T result = null;
 
-        if ((givenPosition >= 1) && (givenPosition <= numberOfEntries)) {
+        if (givenPosition >= 1 && givenPosition <= numberOfEntries) {
             result = array[givenPosition - 1];
 
             if (givenPosition < numberOfEntries) {
@@ -76,7 +71,7 @@ public class ArrayList<T> implements ListInterface<T>, Serializable {
     public boolean replace(int givenPosition, T newEntry) {
         boolean isSuccessful = true;
 
-        if ((givenPosition >= 1) && (givenPosition <= numberOfEntries)) {
+        if (givenPosition >= 1 && givenPosition <= numberOfEntries) {
             array[givenPosition - 1] = newEntry;
         } else {
             isSuccessful = false;
@@ -89,7 +84,7 @@ public class ArrayList<T> implements ListInterface<T>, Serializable {
     public T getEntry(int givenPosition) {
         T result = null;
 
-        if ((givenPosition >= 1) && (givenPosition <= numberOfEntries)) {
+        if (givenPosition >= 1 && givenPosition <= numberOfEntries) {
             result = array[givenPosition - 1];
         }
 
@@ -99,7 +94,7 @@ public class ArrayList<T> implements ListInterface<T>, Serializable {
     @Override
     public boolean contains(T anEntry) {
         boolean found = false;
-        for (int index = 0; !found && (index < numberOfEntries); index++) {
+        for (int index = 0; !found && index < numberOfEntries; index++) {
             if (anEntry.equals(array[index])) {
                 found = true;
             }
@@ -120,6 +115,13 @@ public class ArrayList<T> implements ListInterface<T>, Serializable {
     @Override
     public boolean isFull() {
         return false;
+    }
+    // </editor-fold>
+
+    private void ensureCapacity() {
+        if (isArrayFull()) {
+            doubleArray();
+        }
     }
 
     private void doubleArray() {
@@ -176,4 +178,5 @@ public class ArrayList<T> implements ListInterface<T>, Serializable {
             array[index] = array[index + 1];
         }
     }
+
 }
