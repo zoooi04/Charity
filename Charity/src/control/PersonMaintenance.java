@@ -4,11 +4,7 @@
  */
 package control;
 
-import adt.ListHeap;
-import adt.ListInterface;
 import boundary.PersonMaintenanceUI;
-import dao.DAO;
-import dao.DAO_Heap;
 import entity.Person;
 import utility.MessageUI;
 
@@ -20,15 +16,8 @@ import utility.MessageUI;
 public class PersonMaintenance<T extends Person & Comparable<T>> implements ControlInterface<T> {
 
     protected final PersonMaintenanceUI personUI = new PersonMaintenanceUI();
-    ListHeap<T> personHeap;
-    private final DAO dao = new DAO();
-    private final DAO_Heap daoHeap = new DAO_Heap();
 
     public PersonMaintenance() {
-    }
-
-    public PersonMaintenance(String filename) {
-        personHeap = (ListHeap<T>)daoHeap.retrieveFromHeapFile(filename);
     }
 
     // <editor-fold defaultstate="collapsed" desc="CURD">
@@ -126,7 +115,4 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
         return true;
     }
     // </editor-fold>
-    public void saveHeapToFile(ListHeap<T> heap, String fileName) {
-        daoHeap.saveHeapToFile(heap, fileName);
-    }
 }

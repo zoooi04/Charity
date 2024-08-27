@@ -3,24 +3,26 @@ package control;
 import adt.Heap;
 import adt.ListHeap;
 import boundary.DoneeMaintenanceUI;
+import dao.DAO;
 import entity.Donee;
 import utility.MessageUI;
 
 public class DoneeMaintenance extends PersonMaintenance<Donee> {
 
     private final DoneeMaintenanceUI doneeUI = new DoneeMaintenanceUI();
-    private ListHeap<Donee> doneeHeap;
+    private ListHeap<Donee> doneeHeap = new Heap<>();;
+    private final DAO<ListHeap<Donee>> dao = new DAO<>();
+
     private static final String FILENAME = "donee.dat";
 
     public DoneeMaintenance() {
-        super(FILENAME);
-        doneeHeap = new Heap<>(); // Ensure this is the correct type
+        doneeHeap =  (ListHeap<Donee>) dao.retrieveFromFile(FILENAME); // Ensure this is the correct type
     }
 
     // <editor-fold defaultstate="collapsed" desc="Driver">
     public void doneeMaintenanceDriver() {
         int choice = 0;
-        
+
         do {
             choice = doneeUI.getMenuChoice();
             switch (choice) {
@@ -80,23 +82,23 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
         return false;
     }
 
-public boolean remove(ListHeap<Donee> doneeHeap) {
-    if (!doneeHeap.isEmpty()) {
-        Donee highestPriorityDonee = doneeHeap.peekMaxValue(); // Check the root element without removing it
+    public boolean remove(ListHeap<Donee> doneeHeap) {
+        if (!doneeHeap.isEmpty()) {
+            Donee highestPriorityDonee = doneeHeap.peekMaxValue(); // Check the root element without removing it
 
-        if (!highestPriorityDonee.isIsActive()) {
-            System.out.println("Donee is deactivated and cannot be removed!");
-            return false;
+            if (!highestPriorityDonee.isIsActive()) {
+                System.out.println("Donee is deactivated and cannot be removed!");
+                return false;
+            }
+
+            highestPriorityDonee = doneeHeap.remove(); // Removes the root element
+            highestPriorityDonee.setIsDeleted(true);
+            saveDoneeList(); // Save the updated list
+            return true;
         }
-
-        highestPriorityDonee = doneeHeap.remove(); // Removes the root element
-        highestPriorityDonee.setIsDeleted(true);
-        saveDoneeList(); // Save the updated list
-        return true;
+        System.out.println("Heap is empty, no donee to remove!");
+        return false;
     }
-    System.out.println("Heap is empty, no donee to remove!");
-    return false;
-}
 
     public boolean update(ListHeap<Donee> newEntry) {
         int[] position = {-1};
@@ -134,7 +136,7 @@ public boolean remove(ListHeap<Donee> doneeHeap) {
             return false;
         }
     }
-    
+
     public boolean search(ListHeap<Donee> newEntry, Object newObject) {
         boolean found = false;
         String inputDoneeId = doneeUI.inputDoneeId();
@@ -183,7 +185,7 @@ public boolean remove(ListHeap<Donee> doneeHeap) {
     }
 
     public void saveDoneeList() {
-       super.saveHeapToFile(doneeHeap, FILENAME);
+        dao.saveToFile(doneeHeap, FILENAME);
     }
     // </editor-fold>
 
