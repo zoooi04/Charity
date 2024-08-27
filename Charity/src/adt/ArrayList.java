@@ -21,6 +21,7 @@ public class ArrayList<T> implements ListInterface<T>, Serializable {
         array = (T[]) new Object[initialCapacity];
     }
 
+    // <editor-fold defaultstate="collapsed" desc="abstract method">
     @Override
     public boolean add(T newEntry) {
         ensureCapacity();
@@ -28,7 +29,6 @@ public class ArrayList<T> implements ListInterface<T>, Serializable {
         return true;
     }
 
-    // <editor-fold defaultstate="collapsed" desc="abstract method">
     @Override
     public boolean add(int newPosition, T newEntry) {
         boolean isSuccessful = true;
@@ -86,6 +86,8 @@ public class ArrayList<T> implements ListInterface<T>, Serializable {
 
         if (givenPosition >= 1 && givenPosition <= numberOfEntries) {
             result = array[givenPosition - 1];
+        } else {
+            throw new IndexOutOfBoundsException("Index: " + givenPosition + ", Size: " + numberOfEntries);
         }
 
         return result;
@@ -178,5 +180,4 @@ public class ArrayList<T> implements ListInterface<T>, Serializable {
             array[index] = array[index + 1];
         }
     }
-
 }
