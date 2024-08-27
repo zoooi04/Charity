@@ -56,6 +56,10 @@ public class Donation {
         return donor;
     }
     
+    public void setId(String id){
+        this.id = id;
+    }
+    
     public void setQuantity(int quantity){
         this.quantity = quantity;
     }
