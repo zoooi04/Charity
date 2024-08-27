@@ -2,101 +2,81 @@ package entity;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-
+import java.time.LocalDateTime;
 
 public class Donee extends Person implements Serializable, Comparable<Donee> {
 
     private String id;
-    private Categories category;
-    private DoneeType type;
-    private double receivedAmount;
+    private Type type;
 
-    // Enums for Categories and DoneeType
-    public enum Categories {
-        HEALTH,
-        EDUCATION,
-        WELFARE
+    public enum Type {
+        FAMILY(3),
+        ORGANISATION(2),
+        INDIVIDUAL(1);
+
+        private final int priority;
+
+        Type(int priority) {
+            this.priority = priority;
+        }
+
+        public int getPriority() {
+            return priority;
+        }
     }
 
-    public enum DoneeType {
-        INDIVIDUAL,
-        ORGANISATION,
-        FAMILIAR
-    }
-
-    // Default constructor
     public Donee() {
-        super();
     }
 
-    // Parameterized constructor
-    public Donee(String id, Categories category, DoneeType type, double receivedAmount, String name, int age, LocalDate birthday, Gender gender, String phoneNo) {
+    public Donee(String id, Type type, String name, int age, LocalDate birthday, Person.Gender gender, String phoneNo, LocalDateTime registerDate) {
         super(name, age, birthday, gender, phoneNo);
+        setRegisterDate(registerDate);
         this.id = id;
-        this.category = category;
         this.type = type;
-        this.receivedAmount = receivedAmount;
     }
 
-    // Getter and Setter methods
     public String getId() {
         return id;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     public void setId(String id) {
         this.id = id;
     }
 
-    public Categories getCategory() {
-        return category;
-    }
-
-    public void setCategory(Categories category) {
-        this.category = category;
-    }
-
-    public DoneeType getType() {
-        return type;
-    }
-
-    public void setType(DoneeType type) {
+    public void setType(Type type) {
         this.type = type;
-    }
-
-    public double getReceivedAmount() {
-        return receivedAmount;
-    }
-
-    public void setReceivedAmount(double receivedAmount) {
-        this.receivedAmount = receivedAmount;
-    }
-    
-    public void updateFrom(Donee currentDonee) {
-        if (currentDonee != null) {
-            this.id = currentDonee.getId();
-            this.category = currentDonee.getCategory();
-            this.type = currentDonee.getType();
-            this.receivedAmount = currentDonee.getReceivedAmount();
-            this.setName(currentDonee.getName());
-            this.setAge(currentDonee.getAge());
-            this.setBirthday(currentDonee.getBirthday());
-            this.setGender(currentDonee.getGender());
-            this.setPhoneNo(currentDonee.getPhoneNo());
-            this.setRegisterDate(currentDonee.getRegisterDate());
-            this.setIsActive(currentDonee.isIsActive());
-        }
-    }
-
-    @Override
-    public int compareTo(Donee other) {
-        return Double.compare(this.receivedAmount, other.receivedAmount);
     }
 
     @Override
     public String toString() {
-        return String.format("%-30s%-10s%-20s%-10s%-20s%-30s%-20s%-20s%-20s%-20s",
-                this.getName(), this.getAge(), this.getBirthday(), this.getGender(), this.getPhoneNo(),
-                this.getRegisterDate(), this.isIsActive() ? "Active" : "De-activated", this.id, this.category, this.type);
+        return super.toString() + String.format("%-20s%-20s", id, type);
+    }
+
+    @Override
+    public int compareTo(Donee other) {
+        // Category comparison: FAMILY > ORGANISATION > INDIVIDUAL
+        int typeComparison = this.type.compareTo(other.type);
+        if (typeComparison != 0) {
+            return typeComparison;
+        }
+        // If types are the same, compare by registerDate (earlier dates come first)
+        return this.getRegisterDate().compareTo(other.getRegisterDate());
+    }
+
+    public void updateFrom(Donee other) {
+        this.setId(other.getId());
+        this.setName(other.getName());
+        this.setAge(other.getAge());
+        this.setBirthday(other.getBirthday());
+        this.setGender(other.getGender());
+        this.setPhoneNo(other.getPhoneNo());
+        this.setRegisterDate(other.getRegisterDate());
+        this.setIsActive(other.isIsActive());
+        this.setType(other.getType());
     }
 
     @Override

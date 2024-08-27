@@ -4,9 +4,7 @@
  */
 package control;
 
-import adt.ListInterface;
 import boundary.PersonMaintenanceUI;
-import dao.DAO;
 import entity.Person;
 import utility.MessageUI;
 
@@ -15,21 +13,11 @@ import utility.MessageUI;
  * @author Ooi Choon Chong
  * @param <T>
  */
-public class PersonMaintenance<T extends Person> implements ControlInterface<T> {
+public class PersonMaintenance<T extends Person & Comparable<T>> implements ControlInterface<T> {
 
     protected final PersonMaintenanceUI personUI = new PersonMaintenanceUI();
-    ListInterface<T> personList;
-    private final DAO dao = new DAO();
 
     public PersonMaintenance() {
-    }
-
-    public PersonMaintenance(String filename) {
-        personList = (ListInterface<T>) dao.retrieveFromFile(filename);
-    }
-
-    protected ListInterface<T> getPersonList() {
-        return personList;
     }
 
     // <editor-fold defaultstate="collapsed" desc="CURD">
@@ -127,9 +115,4 @@ public class PersonMaintenance<T extends Person> implements ControlInterface<T> 
         return true;
     }
     // </editor-fold>
-
-    public void saveListToFile(ListInterface<T> list, String fileName) {
-        dao.saveToFile(list, fileName);
-    }
-
 }
