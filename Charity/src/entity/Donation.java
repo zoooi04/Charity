@@ -1,21 +1,25 @@
 package entity;
 
 
-import java.time.LocalDateTime;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 
 /**
  *
  * @author huaiern
  */
-public class Donation {
+public class Donation implements Serializable{
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     private String id;
     private int quantity;
     private String message;
     private Donor donor;
     //private Event event;
     private DonationType type;
-    private LocalDateTime date;
+    private LocalDate date;
     
     // Enums for DonationType
     public enum DonationType {
@@ -25,11 +29,16 @@ public class Donation {
     }
     
     public Donation(){
-        
+        this("",0,"",null,null,null);
     }
     
-    public Donation(String id, int quantity, String message, Donor donor,String type, LocalDateTime date){
-        
+    public Donation(String id, int quantity, String message, Donor donor,DonationType type, LocalDate date){
+        this.id = id;
+        this.quantity = quantity;
+        this.message = message;
+        this.donor = donor;
+        this.type = type;
+        this.date = date;
     }
     
     public String getId(){
@@ -48,7 +57,7 @@ public class Donation {
         return type;
     }
     
-    public LocalDateTime getDate(){
+    public LocalDate getDate(){
         return date;
     }
     
@@ -72,7 +81,7 @@ public class Donation {
         this.type = type;
     }
     
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
     
@@ -82,13 +91,17 @@ public class Donation {
     
     @Override
     public String toString(){
+        return id;
+    }
+    
+    public String getDetails(){
         return String.format("""
-                             Donation ID: %s\n
-                             Quantity: %d\n
-                             Type: %s\n
-                             Message: %s\n
-                             Date: %s\n
-                             Donor: \n
-                             Event: \n""", id, quantity, type,message,date);
+                             Donation ID: %s
+                             Quantity: %d
+                             Type: %s
+                             Message: %s
+                             Date: %s
+                             Donor: 
+                             Event: """, id, quantity, type, message, date.format(formatter));
     }
 }

@@ -58,11 +58,11 @@ public class DonationMaintenanceUI {
         String outputStr = "";
         outputStr += "\nList of Donation:\n";
         outputStr += "\n" + "=".repeat(200) + "\n";
-        outputStr += String.format("%-10s%-3s%-50s%-10%-30s%-30s%-10s%-10s",
+        outputStr += String.format("%-15s%-15s%-50s%-30s%-30s%-15s%-15s",
                 "ID",
                 "Quantity",
                 "Message",
-                "Name",
+                "Donor",
                 "Event",
                 "Type",
                 "Date");
