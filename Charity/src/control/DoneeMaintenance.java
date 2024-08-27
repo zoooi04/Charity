@@ -1,29 +1,26 @@
 package control;
 
 import adt.Heap;
-import adt.ListInterface;
+import adt.ListHeap;
 import boundary.DoneeMaintenanceUI;
 import entity.Donee;
 import utility.MessageUI;
 
-/**
- * Maintenance control class for handling Donee operations using a Heap.
- */
 public class DoneeMaintenance extends PersonMaintenance<Donee> {
 
     private final DoneeMaintenanceUI doneeUI = new DoneeMaintenanceUI();
-    private Heap<Donee> doneeHeap = new Heap<>(10); 
-    private static final String FILENAME = "donee.txt";
+    private ListHeap<Donee> doneeHeap;
+    private static final String FILENAME = "donee.dat";
 
     public DoneeMaintenance() {
         super(FILENAME);
-        // You may need to load the existing donee data into the heap here if needed.
-        // doneeHeap = loadDoneeHeapFromFile();
+        doneeHeap = new Heap<>(); // Ensure this is the correct type
     }
 
     // <editor-fold defaultstate="collapsed" desc="Driver">
     public void doneeMaintenanceDriver() {
         int choice = 0;
+        
         do {
             choice = doneeUI.getMenuChoice();
             switch (choice) {
@@ -36,31 +33,31 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
                     break;
                 case 2:
                     Donee donee = new Donee();
-                    if (search(donee)) {
+                    if (search(doneeHeap, donee)) {
                         doneeUI.printDoneeHeader();
-                        doneeUI.printDoneeDetails(donee);
+                        System.out.println(donee);
                     }
                     break;
                 case 3:
-                    if (create()) {
+                    if (create(doneeHeap)) {
                         doneeUI.printDoneeHeader();
                         display(doneeHeap);
                     }
                     break;
                 case 4:
-                    if (remove()) {
+                    if (remove(doneeHeap)) {
                         doneeUI.printDoneeHeader();
                         display(doneeHeap);
                     }
                     break;
                 case 5:
-                    if (update()) {
+                    if (update(doneeHeap)) {
                         doneeUI.printDoneeHeader();
                         display(doneeHeap);
                     }
                     break;
                 case 6:
-                    // Implement any additional functionality here
+                    // Add functionality if needed
                     break;
                 default:
                     MessageUI.displayInvalidChoiceMessage();
@@ -70,18 +67,12 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="CRUD">
-    // Add a new donee
-    public boolean create() {
+    public boolean create(ListHeap<Donee> newEntry) {
         Donee newDonee = new Donee();
         if (super.create(newDonee)) {
             doneeUI.inputDoneeDetails(newDonee);
-            doneeHeap.add(newDonee);
-            saveDoneeHeap();
-
-            // Debugging output
-            System.out.println("Added Donee: " + newDonee);
-            System.out.println("Donee Heap Size after addition: " + doneeHeap.size());
-
+            newEntry.add(newDonee);
+            saveDoneeList();
             return true;
         } else {
             MessageUI.displayUnableCreateObjectMessage();
@@ -89,29 +80,31 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
         return false;
     }
 
-    // Remove a donee
-    public boolean remove() {
-        Donee doneeToRemove = doneeHeap.peekMaxValue();  // Assuming you want to remove the root of the heap
-        if (doneeToRemove != null) {
-            doneeToRemove.setIsDeleted(true);
-            doneeHeap.remove();  // Remove the root from the heap
+public boolean remove(ListHeap<Donee> doneeHeap) {
+    if (!doneeHeap.isEmpty()) {
+        Donee highestPriorityDonee = doneeHeap.peekMaxValue(); // Check the root element without removing it
 
-            // Debugging output
-            System.out.println("Removed Donee: " + doneeToRemove);
-            return true;
-        } else {
-            MessageUI.displayObjectNotFoundMessage();
+        if (!highestPriorityDonee.isIsActive()) {
+            System.out.println("Donee is deactivated and cannot be removed!");
             return false;
         }
-    }
 
-    // Update donee details
-    public boolean update() {
-        Donee doneeToUpdate = doneeHeap.peekMaxValue();  // Assuming you update the root of the heap
-        if (doneeToUpdate != null) {
+        highestPriorityDonee = doneeHeap.remove(); // Removes the root element
+        highestPriorityDonee.setIsDeleted(true);
+        saveDoneeList(); // Save the updated list
+        return true;
+    }
+    System.out.println("Heap is empty, no donee to remove!");
+    return false;
+}
+
+    public boolean update(ListHeap<Donee> newEntry) {
+        int[] position = {-1};
+        if (search(newEntry, position)) {
+            Donee updateDonee = newEntry.getAnyValue(position[0]);
             boolean confirm = false;
             do {
-                if (super.update(doneeToUpdate)) {
+                if (super.update(updateDonee)) {
                     int choice;
                     do {
                         choice = doneeUI.getUpdateMenuChoice();
@@ -120,7 +113,7 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
                                 MessageUI.displayExitMessage();
                                 break;
                             case 1:
-                                doneeToUpdate.setCategory((Donee.Categories) doneeUI.inputDoneeCategory());
+                                updateDonee.setType(doneeUI.inputDoneeType());
                                 break;
                             case 99:
                                 confirm = true;
@@ -134,58 +127,63 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
                     confirm = true;
                 }
             } while (!confirm);
-            saveDoneeHeap();
+            saveDoneeList();
             return true;
         } else {
             MessageUI.displayObjectNotFoundMessage();
             return false;
         }
     }
-
-    // Search for a donee
-    public boolean search(Donee donee) {
+    
+    public boolean search(ListHeap<Donee> newEntry, Object newObject) {
+        boolean found = false;
         String inputDoneeId = doneeUI.inputDoneeId();
-        for (int i = 0; i < doneeHeap.size(); i++) {
-            Donee currentDonee = doneeHeap.peekMaxValue();  // This should be replaced with a proper search in the heap
-            if (currentDonee != null && inputDoneeId.equals(currentDonee.getId())) {
-                donee.updateFrom(currentDonee);
-                return true;
+        for (int i = 0; !found && i < newEntry.size(); i++) {
+            Donee donee = newEntry.getAnyValue(i);
+            if (inputDoneeId.equals(donee.getId())) {
+                found = true;
+                if (newObject instanceof int[]) {
+                    int[] foundPosition = (int[]) newObject;
+                    foundPosition[0] = i;
+                } else if (newObject instanceof Donee) {
+                    Donee foundDonee = (Donee) newObject;
+                    // Ensure the Donee class has a proper method to update from another Donee
+                    foundDonee.updateFrom(donee);
+                } else {
+                    return false;
+                }
             }
         }
-        MessageUI.displayObjectNotFoundMessage();
-        return false;
-    }
-
-    // Display donees
-    public void display(Heap<Donee> doneeHeap) {
-        // Debugging output
-        System.out.println("Displaying Donees:");
-        for (int i = 0; i < doneeHeap.size(); i++) {
-            Donee donee = doneeHeap.peekMaxValue();  // This should iterate over all elements in the heap
-            if (donee != null && !donee.isIsDeleted()) {
-                System.out.println("Donee " + i + ": " + donee);
-            }
+        if (!found) {
+            MessageUI.displayObjectNotFoundMessage();
         }
-
-        doneeUI.listAllDonees(getAllDonees());
+        return found;
     }
 
+    public void display(ListHeap<Donee> newEntry) {
+        doneeUI.listAllDonee(getAllDonee());
+    }
+
+    public boolean report(ListHeap<Donee> newEntry) {
+        // Add report logic if needed
+        return true;
+    }
     // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="other support function">
-    public String getAllDonees() {
+    // <editor-fold defaultstate="collapsed" desc="other support functions">
+    public String getAllDonee() {
         StringBuilder outputStr = new StringBuilder();
         for (int i = 0; i < doneeHeap.size(); i++) {
-            Donee donee = doneeHeap.peekMaxValue();  // This should iterate over all elements in the heap
-            if (donee != null && !donee.isIsDeleted()) {
+            Donee donee = doneeHeap.getAnyValue(i);
+            if (!donee.isIsDeleted()) {
                 outputStr.append(donee).append("\n");
             }
         }
         return outputStr.toString();
     }
 
-    public void saveDoneeHeap() {
-        super.saveListToFile((ListInterface<Donee>) doneeHeap, FILENAME);
+    public void saveDoneeList() {
+       super.saveHeapToFile(doneeHeap, FILENAME);
     }
     // </editor-fold>
 
