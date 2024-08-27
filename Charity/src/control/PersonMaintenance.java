@@ -20,7 +20,6 @@ import utility.MessageUI;
 public class PersonMaintenance<T extends Person & Comparable<T>> implements ControlInterface<T> {
 
     protected final PersonMaintenanceUI personUI = new PersonMaintenanceUI();
-    ListInterface<T> personList;
     ListHeap<T> personHeap;
     private final DAO dao = new DAO();
     private final DAO_Heap daoHeap = new DAO_Heap();
@@ -29,12 +28,7 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
     }
 
     public PersonMaintenance(String filename) {
-        personList = (ListInterface<T>) dao.retrieveFromFile(filename);
         personHeap = (ListHeap<T>)daoHeap.retrieveFromHeapFile(filename);
-    }
-
-    protected ListInterface<T> getPersonList() {
-        return personList;
     }
 
     // <editor-fold defaultstate="collapsed" desc="CURD">
@@ -132,11 +126,6 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
         return true;
     }
     // </editor-fold>
-
-    public void saveListToFile(ListInterface<T> list, String fileName) {
-        dao.saveToFile(list, fileName);
-    }
-
     public void saveHeapToFile(ListHeap<T> heap, String fileName) {
         daoHeap.saveHeapToFile(heap, fileName);
     }
