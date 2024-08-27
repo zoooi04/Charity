@@ -1,14 +1,18 @@
 package entity;
 
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 
 /**
  *
  * @author huaiern
  */
-public class Donation {
+public class Donation implements Serializable{
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     private String id;
     private int quantity;
     private String message;
@@ -25,11 +29,16 @@ public class Donation {
     }
     
     public Donation(){
-        
+        this("",0,"",null,null,null);
     }
     
-    public Donation(String id, int quantity, String message, Donor donor,String type, LocalDate date){
-        
+    public Donation(String id, int quantity, String message, Donor donor,DonationType type, LocalDate date){
+        this.id = id;
+        this.quantity = quantity;
+        this.message = message;
+        this.donor = donor;
+        this.type = type;
+        this.date = date;
     }
     
     public String getId(){
@@ -56,6 +65,10 @@ public class Donation {
         return donor;
     }
     
+    public void setId(String id){
+        this.id = id;
+    }
+    
     public void setQuantity(int quantity){
         this.quantity = quantity;
     }
@@ -78,11 +91,17 @@ public class Donation {
     
     @Override
     public String toString(){
+        return id;
+    }
+    
+    public String getDetails(){
         return String.format("""
                              Donation ID: %s
                              Quantity: %d
                              Type: %s
                              Message: %s
-                             Date: %s""", id, quantity, type,message,date);
+                             Date: %s
+                             Donor: 
+                             Event: """, id, quantity, type, message, date.format(formatter));
     }
 }

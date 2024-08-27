@@ -1,10 +1,12 @@
 package adt;
 
+import java.io.Serializable;
+
 /**
  *
  * @author huaiern & Ooi Choon Chong
  */
-public class HashMap<K, V> implements MapInterface<K, V> {
+public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
     private final int SIZE = 101;  // HashMap array size to reduce collision possibility
     private Node<K, V>[] table;  // HashMap array
     private int size;  // To keep track of the number of key-value pairs
@@ -187,7 +189,7 @@ public class HashMap<K, V> implements MapInterface<K, V> {
     }
 
     // Node as an inner class for encapsulation purpose
-    private class Node<K, V> implements NodeInterface<K, V> {
+        private class Node<K, V> implements NodeInterface<K, V>, Serializable{
         private K key;
         private V value;
         private Node<K, V> next;
