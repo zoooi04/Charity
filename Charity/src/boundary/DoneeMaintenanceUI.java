@@ -3,123 +3,132 @@ package boundary;
 import entity.Donee;
 import java.util.Scanner;
 
-/**
- * User Interface for Donee Maintenance.
- */
 public class DoneeMaintenanceUI {
-
-    Scanner scanner = new Scanner(System.in);
-
-    // <editor-fold defaultstate="collapsed" desc="menu">
-    // Display the main menu and get the user's choice
+    
+    private PersonMaintenanceUI personUI = new PersonMaintenanceUI();
+    private final Scanner scanner = new Scanner(System.in);
+    private static int idCounter = 2400001;  // Starting point for ID generation
+    private static final String ID_PREFIX = "DN";
+    
+    // Display main menu and get user's choice
     public int getMenuChoice() {
-        System.out.println("\nMAIN MENU");
-        System.out.println("1. List all Donees");
-        System.out.println("2. Search Donee");
-        System.out.println("3. Add new Donee");
-        System.out.println("4. Remove Donee");
-        System.out.println("5. Update Donee");
+        System.out.println("Donee Maintenance Menu:");
+        System.out.println("1. List all donees");
+        System.out.println("2. Search donee");
+        System.out.println("3. Add new donee");
+        System.out.println("4. Remove donee");
+        System.out.println("5. Update donee");
         System.out.println("0. Exit");
         System.out.print("Enter your choice: ");
-        int choice = scanner.nextInt();
-        scanner.nextLine(); // Clear buffer
-        return choice;
+        return Integer.parseInt(scanner.nextLine());
     }
-
-    // Get the choice for updating donee details
-    public int getUpdateMenuChoice() {
-        System.out.println("\nUPDATE MENU");
-        System.out.println("1. Update Category");
-        System.out.println("99. Confirm Update");
-        System.out.println("0. Exit");
+    
+   // Get search criteria from user
+    public int getSearchMenuChoice() {
+        System.out.println("Select search criteria:");
+        System.out.println("1. Search by ID");
+        System.out.println("2. Search by Name");
+        System.out.println("3. Search by Phone Number");
+        System.out.println("4. Search by Type");
         System.out.print("Enter your choice: ");
-        int choice = scanner.nextInt();
-        scanner.nextLine(); // Clear buffer
-        return choice;
+        return Integer.parseInt(scanner.nextLine());
     }
-    // </editor-fold>
-
-    // <editor-fold defaultstate="collapsed" desc="output">
-    // Print all donees
-    public void listAllDonees(String outputStr) {
-        System.out.println(outputStr);
-    }
-
-    // Print details of a donee
-    public void printDoneeDetails(Donee donee) {
-        System.out.println("Donee Details");
-        System.out.println("ID: " + donee.getId());
-        System.out.println("Type: " + donee.getType());
-        System.out.println("Category: " + donee.getCategory());
-        System.out.println("Received Amount: " + donee.getReceivedAmount());
-    }
-
-    // Print the header for the donee list
+    
     public void printDoneeHeader() {
         String outputStr = "";
-        outputStr += "\nList of Donees:\n";
-        outputStr += "\n" + "=".repeat(150) + "\n";
-        outputStr += String.format("%-10s%-20s%-20s%-20s%-20s%-20s%-20s%-20s",
-                "ID",
-                "Type",
-                "Category",
-                "Received Amount",
+        outputStr += "\n" + "=".repeat(200) + "\n";
+        outputStr += String.format("%-30s%-10s%-20s%-10s%-20s%-30s%-20s%-20s%-20s%-20s",
                 "Name",
                 "Age",
-                "Birthday",
-                "Gender");
-        outputStr += "\n" + "=".repeat(150) + "\n";
+                "BirthDay",
+                "Gender",
+                "Phone Number",
+                "Register Date",
+                "Status",
+                "Id",
+                "Type",
+                "Amount Request");
+        outputStr += "\n" + "=".repeat(200) + "\n";
         System.out.print(outputStr);
     }
-    // </editor-fold>
 
-    // <editor-fold defaultstate="collapsed" desc="input">
-    // Input donee ID
+    // Input donee details from user
+    public void inputDoneeDetails(Donee donee) {
+        
+        String generatedId = ID_PREFIX + idCounter;
+        donee.setId(generatedId);
+        idCounter++;  // Increment the counter for the next ID
+        
+        System.out.println("Donee ID: " + donee.getId());
+
+        donee.setType(inputDoneeType());
+    }
+
+    // Get donee type from user
+    public Donee.Type inputDoneeType() {
+        System.out.println("Select Donee Type:");
+        System.out.println("1. Individual");
+        System.out.println("2. Organisation");
+        System.out.println("3. Family");
+
+        int choice = Integer.parseInt(scanner.nextLine());
+
+        switch (choice) {
+            case 1:
+                return Donee.Type.INDIVIDUAL;
+            case 2:
+                return Donee.Type.ORGANISATION;
+            case 3:
+                return Donee.Type.FAMILY;
+            default:
+                System.out.println("Invalid choice. Please select 1, 2, or 3.");
+                return inputDoneeType(); // Recursively prompt until a valid choice is made
+        }
+    }
+
+    // Get donee ID from user
     public String inputDoneeId() {
-        System.out.print("Enter Donee ID: ");
+        System.out.print("Enter Donee ID to search: ");
         return scanner.nextLine();
     }
-
-    // Input donee type
-    public Donee.DoneeType inputDoneeType() {
-        Donee.DoneeType inputEnum = null;
-
-        do {
-            System.out.print("Enter Donee Type (INDIVIDUAL, ORGANISATION, FAMILIAR): ");
-            String inputValue = scanner.nextLine().toUpperCase();
-            try {
-                inputEnum = Donee.DoneeType.valueOf(inputValue);
-            } catch (IllegalArgumentException e) {
-                System.out.println("Invalid choice. Please try again.");
-            }
-        } while (inputEnum == null);
-        return inputEnum;
+    
+    public String inputDoneeName() {
+        return personUI.inputPersonName();
     }
 
-    // Input donee category
-    public Donee.Categories inputDoneeCategory() {
-        Donee.Categories inputEnum = null;
-
-        do {
-            System.out.print("Enter Donee Category (HEALTH, EDUCATION, WELFARE): ");
-            String inputValue = scanner.nextLine().toUpperCase();
-            try {
-                inputEnum = Donee.Categories.valueOf(inputValue);
-            } catch (IllegalArgumentException e) {
-                System.out.println("Invalid choice. Please try again.");
-            }
-        } while (inputEnum == null);
-        return inputEnum;
+    public String inputDoneePhone() {
+        return personUI.inputPersonPhoneNo();
     }
 
-    // Input all details for a donee
-    public void inputDoneeDetails(Donee donee) {
-        donee.setId(inputDoneeId());
-        donee.setType(inputDoneeType());
-        donee.setCategory(inputDoneeCategory());
-        System.out.print("Enter Received Amount: ");
-        donee.setReceivedAmount(scanner.nextDouble());
-        scanner.nextLine(); // Clear buffer
+    // Get update menu choice from user
+    public int getUpdateMenuChoice() {
+        System.out.println("Update Menu:");
+        System.out.println("1. Update Donee Type");
+        System.out.println("2. Update Received Amount");
+        System.out.println("99. Confirm");
+        System.out.println("0. Exit");
+        System.out.print("Enter your choice: ");
+        return Integer.parseInt(scanner.nextLine());
     }
-    // </editor-fold>
+
+    // List all donees
+    public void listAllDonee(String doneeList) {
+
+        System.out.println(doneeList);
+    }
+
+    // Display an invalid choice message
+    public void displayInvalidChoiceMessage() {
+        System.out.println("Invalid choice. Please try again.");
+    }
+
+    // Display an object not found message
+    public void displayObjectNotFoundMessage() {
+        System.out.println("Donee not found.");
+    }
+
+    // Display exit message
+    public void displayExitMessage() {
+        System.out.println("Exiting Donee Maintenance...");
+    }
 }

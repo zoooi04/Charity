@@ -4,9 +4,11 @@
  */
 package control;
 
+import adt.ListHeap;
 import adt.ListInterface;
 import boundary.PersonMaintenanceUI;
 import dao.DAO;
+import dao.DAO_Heap;
 import entity.Person;
 import utility.MessageUI;
 
@@ -15,17 +17,20 @@ import utility.MessageUI;
  * @author Ooi Choon Chong
  * @param <T>
  */
-public class PersonMaintenance<T extends Person> implements ControlInterface<T> {
+public class PersonMaintenance<T extends Person & Comparable<T>> implements ControlInterface<T> {
 
     protected final PersonMaintenanceUI personUI = new PersonMaintenanceUI();
     ListInterface<T> personList;
+    ListHeap<T> personHeap;
     private final DAO dao = new DAO();
+    private final DAO_Heap daoHeap = new DAO_Heap();
 
     public PersonMaintenance() {
     }
 
     public PersonMaintenance(String filename) {
         personList = (ListInterface<T>) dao.retrieveFromFile(filename);
+        personHeap = (ListHeap<T>)daoHeap.retrieveFromHeapFile(filename);
     }
 
     protected ListInterface<T> getPersonList() {
@@ -132,4 +137,7 @@ public class PersonMaintenance<T extends Person> implements ControlInterface<T> 
         dao.saveToFile(list, fileName);
     }
 
+    public void saveHeapToFile(ListHeap<T> heap, String fileName) {
+        daoHeap.saveHeapToFile(heap, fileName);
+    }
 }
