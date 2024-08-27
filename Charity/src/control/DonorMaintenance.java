@@ -10,7 +10,6 @@ import adt.ListInterface;
 import adt.MapInterface;
 import boundary.DonorMaintenanceUI;
 import entity.Donor;
-import entity.Person;
 import utility.MessageUI;
 
 /**
