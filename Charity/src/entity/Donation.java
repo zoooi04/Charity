@@ -14,8 +14,16 @@ public class Donation {
     private String message;
     private Donor donor;
     //private Event event;
-    private String type;
+    private DonationType type;
     private LocalDate date;
+    
+    // Enums for DonationType
+    public enum DonationType {
+        BLOOD_DONATION,
+        CASH,
+        FOOD,
+        ITEM
+    }
     
     public Donation(){
         
@@ -37,12 +45,16 @@ public class Donation {
         return message;
     }
     
-    public String getType(){
+    public DonationType getType(){
         return type;
     }
     
     public LocalDate getDate(){
         return date;
+    }
+    
+    public Donor getDonor(){
+        return donor;
     }
     
     public void setQuantity(int quantity){
@@ -53,7 +65,7 @@ public class Donation {
         this.message = message;
     }
     
-    public void setType(String type) {
+    public void setType(DonationType type) {
         this.type = type;
     }
     
@@ -61,7 +73,12 @@ public class Donation {
         this.date = date;
     }
     
-    public String getString(){
+    public void setDonor(Donor donor){
+        this.donor = donor;
+    }
+    
+    @Override
+    public String toString(){
         return String.format("""
                              Donation ID: %s
                              Quantity: %d
