@@ -12,7 +12,7 @@ public class Donation {
     private String id;
     private int quantity;
     private String message;
-    //private Donor donor;
+    private Donor donor;
     //private Event event;
     private String type;
     private LocalDate date;
@@ -21,7 +21,7 @@ public class Donation {
         
     }
     
-    public Donation(String id, int quantity, String message, String type, LocalDate date){
+    public Donation(String id, int quantity, String message, Donor donor,String type, LocalDate date){
         
     }
     
