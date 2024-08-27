@@ -5,7 +5,9 @@
 package control;
 
 import adt.ArrayList;
+import adt.HashMap;
 import adt.ListInterface;
+import adt.MapInterface;
 import boundary.DonorMaintenanceUI;
 import entity.Donor;
 import entity.Person;
@@ -161,8 +163,24 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     // Search donor details
     public boolean search(ListInterface<Donor> newEntry, Object newObject) {
         boolean found = false;
-        if (newEntry instanceof ArrayList<?>) {
-            String inputDonorId = donorUI.inputDonorId();
+        MapInterface<String, Donor> donorHMap = toHashMap(newEntry);
+        System.out.println("donorHMap :" + donorHMap);
+
+        String inputDonorId = donorUI.inputDonorId().trim();
+        Donor foundDonorInMap = donorHMap.get(inputDonorId);
+
+        System.out.println("donorHMap :" + donorHMap);
+        
+        if (!donorHMap.containsKey(inputDonorId)) {
+            return false;
+        }
+
+        if (newObject instanceof Donor) {
+            Donor foundDonor = (Donor) newObject;
+            foundDonor.updateFrom(foundDonorInMap);
+            found = true;
+        } else if (newObject instanceof int[]) {
+
             for (int i = 1; !found && i <= newEntry.getNumberOfEntries(); i++) {
                 Object entry = newEntry.getEntry(i);
 
@@ -173,21 +191,14 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                         if (newObject instanceof int[]) {
                             int[] foundPosition = (int[]) newObject;
                             foundPosition[0] = i;
-                        } else if (newObject instanceof Donor) {
-                            Donor foundDonor = (Donor) newObject;
-                            foundDonor.updateFrom(donor);
                         } else {
                             return false;
                         }
                     }
-                } else {
-                    // Nothing happen, continue loop
                 }
-
             }
-        } else {
-            return false;
         }
+
         if (!found) {
             MessageUI.displayObjectNotFoundMessage();
         }
@@ -206,8 +217,6 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     //       event
     // donor event
     //       event
-    
-    
     // Generate summary reports / Filter donor based on criteria
     public boolean report(ListInterface<Donor> newEntry) {
 
@@ -232,6 +241,31 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
 
     public void saveDonorList() {
         super.saveListToFile(donorList, FILENAME);
+    }
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="adt convertor">
+    /**
+     * Converts the ArrayList to a Map using a key extractor function.
+     *
+     * @param keyExtractor A function that extracts the key from an element of
+     * type T.
+     * @return A Map where the keys are strings and the values are the elements
+     * of the ArrayList.
+     */
+    private MapInterface<String, Donor> toHashMap(ListInterface<Donor> donorArrList) {
+        MapInterface<String, Donor> donorMap = new HashMap<>();
+
+        for (int i = 1; i <= donorArrList.getNumberOfEntries(); i++) {
+
+            Donor donor = donorArrList.getEntry(i);
+            if (donor == null) {
+                continue;  // Skip this entry
+            }
+            donorMap.put(donor.getId(), donor);
+        }
+
+        return donorMap;
     }
     // </editor-fold>
 
