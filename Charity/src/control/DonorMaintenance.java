@@ -9,6 +9,7 @@ import adt.HashMap;
 import adt.ListInterface;
 import adt.MapInterface;
 import boundary.DonorMaintenanceUI;
+import dao.DAO;
 import entity.Donor;
 import utility.MessageUI;
 
@@ -20,11 +21,11 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
 
     private final DonorMaintenanceUI donorUI = new DonorMaintenanceUI();
     private ListInterface<Donor> donorList = new ArrayList<>();
+    private final DAO<ListInterface<Donor>> dao = new DAO<>();
     private static final String FILENAME = "donor.dat";
 
     public DonorMaintenance() {
-        super(FILENAME);
-        donorList = (ListInterface<Donor>) getPersonList();
+        donorList = dao.retrieveFromFile(FILENAME);
     }
 
     // <editor-fold defaultstate="collapsed" desc="Driver">
@@ -166,7 +167,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
 
         String inputDonorId = donorUI.inputDonorId().trim();
         Donor foundDonorInMap = donorHMap.get(inputDonorId);
-        
+
         if (!donorHMap.containsKey(inputDonorId)) {
             return false;
         }
@@ -236,7 +237,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
 //    }
 
     public void saveDonorList() {
-        super.saveListToFile(donorList, FILENAME);
+        dao.saveToFile(donorList, FILENAME);
     }
     // </editor-fold>
 

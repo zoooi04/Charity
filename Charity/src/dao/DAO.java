@@ -1,7 +1,5 @@
 package dao;
 
-import adt.*;
-import entity.Donor;
 import java.io.*;
 
 /**
@@ -11,7 +9,7 @@ import java.io.*;
  */
 public class DAO<T> {
 
-    public void saveToFile(ListInterface<T> entityList, String fileName) {
+    public void saveToFile(T entityList, String fileName) {
         File file = new File(fileName);
         try {
             ObjectOutputStream ooStream = new ObjectOutputStream(new FileOutputStream(file));
@@ -26,12 +24,12 @@ public class DAO<T> {
         }
     }
 
-    public ListInterface<T> retrieveFromFile(String fileName) {
+    public T retrieveFromFile(String fileName) {
         File file = new File(fileName);
-        ListInterface<T> entityList = new ArrayList<>();
+        T entityList = null;
         try {
             ObjectInputStream oiStream = new ObjectInputStream(new FileInputStream(file));
-            entityList = (ArrayList<T>) (oiStream.readObject());
+            entityList = (T) (oiStream.readObject());
             oiStream.close();
         } catch (FileNotFoundException ex) {
             System.out.println("\nNo such file.");
