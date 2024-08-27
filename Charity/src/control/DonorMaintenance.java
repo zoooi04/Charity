@@ -164,12 +164,9 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     public boolean search(ListInterface<Donor> newEntry, Object newObject) {
         boolean found = false;
         MapInterface<String, Donor> donorHMap = toHashMap(newEntry);
-        System.out.println("donorHMap :" + donorHMap);
 
         String inputDonorId = donorUI.inputDonorId().trim();
         Donor foundDonorInMap = donorHMap.get(inputDonorId);
-
-        System.out.println("donorHMap :" + donorHMap);
         
         if (!donorHMap.containsKey(inputDonorId)) {
             return false;
