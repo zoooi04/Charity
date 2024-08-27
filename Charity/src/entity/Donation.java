@@ -19,7 +19,6 @@ public class Donation {
     
     // Enums for DonationType
     public enum DonationType {
-        BLOOD_DONATION,
         CASH,
         FOOD,
         ITEM
