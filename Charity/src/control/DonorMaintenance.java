@@ -14,6 +14,8 @@ import boundary.DonorMaintenanceUI;
 import dao.DAO;
 import dao.DonorInitializer;
 import entity.Donor;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.Iterator;
 import utility.MessageUI;
@@ -88,6 +90,10 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
             Donor newDonor = new Donor();
             if (super.create(newDonor)) {
                 donorUI.inputDonorDetails(newDonor);
+                DateTimeFormatter yearFormatter = DateTimeFormatter.ofPattern("yy");
+                String year = LocalDate.now().format(yearFormatter);
+                String newId = "AA" + year + String.format("%05d", newEntry.getNumberOfEntries()+1);
+                newDonor.setId(newId);
                 arrListDonor.add(newDonor);
                 saveDonorList();
                 return true;
