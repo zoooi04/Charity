@@ -168,7 +168,6 @@ public class DonorMaintenanceUI {
     // </editor-fold>
 
     public void inputDonorDetails(Donor donor) {
-        donor.setId(inputDonorId());
         donor.setType(inputDonorType());
         donor.setCategory(inputDonorCategory());
     }
