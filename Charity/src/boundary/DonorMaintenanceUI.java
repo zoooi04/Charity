@@ -20,7 +20,7 @@ public class DonorMaintenanceUI {
     // <editor-fold defaultstate="collapsed" desc="menu">
     public int getMenuChoice() {
         System.out.println("\nMAIN MENU");
-        System.out.println("1. List all Donor");
+        System.out.println("1. List Donor");
         System.out.println("2. Search Donor");
         System.out.println("3. Add new Donor");
         System.out.println("4. Delete Donor");
@@ -40,6 +40,50 @@ public class DonorMaintenanceUI {
         System.out.println("99. Confirm");
         System.out.println("0. Back");
         System.out.print("Enter choice: ");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+        return choice;
+    }
+    
+    public int getDisplayMenuChoice(){
+        System.out.println("\nDISPLAY MENU");
+        System.out.println("1. Type");
+        System.out.println("2. Category");
+        System.out.println("3. Sort");
+        System.out.println("0. Back");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+        return choice;
+    }
+    
+    public int getDisplayTypeMenuChoice(){
+        System.out.println("\nDISPLAY MENU");
+        System.out.println("1. Organisation");
+        System.out.println("2. Individual");
+        System.out.println("0. Back");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+        return choice;
+    }
+    
+    public int getDisplayCategoryMenuChoice(){
+        System.out.println("\nDISPLAY MENU");
+        System.out.println("1. Government");
+        System.out.println("2. Private");
+        System.out.println("3. Public");
+        System.out.println("0. Back");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+        return choice;
+    }
+    
+    public int getDisplaySortMenuChoice(){
+        System.out.println("\nDISPLAY MENU");
+        System.out.println("1. ID");
+        System.out.println("2. Name");
+        System.out.println("3. Phone Number");
+        System.out.println("4. Registered Date");
+        System.out.println("0. Back");
         int choice = scanner.nextInt();
         scanner.nextLine();
         return choice;
