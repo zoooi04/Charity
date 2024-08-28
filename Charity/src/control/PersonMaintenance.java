@@ -6,7 +6,6 @@ package control;
 
 import boundary.PersonMaintenanceUI;
 import entity.Person;
-import java.time.LocalDate;
 import utility.MessageUI;
 
 /**
@@ -29,7 +28,7 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
             if (createdPerson != null) {
                 newEntry.setName(createdPerson.getName());
                 newEntry.setBirthday(createdPerson.getBirthday());
-                newEntry.setAge(LocalDate.now().getYear() - createdPerson.getBirthday().getYear());
+                newEntry.setAge(createdPerson.getAge());
                 newEntry.setGender(createdPerson.getGender());
                 newEntry.setPhoneNo(createdPerson.getPhoneNo());
                 newEntry.setRegisterDate(createdPerson.getRegisterDate());

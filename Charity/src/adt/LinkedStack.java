@@ -16,31 +16,36 @@ public class LinkedStack<T> implements StackInterface<T> {
         topNode = null;
     }
 
+    @Override
     public void push(T newEntry) {
         Node<T> newNode = new Node<>(newEntry, topNode);
         topNode = newNode;
     }
 
+    @Override
     public T pop() {
         T top = peek();
         if (topNode != null) {
-            topNode = topNode.getNextNode();
+            topNode = topNode.next;
         }
         return top;
     }
 
+    @Override
     public T peek() {
         if (isEmpty()) {
             return null;
         } else {
-            return topNode.getData();
+            return topNode.data;
         }
     }
 
+    @Override
     public boolean isEmpty() {
         return topNode == null;
     }
 
+    @Override
     public void clear() {
         topNode = null;
     }
@@ -50,21 +55,13 @@ public class LinkedStack<T> implements StackInterface<T> {
         private T data; // Entry in stack
         private Node<T> next; // Link to next node
 
-        private Node(T dataPortion) {
-            this(dataPortion, null);
+        private Node(T data) {
+            this(data, null);
         }
 
-        private Node(T dataPortion, Node<T> nextNode) {
-            data = dataPortion;
-            next = nextNode;
-        }
-
-        private T getData() {
-            return data;
-        }
-
-        private Node<T> getNextNode() {
-            return next;
+        private Node(T data, Node<T> nextNode) {
+            this.data = data;
+            this.next = nextNode;
         }
     }
 }
