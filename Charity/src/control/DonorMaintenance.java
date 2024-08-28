@@ -5,12 +5,17 @@
 package control;
 
 import adt.ArrayList;
+import adt.BinarySearchTree;
+import adt.BinarySearchTreeInterface;
 import adt.HashMap;
 import adt.ListInterface;
 import adt.MapInterface;
 import boundary.DonorMaintenanceUI;
 import dao.DAO;
+import dao.DonorInitializer;
 import entity.Donor;
+import java.util.Comparator;
+import java.util.Iterator;
 import utility.MessageUI;
 
 /**
@@ -26,6 +31,9 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
 
     public DonorMaintenance() {
         donorList = dao.retrieveFromFile(FILENAME);
+        if (donorList == null) {
+            donorList = DonorInitializer.initializeDonor();
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="Driver">
@@ -38,7 +46,6 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                     MessageUI.displayExitMessage();
                     break;
                 case 1:
-                    donorUI.printDonorHeader();
                     display(donorList);
                     break;
                 case 2:
@@ -50,20 +57,17 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                     break;
                 case 3:
                     if (create(donorList)) {
-                        donorUI.printDonorHeader();
-                        display(donorList);
+                        // display(donorList);
                     }
                     break;
                 case 4:
                     if (remove(donorList)) {
-                        donorUI.printDonorHeader();
-                        display(donorList);
+                        // display(donorList);
                     }
                     break;
                 case 5:
                     if (update(donorList)) {
-                        donorUI.printDonorHeader();
-                        display(donorList);
+                        // display(donorList);
                     }
                     break;
                 case 6:
@@ -204,7 +208,77 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
 
     // Display (general)
     public void display(ListInterface<Donor> newEntry) {
-        donorUI.listAllDonor(getAllDonor());
+        int choice = 0;
+        int choiceDetail = 0;
+        do {
+            choice = donorUI.getDisplayMenuChoice();
+            switch (choice) {
+                case 0:
+                    break;
+                case 1:
+                    do {
+                        choiceDetail = donorUI.getDisplayTypeMenuChoice();
+                        switch (choiceDetail) {
+                            case 0:
+                                break;
+                            default:
+                                break;
+                        }
+                    } while (choiceDetail != 0);
+                    break;
+                case 2:
+                    do {
+                        choiceDetail = donorUI.getDisplayCategoryMenuChoice();
+                        switch (choiceDetail) {
+                            case 0:
+                                break;
+                            default:
+                                break;
+                        }
+                    } while (choiceDetail != 0);
+                    break;
+                case 3:
+                    do {
+                        choiceDetail = donorUI.getDisplaySortMenuChoice();
+                        Comparator<Donor> compareBy = null;
+                        switch (choiceDetail) {
+                            case 0:
+                                break;
+                            case 1:
+                                compareBy = Comparator.comparing(Donor::getId);
+                                break;
+                            case 2:
+                                compareBy = Comparator.comparing(Donor::getName);
+                                break;
+                            case 3:
+                                compareBy = Comparator.comparing(Donor::getPhoneNo);
+                                break;
+                            case 4:
+                                compareBy = Comparator.comparing(Donor::getRegisterDate);
+                                break;
+                            default:
+                                break;
+                        }
+                        if (choiceDetail > 0 && choiceDetail < 5) {
+                            BinarySearchTreeInterface<Donor> bstBy = new BinarySearchTree<>(compareBy);
+                            for (int i = 1; i <= newEntry.getNumberOfEntries(); ++i) {
+                                bstBy.insert(newEntry.getEntry(i));
+                            }
+                            donorUI.printDonorHeader();
+                            Iterator it = bstBy.iterator();
+                            while (it.hasNext()) {
+                                System.out.print(it.next() + "\n");
+                            }
+                            System.out.println("\n");
+                        }
+                    } while (choiceDetail != 0);
+                    break;
+
+                default:
+                    break;
+            }
+
+        } while (choice != 0);
     }
 
     // List donors with all the donations made
