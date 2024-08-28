@@ -206,7 +206,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
         return found;
     }
 
-    // Display (general)
+    // Display (general / filter)
     public void display(ListInterface<Donor> newEntry) {
         int choice = 0;
         int choiceDetail = 0;
@@ -312,7 +312,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     //       event
     // donor event
     //       event
-    // Generate summary reports / Filter donor based on criteria
+    // Generate summary reports
     public boolean report(ListInterface<Donor> newEntry) {
 
         return true;

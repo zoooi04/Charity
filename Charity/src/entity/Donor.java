@@ -98,7 +98,7 @@ public class Donor extends Person implements Serializable, Comparable<Donor> {
 
     @Override
     public String toString() {
-        return super.toString() + String.format("%-20s%-20s%-20s", this.id, this.type, this.category);
+        return super.toString() + String.format("%-12s%-15s%-13s", this.id, this.type, this.category);
     }
 
     @Override

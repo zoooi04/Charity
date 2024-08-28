@@ -7,6 +7,7 @@ package entity;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
@@ -113,7 +114,11 @@ public class Person implements Serializable { // Serialization is the process of
         }else{
             activeStatus += "De-activate";
         }
-        return String.format("%-30s%-10s%-20s%-10s%-20s%-30s%-20s", this.name, this.age, this.birthday, this.gender, this.phoneNo, this.registerDate, activeStatus);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        String regDate = this.registerDate.format(dateTimeFormatter);
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        String birthDate = this.birthday.format(dateFormatter);
+        return String.format("%-30s%-5s%-13s%-10s%-15s%-22s%-15s", this.name, this.age, birthDate, this.gender, this.phoneNo, regDate, activeStatus);
     }
 
     @Override

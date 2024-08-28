@@ -23,7 +23,7 @@ public class DoneeMaintenanceUI {
         return Integer.parseInt(scanner.nextLine());
     }
     
-   // Get search criteria from user
+    // Get search criteria from user
     public int getSearchMenuChoice() {
         System.out.println("Select search criteria:");
         System.out.println("1. Search by ID");
@@ -36,8 +36,8 @@ public class DoneeMaintenanceUI {
     
     public void printDoneeHeader() {
         String outputStr = "";
-        outputStr += "\n" + "=".repeat(200) + "\n";
-        outputStr += String.format("%-30s%-10s%-20s%-10s%-20s%-30s%-20s%-20s%-20s%-20s",
+        outputStr += "\n" + "=".repeat(150) + "\n";
+        outputStr += String.format("%-30s%-5s%-13s%-10s%-15s%-22s%-15s%-12s%-15s%-13s",
                 "Name",
                 "Age",
                 "BirthDay",
@@ -48,7 +48,7 @@ public class DoneeMaintenanceUI {
                 "Id",
                 "Type",
                 "Amount Request");
-        outputStr += "\n" + "=".repeat(200) + "\n";
+        outputStr += "\n" + "=".repeat(150) + "\n";
         System.out.print(outputStr);
     }
 

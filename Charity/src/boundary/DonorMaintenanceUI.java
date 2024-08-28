@@ -5,7 +5,6 @@
 package boundary;
 
 import entity.Donor;
-import entity.Person;
 import java.util.Scanner;
 import utility.MessageUI;
 
@@ -105,8 +104,8 @@ public class DonorMaintenanceUI {
     public void printDonorHeader() {
         String outputStr = "";
         outputStr += "\nList of Donor:\n";
-        outputStr += "\n" + "=".repeat(200) + "\n";
-        outputStr += String.format("%-30s%-10s%-20s%-10s%-20s%-30s%-20s%-20s%-20s%-20s",
+        outputStr += "\n" + "=".repeat(150) + "\n";
+        outputStr += String.format("%-30s%-5s%-13s%-10s%-15s%-22s%-15s%-12s%-15s%-13s",
                 "Name",
                 "Age",
                 "BirthDay",
@@ -117,7 +116,7 @@ public class DonorMaintenanceUI {
                 "id",
                 "type",
                 "category");
-        outputStr += "\n" + "=".repeat(200) + "\n";
+        outputStr += "\n" + "=".repeat(150) + "\n";
         System.out.print(outputStr);
     }
     // </editor-fold>
