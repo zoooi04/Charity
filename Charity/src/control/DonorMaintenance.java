@@ -210,6 +210,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     public void display(ListInterface<Donor> newEntry) {
         int choice = 0;
         int choiceDetail = 0;
+        String donorFilterResultStr = "";
         do {
             choice = donorUI.getDisplayMenuChoice();
             switch (choice) {
@@ -221,8 +222,18 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                         switch (choiceDetail) {
                             case 0:
                                 break;
+                            case 1:
+                                donorFilterResultStr = getAllDonor(Donor.Type.INDIVIDUAL);
+                                break;
+                            case 2:
+                                donorFilterResultStr = getAllDonor(Donor.Type.ORGANISATION);
+                                break;
                             default:
                                 break;
+                        }
+                        if (choiceDetail > 0 && choiceDetail < 3) {
+                            donorUI.printDonorHeader();
+                            donorUI.listAllDonor(donorFilterResultStr);
                         }
                     } while (choiceDetail != 0);
                     break;
@@ -232,8 +243,21 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                         switch (choiceDetail) {
                             case 0:
                                 break;
+                            case 1:
+                                donorFilterResultStr = getAllDonor(Donor.Category.GOVERNMENT);
+                                break;
+                            case 2:
+                                donorFilterResultStr = getAllDonor(Donor.Category.PRIVATE);
+                                break;
+                            case 3:
+                                donorFilterResultStr = getAllDonor(Donor.Category.PUBLIC);
+                                break;
                             default:
                                 break;
+                        }
+                        if (choiceDetail > 0 && choiceDetail < 4) {
+                            donorUI.printDonorHeader();
+                            donorUI.listAllDonor(donorFilterResultStr);
                         }
                     } while (choiceDetail != 0);
                     break;
@@ -296,19 +320,29 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="other support function">
-    public String getAllDonor() {
-        String outputStr = "";
-        for (int i = 1; i <= donorList.getNumberOfEntries(); i++) {
-            if (!donorList.getEntry(i).isIsDeleted()) {
-                outputStr += donorList.getEntry(i) + "\n";
+    public String getAllDonor(Enum<?> filter) {
+        StringBuilder outputStr = new StringBuilder();
+        if (filter instanceof Donor.Type) {
+            Donor.Type typeFilter = (Donor.Type) filter;
+            for (int i = 1; i <= donorList.getNumberOfEntries(); i++) {
+                Donor donor = donorList.getEntry(i);
+                if (!donor.isIsDeleted() && donor.getType() == typeFilter) {
+                    outputStr.append(donor).append("\n");
+                }
             }
+        } else if (filter instanceof Donor.Category) {
+            Donor.Category categoryFilter = (Donor.Category) filter;
+            for (int i = 1; i <= donorList.getNumberOfEntries(); i++) {
+                Donor donor = donorList.getEntry(i);
+                if (!donor.isIsDeleted() && donor.getCategory() == categoryFilter) {
+                    outputStr.append(donor).append("\n");
+                }
+            }
+        } else {
+            // Handle cases where filter is not of Type or Category (optional)
         }
-        return outputStr;
+        return outputStr.toString();
     }
-//    private void refreshDisplay() {
-//        donorUI.printDonorHeader();
-//        display(donorList);
-//    }
 
     public void saveDonorList() {
         dao.saveToFile(donorList, FILENAME);
