@@ -2,6 +2,10 @@ package adt;
 
 import java.util.Iterator;
 
+/**
+ *
+ * @author Ooi Choon Chong
+ */
 public interface BinarySearchTreeInterface<T> extends Iterable<T> {
 
     boolean insert(T element); // Inserts an element into the tree
