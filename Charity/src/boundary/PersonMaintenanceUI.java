@@ -2,6 +2,7 @@ package boundary;
 
 import entity.Person;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.Scanner;
 import utility.MessageUI;
 
@@ -47,14 +48,22 @@ public class PersonMaintenanceUI {
     }
 
     public void printPersonActivate(Person person) {
-        if(person.isIsActive()){
+        if (person.isIsActive()) {
             System.out.println("This person is now Activated");
-        }else{
+        } else {
             System.out.println("This person is now De-activated");
         }
     }
-    // </editor-fold> 
 
+    public void personGenderMenu() {
+        System.out.println("\nSelection of Gender");
+        System.out.println("1. Male");
+        System.out.println("2. Female");
+        System.out.println("3. Other");
+        System.out.print("Enter Selection: ");
+    }
+
+    // </editor-fold> 
     // <editor-fold defaultstate="collapsed" desc="input">
     public String inputPersonName() {
         System.out.print("Enter person name: ");
@@ -65,58 +74,149 @@ public class PersonMaintenanceUI {
     // can be automated, not really needed
     public int inputPersonAge() {
         System.out.print("Enter person Age: ");
-        int inputValue = scanner.nextInt();
-        scanner.nextLine();
-        return inputValue;
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+            System.out.print("Enter person Age: ");
+        }
+        return scanner.nextInt();
     }
 
     public LocalDate inputPersonBirthday() {
-        System.out.print("Enter person birthday: \n");
-        System.out.print("Enter person birthday (Day): ");
-        int inputValueDay = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter person birthday (Month): ");
-        int inputValueMonth = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter person birthday (Year): ");
-        int inputValueYear = Integer.parseInt(scanner.nextLine());
+        System.out.println("Enter person birthday:");
+
+        int inputValueYear = inputYear();
+        int inputValueMonth = inputMonth(inputValueYear);
+        int inputValueDay = inputDay(inputValueYear, inputValueMonth);
+
         LocalDate birthday = LocalDate.of(inputValueYear, inputValueMonth, inputValueDay);
+
+        // Check if the entered date is in the future
+        while (birthday.isAfter(LocalDate.now())) {
+            System.out.println("The entered date is in the future. Please enter a valid birthday.");
+            inputValueYear = inputYear();
+            inputValueMonth = inputMonth(inputValueYear);
+            inputValueDay = inputDay(inputValueYear, inputValueMonth);
+            birthday = LocalDate.of(inputValueYear, inputValueMonth, inputValueDay);
+        }
         return birthday;
     }
 
-    public Person.Gender inputPersonGender() {
-        Person.Gender inputGender = null;
+    private int inputYear() {
+        int minYear = LocalDate.now().getYear() - 120;
+        int maxYear = LocalDate.now().getYear();
+        int year;
 
+        System.out.print("Enter person birthday (Year): ");
         do {
-            System.out.print("Enter person gender: ");
-            String inputValue = scanner.nextLine();
-            switch (inputValue) {
-                case "m", "M" ->
-                    inputGender = Person.Gender.MALE;
-                case "f", "F" ->
-                    inputGender = Person.Gender.FEMALE;
-                case "o", "O" ->
-                    inputGender = Person.Gender.OTHER;
-                default ->
-                    MessageUI.displayInvalidChoiceMessage();
+            while (!scanner.hasNextInt()) {
+                scanner.next(); // Clear the invalid input
+                System.out.print("Please enter a valid year (oldest: " + minYear + ", latest: " + maxYear + "): ");
+
             }
-        } while (inputGender == null);
-        return inputGender;
+            year = scanner.nextInt();
+            if (year < minYear || year > maxYear) {
+                System.out.print("Please enter a valid year (oldest: " + minYear + ", latest: " + maxYear + "): ");
+            }
+        } while (year < minYear || year > maxYear);
+        return year;
+    }
+
+    private int inputMonth(int year) {
+        int month = 0;
+        int maxMonth = 12;
+        if (year == LocalDate.now().getYear()) {
+            maxMonth = LocalDate.now().getMonthValue();
+        }
+        System.out.print("Enter person birthday (Month): ");
+        do {
+            while (!scanner.hasNextInt()) {
+                scanner.next(); // Clear the invalid input
+                System.out.print("Please enter a valid month (1-" + maxMonth + "): ");
+            }
+            month = scanner.nextInt();
+            if (month >= 1 && month <= maxMonth) {
+                if (year != LocalDate.now().getYear()) {
+                    return month;
+                } else {
+                    if (month <= maxMonth) {
+                        return month;
+                    } else {
+                        System.out.print("Please enter a valid month (1-" + maxMonth + "): ");
+                    }
+                }
+            } else {
+                System.out.print("Please enter a valid month (1-" + maxMonth + "): ");
+            }
+        } while (month < 1 || month > maxMonth);
+        return month;
+    }
+
+    private int inputDay(int year, int month) {
+        int day = 1;
+        YearMonth yearMonth = YearMonth.of(year, month);
+        int maxDays = yearMonth.lengthOfMonth();
+        System.out.print("Enter person birthday (Day): ");
+        do {
+            while (!scanner.hasNextInt()) {
+                scanner.next(); // Clear the invalid input
+                System.out.print("Please enter a valid day (1-" + maxDays + "): ");
+            }
+            day = scanner.nextInt();
+            if (day >= 1 && day <= maxDays) {
+                if (year != LocalDate.now().getYear()) {
+                    return day;
+                } else {
+                    if (month != LocalDate.now().getMonthValue()) {
+                        return day;
+                    } else {
+                        if (day < LocalDate.now().getDayOfMonth()) {
+                            return day;
+                        }
+                    }
+                }
+            } else {
+                System.out.print("Please enter a valid day (1-" + maxDays + "): ");
+            }
+        } while (day < 1 || day > maxDays);
+        return day;
+    }
+
+    public Person.Gender inputPersonGender() {
+        personGenderMenu();
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+            personGenderMenu();
+        }
+        switch (scanner.nextInt()) {
+            case 1:
+                return Person.Gender.MALE;
+            case 2:
+                return Person.Gender.FEMALE;
+            case 3:
+                return Person.Gender.OTHER;
+            default:
+                MessageUI.displayInvalidChoiceMessage();
+        }
+        return null;
     }
 
     public String inputPersonPhoneNo() {
         System.out.print("Enter person phoneNo: ");
-        String inputValue = scanner.nextLine();
-        return inputValue;
+        return scanner.nextLine();
     }
     // </editor-fold >
 
     public Person inputPersonDetails() {
         String personName = inputPersonName();
-        int personAge = inputPersonAge();
-        LocalDate personBirthday = inputPersonBirthday();
-        Person.Gender personGender = inputPersonGender();
         String personPhoneNo = inputPersonPhoneNo();
+        LocalDate personBirthday = inputPersonBirthday();
+        int personAge = LocalDate.now().getYear() - personBirthday.getYear();
+        Person.Gender personGender = inputPersonGender();
         System.out.println();
         return new Person(personName, personAge, personBirthday, personGender, personPhoneNo);
+        
+//        System.out.println(personPhoneNo);
+//        return new Person();
     }
 
 }

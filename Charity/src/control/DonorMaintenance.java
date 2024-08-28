@@ -81,6 +81,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     }
     // </editor-fold>
 
+    
     // <editor-fold defaultstate="collapsed" desc="CRUD">
     // Add a new donor
     public boolean create(ListInterface<Donor> newEntry) {
