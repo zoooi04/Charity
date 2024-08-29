@@ -3,6 +3,7 @@ package boundary;
 import entity.Person;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 import utility.MessageUI;
@@ -38,13 +39,18 @@ public class PersonMaintenanceUI {
     }
 
     public void printPersonDetails(Person person) {
-        System.out.println("Person Details");
-        System.out.println("Person name: " + person.getName());
-        System.out.println("Person Age: " + person.getAge());
-        System.out.println("Person birthday:" + person.getBirthday());
-        System.out.println("Person gender:" + person.getGender());
-        System.out.println("Person phoneNo:" + person.getPhoneNo());
-        System.out.println("Person egistration date:" + person.getRegisterDate());
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        
+        System.out.print("\n" + "=".repeat(48) + "\n");
+        System.out.print("\tPerson Details");
+        System.out.print("\n" + "=".repeat(48) + "\n");
+        System.out.println("Person name              : " + person.getName());
+        System.out.println("Person Age               : " + person.getAge());
+        System.out.println("Person birthday          : " + person.getBirthday().format(dateFormatter));
+        System.out.println("Person gender            : " + person.getGender());
+        System.out.println("Person phoneNo           : " + person.getPhoneNo());
+        System.out.println("Person registration date : " + person.getRegisterDate().format(dateTimeFormatter));
     }
 
     public void printPersonActivate(Person person) {

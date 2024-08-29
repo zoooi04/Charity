@@ -32,7 +32,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     private ListInterface<Donor> donorList = new ArrayList<>();
     private final DAO<ListInterface<Donor>> dao = new DAO<>();
     private static final String FILENAME = "donor.dat";
-    private static String selectedDonorId = "";
+    private static Donor lastSearchDonor = null;
 
     public DonorMaintenance() {
         donorList = dao.retrieveFromFile(FILENAME);
@@ -54,26 +54,26 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                     display(donorList);
                     break;
                 case 2:
-                    Donor donor = new Donor();
-                    if (search(donorList, donor)) {
-                        donorUI.printDonorHeader();
-                        System.out.println(donor);
+//                    Donor donor = new Donor();
+//                    if (search(donorList, donor)) {
+//                        donorUI.printDonorHeader();
+//                        System.out.println(donor);
+//                    }
+
+                    int[] position = {-1};
+                    if (search(donorList, position)) {
+                        donorUI.printDonorDetails(lastSearchDonor);
+//                        System.out.println(lastSearchDonor);
                     }
                     break;
                 case 3:
-                    if (create(donorList)) {
-                        // display(donorList);
-                    }
+                    create(donorList);
                     break;
                 case 4:
-                    if (remove(donorList)) {
-                        // display(donorList);
-                    }
+                    remove(donorList);
                     break;
                 case 5:
-                    if (update(donorList)) {
-                        // display(donorList);
-                    }
+                    update(donorList);
                     break;
                 case 6:
                     break;
@@ -130,19 +130,44 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
 
     // Update donors details
     public boolean update(ListInterface<Donor> newEntry) {
+        boolean searchNewDonor = true, updateSelectedDonor = false;
         if (newEntry instanceof ArrayList<?>) {
             int[] position = {-1};
-            if (search(newEntry, position)) {
+            if (lastSearchDonor != null) {
+                int choice = donorUI.getUpdateDonorConfirmation(lastSearchDonor.getId());
+                do {
+                    switch (choice) {
+                        case 0:
+                            return false;
+                        case 1:
+                            searchNewDonor = false;
+                            updateSelectedDonor = true;
+                            break;
+                        case 2:
+                            break;
+                        default:
+                            break;
+                    }
+                } while (choice < 0 || choice > 2);
+            }
+
+            if (searchNewDonor) {
+                if (search(newEntry, position)) {
+                    updateSelectedDonor = true;
+                }
+            }
+
+            if (updateSelectedDonor) {
+
                 boolean confirm = false;
                 do {
-                    Donor updateDonor = (Donor) newEntry.getEntry(position[0]);
+                    Donor updateDonor = lastSearchDonor;
                     if (super.update(updateDonor)) {
                         int choice;
                         do {
                             choice = donorUI.getUpdateMenuChoice();
                             switch (choice) {
                                 case 0:
-                                    MessageUI.displayExitMessage();
                                     break;
                                 case 1:
                                     updateDonor.setType(donorUI.inputDonorType());
@@ -163,10 +188,8 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                     }
                 } while (!confirm);
                 saveDonorList();
-            } else {
-                MessageUI.displayObjectNotFoundMessage();
-                return false;
             }
+
         } else {
             return false;
         }
@@ -177,10 +200,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     public boolean search(ListInterface<Donor> newEntry, Object newObject) {
         boolean found = false;
         MapInterface<String, QueueInterface<Donor>> donorHMap;
-        // menu
-        // 1. name
-        // 2. id
-        // search through name;
+        String selectedDonorId = "";
         int choice = 0;
         while (choice == 0) {
             switch (donorUI.getSearchMenuChoice()) {
@@ -230,26 +250,27 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
         if (choice == 0) {
             return false;
         }
-        
-        donorHMap = toHashMap(newEntry);
-        if (selectedDonorId == null) {
-            return false;
-        }
-        if (donorHMap.get(selectedDonorId) == null) {
-            return false;
-        }
-        if (donorHMap.get(selectedDonorId).getFront() == null) {
-            return false;
-        }
-        Donor foundDonorInMap = (Donor) donorHMap.get(selectedDonorId).getFront();
 
-        if (!donorHMap.containsKey(selectedDonorId)) {
+        if (selectedDonorId == null) {
             return false;
         }
 
         if (newObject instanceof Donor) {
+            donorHMap = toHashMap(newEntry);
+            if (!donorHMap.containsKey(selectedDonorId)) {
+                return false;
+            }
+            if (donorHMap.get(selectedDonorId) == null) {
+                return false;
+            }
+            if (donorHMap.get(selectedDonorId).getFront() == null) {
+                return false;
+            }
+            Donor donorInMap = (Donor) donorHMap.get(selectedDonorId).getFront();
+
             Donor foundDonor = (Donor) newObject;
-            foundDonor.updateFrom(foundDonorInMap);
+            foundDonor.updateFrom(donorInMap);
+            lastSearchDonor = foundDonor;
             found = true;
         } else if (newObject instanceof int[]) {
 
@@ -259,6 +280,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                 if (entry instanceof Donor) {
                     Donor donor = (Donor) entry;
                     if (selectedDonorId.equals(donor.getId())) {
+                        lastSearchDonor = (Donor) entry;
                         found = true;
                         if (newObject instanceof int[]) {
                             int[] foundPosition = (int[]) newObject;
