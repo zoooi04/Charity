@@ -6,6 +6,7 @@ package boundary;
 
 import entity.Donor;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 import utility.MessageUI;
 
 /**
@@ -17,7 +18,7 @@ public class DonorMaintenanceUI {
     Scanner scanner = new Scanner(System.in);
 
     // <editor-fold defaultstate="collapsed" desc="menu">
-    public void getMenu() {
+    private void getMenu() {
         System.out.println("\nMAIN MENU");
         System.out.println("1. List Donor");
         System.out.println("2. Search Donor");
@@ -38,7 +39,7 @@ public class DonorMaintenanceUI {
         return scanner.nextInt();
     }
 
-    public void getUpdateMenu() {
+    private void getUpdateMenu() {
         System.out.println("\nUPDATE MENU");
         System.out.println("1. Type");
         System.out.println("2. Category");
@@ -56,7 +57,7 @@ public class DonorMaintenanceUI {
         return scanner.nextInt();
     }
 
-    public void getDisplayMenu() {
+    private void getDisplayMenu() {
         System.out.println("\nDISPLAY MENU");
         System.out.println("1. Type");
         System.out.println("2. Category");
@@ -74,7 +75,7 @@ public class DonorMaintenanceUI {
         return scanner.nextInt();
     }
 
-    public void getDisplayTypeMenu() {
+    private void getDisplayTypeMenu() {
         System.out.println("\nSelection of Type: ");
         System.out.println("1. Organisation");
         System.out.println("2. Individual");
@@ -91,7 +92,7 @@ public class DonorMaintenanceUI {
         return scanner.nextInt();
     }
 
-    public void getDisplayCategoryMenu() {
+    private void getDisplayCategoryMenu() {
         System.out.println("\nSelection of Category: ");
         System.out.println("1. Government");
         System.out.println("2. Private");
@@ -109,7 +110,7 @@ public class DonorMaintenanceUI {
         return scanner.nextInt();
     }
 
-    public void getDisplaySortMenu() {
+    private void getDisplaySortMenu() {
         System.out.println("\nSort by Details: ");
         System.out.println("1. ID");
         System.out.println("2. Name");
@@ -126,8 +127,24 @@ public class DonorMaintenanceUI {
         }
         return scanner.nextInt();
     }
-    // </editor-fold>
 
+    public void getSearchMenu() {
+        System.out.println("\nSelection of Search: ");
+        System.out.println("1. ID");
+        System.out.println("2. Name");
+        System.out.println("0. Back");
+    }
+
+    public int getSearchMenuChoice() {
+        getSearchMenu();
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+            getSearchMenu();
+        }
+        return scanner.nextInt();
+    }
+
+    // </editor-fold>
     // <editor-fold defaultstate="collapsed" desc="output">
     public void listAllDonor(String outputStr) {
         System.out.println(outputStr);
@@ -162,9 +179,14 @@ public class DonorMaintenanceUI {
 
     // <editor-fold defaultstate="collapsed" desc="input">
     public String inputDonorId() {
+        Pattern pattern = Pattern.compile("AA24[0-9]*");
         System.out.print("Enter donor Id: ");
-        String inputValue = scanner.nextLine();
-        return inputValue;
+        while (!scanner.hasNext(pattern)) {
+            scanner.next();
+            System.out.print("Enter donor Id: ");
+        }
+        return scanner.next();
+
     }
 
     public Donor.Type inputDonorType() {

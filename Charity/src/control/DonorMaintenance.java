@@ -371,8 +371,8 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     public void saveDonorList() {
         dao.saveToFile(donorList, FILENAME);
     }
-
-    public ListInterface<Donor> getDonorList() {
+    
+    public ListInterface<Donor> getDonorList(){
         return donorList;
     }
     // </editor-fold>
