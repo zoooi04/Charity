@@ -61,6 +61,25 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
         return choice;
     }
 
+    public void getUpdateDonor(String id) {
+        System.out.println("\nDo you want to update " + id + " ?");
+        System.out.println("1. Yes");
+        System.out.println("2. No");
+        System.out.println("0. Back");
+        System.out.print("Enter choice: ");
+    }
+
+    public int getUpdateDonorConfirmation(String id) {
+        getUpdateDonor(id);
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+            getUpdateDonor(id);
+        }
+        int choice = scanner.nextInt();
+        scanner.nextLine();  // consume the leftover newline character
+        return choice;
+    }
+
     private void getDisplayMenu() {
         System.out.println("\nDISPLAY MENU");
         System.out.println("1. Type");
@@ -166,10 +185,13 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
     }
 
     public void printDonorDetails(Donor donor) {
-        System.out.println("Donor Details");
-        System.out.println("Donor id: " + donor.getId());
-        System.out.println("Donor type:" + donor.getType());
-        System.out.println("Donor category: " + donor.getCategory());
+        super.printPersonDetails(donor);
+        System.out.print("\n" + "=".repeat(48) + "\n");
+        System.out.print("\tDonor Details");
+        System.out.print("\n" + "=".repeat(48) + "\n");
+        System.out.println("Donor id                 : " + donor.getId());
+        System.out.println("Donor type               : " + donor.getType());
+        System.out.println("Donor category           : " + donor.getCategory());
     }
 
     public void printDonorHeader() {
@@ -218,7 +240,7 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
         String inputStr;
 
         while (true) {
-            System.out.print("Enter donor ID (format: AA24XXXX): ");
+            System.out.print("Enter donor ID (format: AA24XXXXX): ");
             inputStr = scanner.nextLine();
 
             // Check if input is not empty and matches the pattern
