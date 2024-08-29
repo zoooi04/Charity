@@ -546,6 +546,10 @@ public class EventMaintenance {
 
         return sortedEvents;
     }
+    
+    public MapInterface<String, Event> getEventMap(){
+        return eventsMap;
+    }
 
     public static void main(String[] args) {
         EventMaintenance em = new EventMaintenance();

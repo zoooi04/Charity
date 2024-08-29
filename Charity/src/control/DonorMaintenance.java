@@ -354,6 +354,10 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     public void saveDonorList() {
         dao.saveToFile(donorList, FILENAME);
     }
+    
+    public ListInterface<Donor> getDonorList(){
+        return donorList;
+    }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="adt convertor">
@@ -365,7 +369,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
      * @return A Map where the keys are strings and the values are the elements
      * of the ArrayList.
      */
-    private MapInterface<String, Donor> toHashMap(ListInterface<Donor> donorArrList) {
+    public MapInterface<String, Donor> toHashMap(ListInterface<Donor> donorArrList) {
         MapInterface<String, Donor> donorMap = new HashMap<>();
 
         for (int i = 1; i <= donorArrList.getNumberOfEntries(); i++) {

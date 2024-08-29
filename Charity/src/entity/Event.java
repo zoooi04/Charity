@@ -161,8 +161,14 @@ public class Event implements Serializable, Comparable {
 
     @Override
     public boolean equals(Object o) {
-        String other = (String) o;
-        return this.name.equalsIgnoreCase(other);
+        if (o instanceof Event) {
+            Event e = (Event) o;
+            if (name.equals(e.getName())) {
+                return true;
+            }
+        }
+        return false;
+
     }
 
     @Override

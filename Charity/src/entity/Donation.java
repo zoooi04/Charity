@@ -17,7 +17,7 @@ public class Donation implements Serializable{
     private int quantity;
     private String message;
     private Donor donor;
-    //private Event event;
+    private Event event;
     private DonationType type;
     private LocalDate date;
     
@@ -65,6 +65,10 @@ public class Donation implements Serializable{
         return donor;
     }
     
+    public Event getEvent(){
+        return event;
+    }
+    
     public void setId(String id){
         this.id = id;
     }
@@ -89,19 +93,38 @@ public class Donation implements Serializable{
         this.donor = donor;
     }
     
+    public void setEvent(Event event){
+        this.event = event;
+    }
+    
     @Override
     public String toString(){
         return id;
     }
     
+    @Override
+    public boolean equals(Object obj){
+        if(obj instanceof Donation){
+            Donation donation = (Donation) obj;
+            if(id.equals(donation.getId())){
+                return true;
+            }
+        }
+        return false;
+        
+    }
+    
     public String getDetails(){
         return String.format("""
+                             ================
+                             Donation Details
+                             =================
                              Donation ID: %s
                              Quantity: %d
                              Type: %s
                              Message: %s
                              Date: %s
-                             Donor: 
-                             Event: """, id, quantity, type, message, date.format(formatter));
+                             Donor: %s
+                             Event: %s""", id, quantity, type, message, date.format(formatter),donor.getId(),event.getId());
     }
 }
