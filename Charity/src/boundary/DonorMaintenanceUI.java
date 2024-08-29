@@ -5,7 +5,6 @@
 package boundary;
 
 import entity.Donor;
-import entity.Person;
 import java.util.Scanner;
 import utility.MessageUI;
 
@@ -18,9 +17,9 @@ public class DonorMaintenanceUI {
     Scanner scanner = new Scanner(System.in);
 
     // <editor-fold defaultstate="collapsed" desc="menu">
-    public int getMenuChoice() {
+    public void getMenu() {
         System.out.println("\nMAIN MENU");
-        System.out.println("1. List all Donor");
+        System.out.println("1. List Donor");
         System.out.println("2. Search Donor");
         System.out.println("3. Add new Donor");
         System.out.println("4. Delete Donor");
@@ -28,21 +27,104 @@ public class DonorMaintenanceUI {
         System.out.println("6. Donor Report");
         System.out.println("0. Quit");
         System.out.print("Enter choice: ");
-        int choice = scanner.nextInt();
-        scanner.nextLine();
-        return choice;
     }
 
-    public int getUpdateMenuChoice() {
+    public int getMenuChoice() {
+        getMenu();
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+            getMenu();
+        }
+        return scanner.nextInt();
+    }
+
+    public void getUpdateMenu() {
         System.out.println("\nUPDATE MENU");
         System.out.println("1. Type");
         System.out.println("2. Category");
         System.out.println("99. Confirm");
         System.out.println("0. Back");
         System.out.print("Enter choice: ");
-        int choice = scanner.nextInt();
-        scanner.nextLine();
-        return choice;
+    }
+
+    public int getUpdateMenuChoice() {
+        getUpdateMenu();
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+            getUpdateMenu();
+        }
+        return scanner.nextInt();
+    }
+
+    public void getDisplayMenu() {
+        System.out.println("\nDISPLAY MENU");
+        System.out.println("1. Type");
+        System.out.println("2. Category");
+        System.out.println("3. Sort");
+        System.out.println("0. Back");
+        System.out.print("Enter Choice: ");
+    }
+
+    public int getDisplayMenuChoice() {
+        getDisplayMenu();
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+            getDisplayMenu();
+        }
+        return scanner.nextInt();
+    }
+
+    public void getDisplayTypeMenu() {
+        System.out.println("\nSelection of Type: ");
+        System.out.println("1. Organisation");
+        System.out.println("2. Individual");
+        System.out.println("0. Back");
+        System.out.print("Enter Selection: ");
+    }
+
+    public int getDisplayTypeMenuChoice() {
+        getDisplayTypeMenu();
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+            getDisplayTypeMenu();
+        }
+        return scanner.nextInt();
+    }
+
+    public void getDisplayCategoryMenu() {
+        System.out.println("\nSelection of Category: ");
+        System.out.println("1. Government");
+        System.out.println("2. Private");
+        System.out.println("3. Public");
+        System.out.println("0. Back");
+        System.out.print("Enter Selection: ");
+    }
+
+    public int getDisplayCategoryMenuChoice() {
+        getDisplayCategoryMenu();
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+            getDisplayCategoryMenu();
+        }
+        return scanner.nextInt();
+    }
+
+    public void getDisplaySortMenu() {
+        System.out.println("\nSort by Details: ");
+        System.out.println("1. ID");
+        System.out.println("2. Name");
+        System.out.println("3. Phone Number");
+        System.out.println("4. Registered Date");
+        System.out.println("0. Back");
+    }
+
+    public int getDisplaySortMenuChoice() {
+        getDisplaySortMenu();
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+            getDisplaySortMenu();
+        }
+        return scanner.nextInt();
     }
     // </editor-fold>
 
@@ -61,8 +143,8 @@ public class DonorMaintenanceUI {
     public void printDonorHeader() {
         String outputStr = "";
         outputStr += "\nList of Donor:\n";
-        outputStr += "\n" + "=".repeat(200) + "\n";
-        outputStr += String.format("%-30s%-10s%-20s%-10s%-20s%-30s%-20s%-20s%-20s%-20s",
+        outputStr += "\n" + "=".repeat(150) + "\n";
+        outputStr += String.format("%-30s%-5s%-13s%-10s%-15s%-22s%-15s%-12s%-15s%-13s",
                 "Name",
                 "Age",
                 "BirthDay",
@@ -73,7 +155,7 @@ public class DonorMaintenanceUI {
                 "id",
                 "type",
                 "category");
-        outputStr += "\n" + "=".repeat(200) + "\n";
+        outputStr += "\n" + "=".repeat(150) + "\n";
         System.out.print(outputStr);
     }
     // </editor-fold>
@@ -86,46 +168,33 @@ public class DonorMaintenanceUI {
     }
 
     public Donor.Type inputDonorType() {
-        Donor.Type inputEnum = null;
-
-        do {
-            System.out.print("Enter donor Type(I/O): ");
-            String inputValue = scanner.nextLine();
-            switch (inputValue) {
-                case "i", "I" ->
-                    inputEnum = Donor.Type.INDIVIDUAL;
-                case "o", "O" ->
-                    inputEnum = Donor.Type.ORGANISATION;
-                default ->
-                    MessageUI.displayInvalidChoiceMessage();
-            }
-        } while (inputEnum == null);
-        return inputEnum;
+        switch (getDisplayTypeMenuChoice()) {
+            case 1:
+                return Donor.Type.ORGANISATION;
+            case 2:
+                return Donor.Type.INDIVIDUAL;
+            default:
+                MessageUI.displayInvalidChoiceMessage();
+        }
+        return null;
     }
 
     public Donor.Category inputDonorCategory() {
-        Donor.Category inputEnum = null;
-
-        do {
-            System.out.print("Enter donor category(G/V/U): ");
-            String inputValue = scanner.nextLine();
-            switch (inputValue) {
-                case "g", "G" ->
-                    inputEnum = Donor.Category.GOVERNMENT;
-                case "v", "V" ->
-                    inputEnum = Donor.Category.PRIVATE;
-                case "u", "U" ->
-                    inputEnum = Donor.Category.PUBLIC;
-                default ->
-                    MessageUI.displayInvalidChoiceMessage();
-            }
-        } while (inputEnum == null);
-        return inputEnum;
+        switch (getDisplayCategoryMenuChoice()) {
+            case 1:
+                return Donor.Category.GOVERNMENT;
+            case 2:
+                return Donor.Category.PRIVATE;
+            case 3:
+                return Donor.Category.PUBLIC;
+            default:
+                MessageUI.displayInvalidChoiceMessage();
+        }
+        return null;
     }
     // </editor-fold>
 
     public void inputDonorDetails(Donor donor) {
-        donor.setId(inputDonorId());
         donor.setType(inputDonorType());
         donor.setCategory(inputDonorCategory());
     }

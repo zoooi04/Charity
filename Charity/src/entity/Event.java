@@ -158,11 +158,6 @@ public class Event implements Serializable, Comparable {
 
         return String.format("%-10s%-30s%-12s%-12s%-12s%-55s%-15d%-15d%-15d%3s%9.2f%15s%9.2f", id, name, type, startDateStr, endDateStr, location, minVolunteer, maxVolunteer, currentVolunteer, "", currentAmount, "", goalAmount);
     }
-    
-//    @Override
-//    public String toString(){
-//        return name;
-//    }
 
     @Override
     public boolean equals(Object o) {
@@ -174,7 +169,6 @@ public class Event implements Serializable, Comparable {
         }
         return false;
 
-        
     }
 
     @Override
@@ -182,6 +176,12 @@ public class Event implements Serializable, Comparable {
         Event otherEvent = (Event) o;
 
         return this.startDate.compareTo(otherEvent.startDate);
+    }
+
+    public Event deepCopy() {
+        return new Event(this.id, this.name, this.type, this.startDate, this.endDate, this.location,
+                this.minVolunteer, this.maxVolunteer, this.currentVolunteer,
+                this.currentAmount, this.goalAmount, this.isDeleted);
     }
 
 }

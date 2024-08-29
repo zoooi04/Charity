@@ -11,19 +11,12 @@ import java.time.LocalDate;
  *
  * @author Ooi Choon Chong
  */
-public class Donor extends Person implements Serializable ,Comparable<Donor>{ 
-
-    @Override
-    public int compareTo(Donor o) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-    
+public class Donor extends Person implements Serializable, Comparable<Donor> {
 // Serialization is the process of converting an object's state into a byte stream, so it can be easily saved to a file
 
     public enum Type {
         INDIVIDUAL,
-        ORGANISATION,
-        FAMILY
+        ORGANISATION
     }
 
     public enum Category {
@@ -99,14 +92,14 @@ public class Donor extends Person implements Serializable ,Comparable<Donor>{
     }
 
     @Override
-    public String toString() {
-        return super.toString() + String.format("%-20s%-20s%-20s", this.id, this.type, this.category);
+    public int compareTo(Donor otherDonor) {
+        return this.id.compareTo(otherDonor.id);
     }
-    
-//    @Override
-//    public String toString(){
-//        return super.getName();
-//    }
+
+    @Override
+    public String toString() {
+        return super.toString() + String.format("%-12s%-15s%-13s", this.id, this.type, this.category);
+    }
 
     @Override
     public int hashCode() {

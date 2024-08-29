@@ -7,7 +7,7 @@ package utility;
 public class MessageUI {
 
     public static void displayInvalidChoiceMessage() {
-        System.out.println("\nInvalid choice");
+        System.out.println("\nInvalid choice!\n");
     }
 
     public static void displayExitMessage() {
@@ -24,4 +24,16 @@ public class MessageUI {
     }
     // CC END
 
+    public static void displayInvalidAddMessage(String object){
+        System.out.println("\nUnable to add "+ object);
+    }
+    
+    public static void displayExitToMainMenuMessage(){
+        System.out.println("\nExiting to main menu...\n");
+    }
+    
+    public static void displaySearchNotFoundMessage(String object){
+        System.out.println("\n"+ object+" not found...\n");
+    }
+        
 }

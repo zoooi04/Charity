@@ -5,12 +5,19 @@
 package control;
 
 import adt.ArrayList;
+import adt.BinarySearchTree;
+import adt.BinarySearchTreeInterface;
 import adt.HashMap;
 import adt.ListInterface;
 import adt.MapInterface;
 import boundary.DonorMaintenanceUI;
 import dao.DAO;
+import dao.DonorInitializer;
 import entity.Donor;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.Iterator;
 import utility.MessageUI;
 
 /**
@@ -26,6 +33,9 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
 
     public DonorMaintenance() {
         donorList = dao.retrieveFromFile(FILENAME);
+        if (donorList == null) {
+            donorList = DonorInitializer.initializeDonor();
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="Driver">
@@ -38,7 +48,6 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                     MessageUI.displayExitMessage();
                     break;
                 case 1:
-                    donorUI.printDonorHeader();
                     display(donorList);
                     break;
                 case 2:
@@ -50,20 +59,17 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                     break;
                 case 3:
                     if (create(donorList)) {
-                        donorUI.printDonorHeader();
-                        display(donorList);
+                        // display(donorList);
                     }
                     break;
                 case 4:
                     if (remove(donorList)) {
-                        donorUI.printDonorHeader();
-                        display(donorList);
+                        // display(donorList);
                     }
                     break;
                 case 5:
                     if (update(donorList)) {
-                        donorUI.printDonorHeader();
-                        display(donorList);
+                        // display(donorList);
                     }
                     break;
                 case 6:
@@ -75,6 +81,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     }
     // </editor-fold>
 
+    
     // <editor-fold defaultstate="collapsed" desc="CRUD">
     // Add a new donor
     public boolean create(ListInterface<Donor> newEntry) {
@@ -84,6 +91,10 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
             Donor newDonor = new Donor();
             if (super.create(newDonor)) {
                 donorUI.inputDonorDetails(newDonor);
+                DateTimeFormatter yearFormatter = DateTimeFormatter.ofPattern("yy");
+                String year = LocalDate.now().format(yearFormatter);
+                String newId = "AA" + year + String.format("%05d", newEntry.getNumberOfEntries()+1);
+                newDonor.setId(newId);
                 arrListDonor.add(newDonor);
                 saveDonorList();
                 return true;
@@ -202,9 +213,103 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
         return found;
     }
 
-    // Display (general)
+    // Display (general / filter)
     public void display(ListInterface<Donor> newEntry) {
-        donorUI.listAllDonor(getAllDonor());
+        int choice = 0;
+        int choiceDetail = 0;
+        String donorFilterResultStr = "";
+        do {
+            choice = donorUI.getDisplayMenuChoice();
+            switch (choice) {
+                case 0:
+                    break;
+                case 1:
+                    do {
+                        choiceDetail = donorUI.getDisplayTypeMenuChoice();
+                        switch (choiceDetail) {
+                            case 0:
+                                break;
+                            case 1:
+                                donorFilterResultStr = getAllDonor(Donor.Type.INDIVIDUAL);
+                                break;
+                            case 2:
+                                donorFilterResultStr = getAllDonor(Donor.Type.ORGANISATION);
+                                break;
+                            default:
+                                break;
+                        }
+                        if (choiceDetail > 0 && choiceDetail < 3) {
+                            donorUI.printDonorHeader();
+                            donorUI.listAllDonor(donorFilterResultStr);
+                        }
+                    } while (choiceDetail != 0);
+                    break;
+                case 2:
+                    do {
+                        choiceDetail = donorUI.getDisplayCategoryMenuChoice();
+                        switch (choiceDetail) {
+                            case 0:
+                                break;
+                            case 1:
+                                donorFilterResultStr = getAllDonor(Donor.Category.GOVERNMENT);
+                                break;
+                            case 2:
+                                donorFilterResultStr = getAllDonor(Donor.Category.PRIVATE);
+                                break;
+                            case 3:
+                                donorFilterResultStr = getAllDonor(Donor.Category.PUBLIC);
+                                break;
+                            default:
+                                break;
+                        }
+                        if (choiceDetail > 0 && choiceDetail < 4) {
+                            donorUI.printDonorHeader();
+                            donorUI.listAllDonor(donorFilterResultStr);
+                        }
+                    } while (choiceDetail != 0);
+                    break;
+                case 3:
+                    do {
+                        choiceDetail = donorUI.getDisplaySortMenuChoice();
+                        Comparator<Donor> compareBy = null;
+                        switch (choiceDetail) {
+                            case 0:
+                                break;
+                            case 1:
+                                compareBy = Comparator.comparing(Donor::getId);
+                                break;
+                            case 2:
+                                compareBy = Comparator.comparing(Donor::getName);
+                                break;
+                            case 3:
+                                compareBy = Comparator.comparing(Donor::getPhoneNo);
+                                break;
+                            case 4:
+                                compareBy = Comparator.comparing(Donor::getRegisterDate);
+                                break;
+                            default:
+                                break;
+                        }
+                        if (choiceDetail > 0 && choiceDetail < 5) {
+                            BinarySearchTreeInterface<Donor> bstBy = new BinarySearchTree<>(compareBy);
+                            for (int i = 1; i <= newEntry.getNumberOfEntries(); ++i) {
+                                bstBy.insert(newEntry.getEntry(i));
+                            }
+                            donorUI.printDonorHeader();
+                            Iterator it = bstBy.iterator();
+                            while (it.hasNext()) {
+                                System.out.print(it.next() + "\n");
+                            }
+                            System.out.println("\n");
+                        }
+                    } while (choiceDetail != 0);
+                    break;
+
+                default:
+                    break;
+            }
+
+        } while (choice != 0);
     }
 
     // List donors with all the donations made
@@ -214,7 +319,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     //       event
     // donor event
     //       event
-    // Generate summary reports / Filter donor based on criteria
+    // Generate summary reports
     public boolean report(ListInterface<Donor> newEntry) {
 
         return true;
@@ -222,22 +327,36 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="other support function">
-    public String getAllDonor() {
-        String outputStr = "";
-        for (int i = 1; i <= donorList.getNumberOfEntries(); i++) {
-            if (!donorList.getEntry(i).isIsDeleted()) {
-                outputStr += donorList.getEntry(i) + "\n";
+    public String getAllDonor(Enum<?> filter) {
+        StringBuilder outputStr = new StringBuilder();
+        if (filter instanceof Donor.Type) {
+            Donor.Type typeFilter = (Donor.Type) filter;
+            for (int i = 1; i <= donorList.getNumberOfEntries(); i++) {
+                Donor donor = donorList.getEntry(i);
+                if (!donor.isIsDeleted() && donor.getType() == typeFilter) {
+                    outputStr.append(donor).append("\n");
+                }
             }
+        } else if (filter instanceof Donor.Category) {
+            Donor.Category categoryFilter = (Donor.Category) filter;
+            for (int i = 1; i <= donorList.getNumberOfEntries(); i++) {
+                Donor donor = donorList.getEntry(i);
+                if (!donor.isIsDeleted() && donor.getCategory() == categoryFilter) {
+                    outputStr.append(donor).append("\n");
+                }
+            }
+        } else {
+            // Handle cases where filter is not of Type or Category (optional)
         }
-        return outputStr;
+        return outputStr.toString();
     }
-//    private void refreshDisplay() {
-//        donorUI.printDonorHeader();
-//        display(donorList);
-//    }
 
     public void saveDonorList() {
         dao.saveToFile(donorList, FILENAME);
+    }
+    
+    public ListInterface<Donor> getDonorList(){
+        return donorList;
     }
     // </editor-fold>
 
@@ -250,7 +369,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
      * @return A Map where the keys are strings and the values are the elements
      * of the ArrayList.
      */
-    private MapInterface<String, Donor> toHashMap(ListInterface<Donor> donorArrList) {
+    public MapInterface<String, Donor> toHashMap(ListInterface<Donor> donorArrList) {
         MapInterface<String, Donor> donorMap = new HashMap<>();
 
         for (int i = 1; i <= donorArrList.getNumberOfEntries(); i++) {

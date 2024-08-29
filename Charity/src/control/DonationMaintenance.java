@@ -136,17 +136,43 @@ public class DonationMaintenance{
         System.out.print("Enter message: ");
         String message = scanner.nextLine();
         
-        System.out.print("Enter donor ID: ");
-        String donorID = scanner.nextLine();
         
-        System.out.print("Enter event ID:");
-        String eventID = scanner.nextLine();
+        Donor donor = null;
+        while(donor==null){
+            System.out.print("Enter donor ID: ");
+            String donorID = scanner.nextLine();
+            donor = getDonorById(donorID);
+            if(donor == null){
+                System.out.println("Donor does not exist!\nPlease re-enter a valid donor ID.");
+            }
+        }
+  
+        
+        Event event = null;
+        while (event == null) {
+            System.out.print("Enter event ID:");
+            String eventID = scanner.nextLine();
+            event = getEventById(eventID);
+            if (event == null) {
+                System.out.println("Event does not exist!\nPlease re-enter a valid event ID.");
+            }
+        }
+        
         
 
+        
+        
+        
+        LocalDate startDate = event.getStartDate();
+        LocalDate endDate = event.getEndDate();
+        String startDateStr = startDate.format(formatter);
+        String endDateStr = endDate.format(formatter);
+        
         LocalDate date = null;
         boolean isValid = false;
         while (!isValid) {
-            System.out.print("Enter date (dd/MM/yyyy): ");
+            System.out.println("\nEvent period: " + startDateStr + " -- " + endDateStr);
+            System.out.print("Enter date within event period (dd/MM/yyyy): ");
             String inputDate = scanner.nextLine();
 
             try {
@@ -155,6 +181,14 @@ public class DonationMaintenance{
             } catch (DateTimeParseException e) {
                 System.out.println("Invalid date format. Please enter the date in dd/MM/yyyy format.");
             }
+            
+            if(date!=null){
+                if (date.isBefore(startDate) || date.isAfter(endDate)) {
+                    isValid = false;
+                }
+            }
+            
+            
         }
         
         Donation.DonationType inputEnum = null;
@@ -174,16 +208,17 @@ public class DonationMaintenance{
             }
         } while (inputEnum == null);
         
+
         
         //assign properties
         donation.setId(getIdCount());
         donation.setQuantity(quantity);
         donation.setMessage(message);
-//        donation.setDonor(donor.getbyid or whatever);
-        donation.setDonor(new Donor("donorid1", Donor.Type.INDIVIDUAL,Donor.Category.GOVERNMENT,"Tan Yi Ming",27,LocalDate.parse("27/02/2022",formatter),Donor.Gender.FEMALE,"012-1212121"));
-        //donation.setEvent(event.getbyid);
-        donation.setEvent(new Event("EVTA0001", "Money Laundering", "Cash", LocalDate.parse("01/02/2022",formatter), LocalDate.parse("31/02/2022",formatter), "TARUMT", 5, 30, 2, 30000, 35000, false));
+        donation.setDonor(donor);
+        donation.setEvent(event);
         donation.setType(inputEnum);
+        
+        
         donation.setDate(date);
         
         //add in donation donationMap
@@ -610,6 +645,20 @@ int quantity = -1;  // Initialize with an invalid value
         }catch(NumberFormatException ex){
             return false;
         }
+    }
+    
+    public Donor getDonorById(String id){
+        DonorMaintenance donorM = new DonorMaintenance();
+        ListInterface<Donor> list = donorM.getDonorList();
+        MapInterface<String,Donor> donorMap = donorM.toHashMap(list);
+        return donorMap.get(id);
+    }
+    
+    public Event getEventById(String id){
+        EventMaintenance eventM = new EventMaintenance();
+        MapInterface<String,Event> eventMap = eventM.getEventMap();
+        return eventMap.get(id);
+        
     }
     // </editor-fold>
 

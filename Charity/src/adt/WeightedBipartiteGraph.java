@@ -4,6 +4,7 @@
  */
 package adt;
 
+import entity.Donor;
 import entity.Event;
 
 /**
@@ -231,7 +232,13 @@ public class WeightedBipartiteGraph<T, N>{
         
         @Override
         public String toString(){
-            return data.toString();
+            if(data instanceof Event){
+                return ((Event)data).getName();
+            }else if(data instanceof Donor){
+                return ((Donor)data).getName();
+            }
+            
+            return data.getClass().getName();
         }
         
         @Override
