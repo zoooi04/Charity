@@ -18,11 +18,10 @@ public class PersonMaintenanceUI {
     public int getUpdateMenuChoice() {
         System.out.println("\nUPDATE MENU");
         System.out.println("1. Name");
-        System.out.println("2. Age");
+        System.out.println("2. Phone Number");
         System.out.println("3. Birthday");
         System.out.println("4. Gender");
-        System.out.println("5. Phone Number");
-        System.out.println("6. Activate / Deactivate");
+        System.out.println("5. Activate / Deactivate");
         System.out.println("99. Next Page");
         System.out.println("0. Back");
         System.out.print("Enter choice: ");
@@ -214,9 +213,6 @@ public class PersonMaintenanceUI {
         Person.Gender personGender = inputPersonGender();
         System.out.println();
         return new Person(personName, personAge, personBirthday, personGender, personPhoneNo);
-        
-//        System.out.println(personPhoneNo);
-//        return new Person();
     }
 
 }
