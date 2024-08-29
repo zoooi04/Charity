@@ -4,6 +4,7 @@ import entity.Person;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 import utility.MessageUI;
 
 /**
@@ -61,13 +62,17 @@ public class PersonMaintenanceUI {
         System.out.println("3. Other");
         System.out.print("Enter Selection: ");
     }
-
     // </editor-fold> 
+
     // <editor-fold defaultstate="collapsed" desc="input">
     public String inputPersonName() {
+        Pattern pattern = Pattern.compile("[A-Za-z]*");
         System.out.print("Enter person name: ");
-        String inputValue = scanner.nextLine();
-        return inputValue;
+        while (!scanner.hasNext(pattern)) {
+            scanner.next();
+            System.out.print("Enter person name: ");
+        }
+        return scanner.nextLine();
     }
 
     // can be automated, not really needed
@@ -200,7 +205,14 @@ public class PersonMaintenanceUI {
     }
 
     public String inputPersonPhoneNo() {
+        Pattern pattern = Pattern.compile("[0-9]{10,11}");
         System.out.print("Enter person phoneNo: ");
+
+        while (!scanner.hasNext(pattern)) {
+            scanner.next();
+            System.out.print("Enter person phoneNo: ");
+
+        }
         return scanner.nextLine();
     }
     // </editor-fold >
