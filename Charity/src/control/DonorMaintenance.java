@@ -8,8 +8,10 @@ import adt.ArrayList;
 import adt.BinarySearchTree;
 import adt.BinarySearchTreeInterface;
 import adt.HashMap;
+import adt.LinkedQueue;
 import adt.ListInterface;
 import adt.MapInterface;
+import adt.QueueInterface;
 import boundary.DonorMaintenanceUI;
 import dao.DAO;
 import dao.DonorInitializer;
@@ -30,6 +32,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     private ListInterface<Donor> donorList = new ArrayList<>();
     private final DAO<ListInterface<Donor>> dao = new DAO<>();
     private static final String FILENAME = "donor.dat";
+    private static String selectedDonorId = "";
 
     public DonorMaintenance() {
         donorList = dao.retrieveFromFile(FILENAME);
@@ -173,29 +176,72 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     // Search donor details
     public boolean search(ListInterface<Donor> newEntry, Object newObject) {
         boolean found = false;
-        String selectedDonorId = "";
-
+        MapInterface<String, QueueInterface<Donor>> donorHMap;
         // menu
         // 1. name
         // 2. id
         // search through name;
-        switch (donorUI.getSearchMenuChoice()) {
-            case 0:
-                break;
-            case 1:
-
-                // list donor base on name
-                // let user select numbering
-                break;
-            case 2:
-                selectedDonorId = donorUI.inputDonorId().trim();
-                break;
-            default:
-                break;
+        int choice = 0;
+        while (choice == 0) {
+            switch (donorUI.getSearchMenuChoice()) {
+                case 0:
+                    choice = -1;
+                    break;
+                case 1:
+                    selectedDonorId = donorUI.inputDonorId().trim();
+                    choice = -1;
+                    break;
+                case 2:
+                    String selectedDonorName = donorUI.inputPersonName().trim().toLowerCase();
+                    donorHMap = toHashMap(newEntry, false);
+                    if (!donorHMap.containsKey(selectedDonorName)) {
+                        MessageUI.displayObjectNotFoundMessage();
+                    } else {
+                        QueueInterface<Donor> foundDonorInMap = donorHMap.get(selectedDonorName);
+                        Iterator<Donor> itr = foundDonorInMap.getIterator();
+                        int i = 1;
+                        MapInterface<Integer, String> selectedDonorHMap = new HashMap<>();
+                        while (itr.hasNext()) {
+                            selectedDonorHMap.put(i++, itr.next().getId());
+                        }
+                        // list donor base on name
+                        // let user select numbering
+                        donorUI.printDonorSearchHeader();
+                        do {
+                            i = 1;
+                            itr = foundDonorInMap.getIterator();
+                            while (itr.hasNext()) {
+                                System.out.println(" [" + i++ + "] " + itr.next() + "\n");
+                            }
+                            choice = donorUI.inputSelection();
+                            if (choice > 0 && choice < i) {
+                                selectedDonorId = selectedDonorHMap.get(choice);
+                            } else if (choice == 0) {
+                                break;
+                            }
+                        } while (choice <= 0 || choice >= i);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
 
-        MapInterface<String, Donor> donorHMap = toHashMap(newEntry);
-        Donor foundDonorInMap = donorHMap.get(selectedDonorId);
+        if (choice == 0) {
+            return false;
+        }
+        
+        donorHMap = toHashMap(newEntry);
+        if (selectedDonorId == null) {
+            return false;
+        }
+        if (donorHMap.get(selectedDonorId) == null) {
+            return false;
+        }
+        if (donorHMap.get(selectedDonorId).getFront() == null) {
+            return false;
+        }
+        Donor foundDonorInMap = (Donor) donorHMap.get(selectedDonorId).getFront();
 
         if (!donorHMap.containsKey(selectedDonorId)) {
             return false;
@@ -371,23 +417,27 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     public void saveDonorList() {
         dao.saveToFile(donorList, FILENAME);
     }
-    
-    public ListInterface<Donor> getDonorList(){
+
+    public ListInterface<Donor> getDonorList() {
         return donorList;
     }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="adt convertor">
+    public MapInterface<String, QueueInterface<Donor>> toHashMap(ListInterface<Donor> donorArrList) {
+        return toHashMap(donorArrList, true);
+    }
+
     /**
      * Converts the ArrayList to a Map using a key extractor function.
      *
-     * @param keyExtractor A function that extracts the key from an element of
-     * type T.
+     * @param donorArrList
+     * @param useIDAsKey
      * @return A Map where the keys are strings and the values are the elements
      * of the ArrayList.
      */
-    public MapInterface<String, Donor> toHashMap(ListInterface<Donor> donorArrList) {
-        MapInterface<String, Donor> donorMap = new HashMap<>();
+    public MapInterface<String, QueueInterface<Donor>> toHashMap(ListInterface<Donor> donorArrList, boolean useIDAsKey) {
+        MapInterface<String, QueueInterface<Donor>> donorMap = new HashMap<>();
 
         for (int i = 1; i <= donorArrList.getNumberOfEntries(); i++) {
 
@@ -395,7 +445,16 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
             if (donor == null) {
                 continue;  // Skip this entry
             }
-            donorMap.put(donor.getId(), donor);
+            String key = useIDAsKey ? donor.getId() : donor.getName().trim().toLowerCase();
+            QueueInterface<Donor> queue = donorMap.get(key);
+
+            if (queue == null) {
+                // If no queue exists for this key, create a new one
+                queue = new LinkedQueue<>();
+                donorMap.put(key, queue);
+            }
+            // Enqueue the donor into the existing or newly created queue
+            queue.enqueue(donor);
         }
 
         return donorMap;
