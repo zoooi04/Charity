@@ -12,6 +12,7 @@ import utility.MessageUI;
 import adt.MapInterface;
 import adt.HashMap;
 import adt.ListInterface;
+import adt.QueueInterface;
 import dao.DAO;
 import entity.Donor;
 import entity.Event;
@@ -650,8 +651,8 @@ int quantity = -1;  // Initialize with an invalid value
     public Donor getDonorById(String id){
         DonorMaintenance donorM = new DonorMaintenance();
         ListInterface<Donor> list = donorM.getDonorList();
-        MapInterface<String,Donor> donorMap = donorM.toHashMap(list);
-        return donorMap.get(id);
+        MapInterface<String, QueueInterface<Donor>> donorMap = donorM.toHashMap(list);
+        return (Donor)donorMap.get(id);
     }
     
     public Event getEventById(String id){
