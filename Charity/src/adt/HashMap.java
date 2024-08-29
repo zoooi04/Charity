@@ -7,7 +7,7 @@ import java.io.Serializable;
  * @author huaiern & Ooi Choon Chong
  */
 public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
-    private final int SIZE = 101;  // HashMap array size to reduce collision possibility
+    private final int SIZE = 16;  // HashMap array size to reduce collision possibility
     private Node<K, V>[] table;  // HashMap array
     private int size;  // To keep track of the number of key-value pairs
 
@@ -189,7 +189,7 @@ public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
     }
 
     // Node as an inner class for encapsulation purpose
-        private class Node<K, V> implements NodeInterface<K, V>, Serializable{
+    private class Node<K, V> implements NodeInterface<K, V>, Serializable{
         private K key;
         private V value;
         private Node<K, V> next;
@@ -210,7 +210,12 @@ public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
         public void setValue(V value) {
             this.value = value;
         }
-
+        
+        @Override
+        public boolean equals(Object obj){
+            return this == obj;
+        }
+        
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();

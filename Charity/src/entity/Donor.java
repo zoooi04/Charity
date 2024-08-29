@@ -102,6 +102,11 @@ public class Donor extends Person implements Serializable ,Comparable<Donor>{
     public String toString() {
         return super.toString() + String.format("%-20s%-20s%-20s", this.id, this.type, this.category);
     }
+    
+//    @Override
+//    public String toString(){
+//        return super.getName();
+//    }
 
     @Override
     public int hashCode() {

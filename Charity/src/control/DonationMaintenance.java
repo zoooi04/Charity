@@ -14,6 +14,7 @@ import adt.HashMap;
 import adt.ListInterface;
 import dao.DAO;
 import entity.Donor;
+import entity.Event;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,13 +22,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 /**
  *
  * @author huaiern
  */
 public class DonationMaintenance{
     private final DonationMaintenanceUI donationUI = new DonationMaintenanceUI();
-    private MapInterface<String,Donation> map;
+    private MapInterface<String,Donation> donationMap;
     private final DAO<MapInterface<String,Donation>> dao = new DAO<>();
     private static final String FILENAME = "donationHashMap.dat";
     private static final Scanner scanner = new Scanner(System.in);
@@ -39,9 +41,9 @@ public class DonationMaintenance{
     public DonationMaintenance(){
         HashMap fileMap = (HashMap<String,Donation>) dao.retrieveFromFile(FILENAME);
         if(fileMap!=null){
-            map = fileMap;
+            donationMap = fileMap;
         }else{
-            map = new HashMap<>();
+            donationMap = new HashMap<>();
         }
     }
     
@@ -96,7 +98,19 @@ public class DonationMaintenance{
                     }
                     break;
                 case 6:
-                    //report
+                    //track donation by categories
+                    trackByCategories();
+                    break;
+                case 7:
+                    //List donation by donor
+                    listDonationByDonor();
+                    break;
+                case 8:
+                    //filter donation by criteria
+                    filterDonationByCriteria();
+                    break;
+                case 9:
+                    //donation report
                     break;
                 default:
                     MessageUI.displayInvalidChoiceMessage();
@@ -105,13 +119,19 @@ public class DonationMaintenance{
     }
     // </editor-fold>
     
-    // <editor-fold defaultstate="collapsed" desc="CRUD">
+    // <editor-fold defaultstate="collapsed" desc="Main Functions">
     public boolean create() {
         Donation donation = new Donation();
         
+        int quantity = -1;  // Initialize with an invalid value
         System.out.print("Enter quantity: ");
-        int quantity = scanner.nextInt();
-        scanner.nextLine();
+        // Keep looping until a valid, non-negative integer is provided
+        while (!scanner.hasNextInt() || (quantity = scanner.nextInt()) < 0) {
+            System.out.println("Invalid input. Please enter a valid quantity.");
+            scanner.nextLine();  // Consume the invalid input
+            System.out.print("Enter quantity: ");
+        }
+        scanner.nextLine();  // Consume the newline character after the valid integer input
         
         System.out.print("Enter message: ");
         String message = scanner.nextLine();
@@ -122,9 +142,20 @@ public class DonationMaintenance{
         System.out.print("Enter event ID:");
         String eventID = scanner.nextLine();
         
-        System.out.print("Enter date (dd/MM/yyyy): ");
-        String inputDate = scanner.nextLine();
-        LocalDate date = LocalDate.parse(inputDate,formatter);
+
+        LocalDate date = null;
+        boolean isValid = false;
+        while (!isValid) {
+            System.out.print("Enter date (dd/MM/yyyy): ");
+            String inputDate = scanner.nextLine();
+
+            try {
+                date = LocalDate.parse(inputDate, formatter); // Try to parse the date
+                isValid = true; // If parsing is successful, set the flag to true
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please enter the date in dd/MM/yyyy format.");
+            }
+        }
         
         Donation.DonationType inputEnum = null;
 
@@ -148,14 +179,16 @@ public class DonationMaintenance{
         donation.setId(getIdCount());
         donation.setQuantity(quantity);
         donation.setMessage(message);
-        //donation.setDonor(inputDonor());
-        //donation.setEvent(inputEvent());
+//        donation.setDonor(donor.getbyid or whatever);
+        donation.setDonor(new Donor("donorid1", Donor.Type.INDIVIDUAL,Donor.Category.GOVERNMENT,"Tan Yi Ming",27,LocalDate.parse("27/02/2022",formatter),Donor.Gender.FEMALE,"012-1212121"));
+        //donation.setEvent(event.getbyid);
+        donation.setEvent(new Event("EVTA0001", "Money Laundering", "Cash", LocalDate.parse("01/02/2022",formatter), LocalDate.parse("31/02/2022",formatter), "TARUMT", 5, 30, 2, 30000, 35000, false));
         donation.setType(inputEnum);
         donation.setDate(date);
         
-        //add in donation map
-        if(!map.containsKey(donation.getId())){
-            map.put(donation.getId(), donation);
+        //add in donation donationMap
+        if(!donationMap.containsKey(donation.getId())){
+            donationMap.put(donation.getId(), donation);
             saveDonationList();
             incrementIdCount(getIdCount());
             System.out.println("Successfully added");
@@ -170,13 +203,13 @@ public class DonationMaintenance{
     
     public boolean remove() {
         System.out.print("Enter donation ID to remove: ");
-        String id = scanner.nextLine();
+        String id = scanner.nextLine().toUpperCase();
         
         //use id to get the donation object
-        Donation donation = map.get(id);
+        Donation donation = donationMap.get(id);
         
-        if(!map.isEmpty()){
-            if(map.remove(donation.getId())!=null){
+        if(!donationMap.isEmpty()&& donation!=null){
+            if(donationMap.remove(donation.getId())!=null){
                 saveDonationList();
                 System.out.println("Successfully removed");
                 return true;
@@ -186,7 +219,7 @@ public class DonationMaintenance{
             }
             
         }else{
-            System.out.println("Empty donation.");
+            System.out.println("Donation does not exist");
             return false;
         }
         
@@ -195,12 +228,18 @@ public class DonationMaintenance{
     
     public boolean update() {
         System.out.print("Enter donation ID to update: ");
-        String id = scanner.nextLine();
+        String id = scanner.nextLine().toUpperCase();
         
-        if(!map.isEmpty() && map.containsKey(id)){
-            System.out.print("Enter new quantity: ");
-            int quantity = scanner.nextInt();
-            scanner.nextLine();
+        if(!donationMap.isEmpty() && donationMap.containsKey(id)){
+int quantity = -1;  // Initialize with an invalid value
+        System.out.print("Enter quantity: ");
+        // Keep looping until a valid, non-negative integer is provided
+        while (!scanner.hasNextInt() || (quantity = scanner.nextInt()) < 0) {
+            System.out.println("Invalid input. Please enter a valid quantity.");
+            scanner.nextLine();  // Consume the invalid input
+            System.out.print("Enter quantity: ");
+        }
+        scanner.nextLine();  // Consume the newline character after the valid integer input
 
             System.out.print("Enter new message: ");
             String message = scanner.nextLine();
@@ -222,18 +261,28 @@ public class DonationMaintenance{
                 }
             } while (inputEnum == null);
             
-            System.out.print("Enter new date (dd/MM/yyyy): ");
-            String inputDate = scanner.nextLine();
-            LocalDate date = LocalDate.parse(inputDate, formatter);
+            LocalDate date = null;
+            boolean isValid = false;
+            while (!isValid) {
+                System.out.print("Enter date (dd/MM/yyyy): ");
+                String inputDate = scanner.nextLine();
+
+                try {
+                    date = LocalDate.parse(inputDate, formatter); // Try to parse the date
+                    isValid = true; // If parsing is successful, set the flag to true
+                } catch (DateTimeParseException e) {
+                    System.out.println("Invalid date format. Please enter the date in dd/MM/yyyy format.");
+                }
+            }
             
-            Donation donation = map.get(id);
+            Donation donation = donationMap.get(id);
             donation.setQuantity(quantity);
             donation.setMessage(message);
             donation.setType(inputEnum);
             donation.setDate(date);
             
             //put can overwrite existing key value
-            map.put(id,donation);
+            donationMap.put(id,donation);
             System.out.println("Successfully updated");
             return true;
         }else{
@@ -246,29 +295,236 @@ public class DonationMaintenance{
     
     public Donation searchById() {
         System.out.print("Enter donation Id to search: ");
-        String id = scanner.nextLine();
+        String id = scanner.nextLine().toUpperCase();
         
-        return map.get(id);
-        
-        
+        return donationMap.get(id.toUpperCase());
     }
-   
+    
+    public void trackByCategories(){
+        ListInterface<Donation> donationList = donationMap.values();        
+        
+        int choice = 0;
+        do {
+            choice = donationUI.getCategoriesMenuChoice();
+            switch (choice) {
+                case 0:
+                    return;
+                case 1:
+                    //Cash
+                    donationUI.printDonationHeader();
+                    for(int i = 1; i<= donationList.getNumberOfEntries();i++){
+                        Donation donation = donationList.getEntry(i);
+                        if(donation.getType().equals(Donation.DonationType.CASH)){
+                            displayDonation(donation,false,false);
+                        }
+                    }
+                    break;
+                case 2:
+                    //Food
+                    donationUI.printDonationHeader();
+                    for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
+                        Donation donation = donationList.getEntry(i);
+                        if (donation.getType().equals(Donation.DonationType.FOOD)) {
+                            displayDonation(donation,false,false);
+                        }
+                    }
+                    break;
+                case 3:
+                    //Item
+                    donationUI.printDonationHeader();
+                    for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
+                        Donation donation = donationList.getEntry(i);
+                        if (donation.getType().equals(Donation.DonationType.ITEM)) {
+                            displayDonation(donation,false,false);
+                        }
+                    }
+                    break;
+                default:
+                    MessageUI.displayInvalidChoiceMessage();
+            }
+        } while (choice != 0);
+    }
+    
+    public void listDonationByDonor(){
+        ListInterface<Donation> donationList = donationMap.values();
+        
+        int choice = 0;
+        do {
+            choice = donationUI.getDonorInfoMenuChoice();
+            switch (choice) {
+                case 0:
+                    return;
+                case 1:
+                    //Donor Id
+                    System.out.print("Enter donor Id: ");
+                    String id = scanner.nextLine();
+                    
+                    donationUI.printDonationHeader();
+                    for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
+                        Donation donation = donationList.getEntry(i);
+                        if (donation.getDonor().getId().equals(id)) {
+                            displayDonation(donation, true,false);
+                        }
+                    }
+                    break;
+                case 2:
+                    //Donor Name
+                    System.out.print("Enter donor name: ");
+                    String name = scanner.nextLine();
+                    
+                    donationUI.printDonationHeader();
+                    for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
+                        Donation donation = donationList.getEntry(i);
+                        if (donation.getDonor().getName().toUpperCase().equals(name.toUpperCase())) {
+                            displayDonation(donation, false,false);
+                        }
+                    }
+                    break;
+                default:
+                    MessageUI.displayInvalidChoiceMessage();
+                    break;
+            }
+        } while (choice != 0);
+    }
+    
+    public void filterDonationByCriteria(){
+        ListInterface<Donation> donationList = donationMap.values();
+        
+        int choice = 0;
+        do {
+            choice = donationUI.getFilterCriteria();
+            switch (choice) {
+                case 0:
+                    return;
+                case 1:
+                    //Message Availability
+                    String message;
+                    do{
+                        System.out.print("Show donation with message? (Y/N): ");
+                        message = scanner.nextLine().trim().toUpperCase();
+                    }while(!message.equals("Y") && !message.equals("N"));
+                    
+                    
+                    donationUI.printDonationHeader();
+                    if(message.equals("Y")){
+                        for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
+                            Donation donation = donationList.getEntry(i);
+                            if (!donation.getMessage().isBlank()) {
+                                displayDonation(donation, false,false);
+                            }
+                        }
+                    }else if (message.equals("N")){
+                        for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
+                            Donation donation = donationList.getEntry(i);
+                            if (donation.getMessage().isBlank()) {
+                                displayDonation(donation, false,false);
+                            }
+                        }
+                    }
+                    break;
+                case 2:
+                    //Event
+                    int choice2 = 0;
+                    do {
+                        choice2 = donationUI.getEventInfoMenuChoice();
+                        switch (choice2) {
+                            case 0:
+                                break;
+                            case 1:
+                                //Donor Id
+                                System.out.print("Enter event Id: ");
+                                String id = scanner.nextLine();
+
+                                donationUI.printDonationHeader();
+                                for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
+                                    Donation donation = donationList.getEntry(i);
+                                    if (donation.getEvent().getId().equals(id)) {
+                                        displayDonation(donation, true,true);
+                                    }
+                                }
+                                break;
+                            case 2:
+                                //Donor Name
+                                System.out.print("Enter event name: ");
+                                String name = scanner.nextLine();
+
+                                donationUI.printDonationHeader();
+                                for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
+                                    Donation donation = donationList.getEntry(i);
+                                    if (donation.getEvent().getName().toUpperCase().equals(name.toUpperCase())) {
+                                        displayDonation(donation, false,false);
+                                    }
+                                }
+                                break;
+                            default:
+                                MessageUI.displayInvalidChoiceMessage();
+                                break;
+                        }
+                    } while (choice2 != 0);
+                    break;
+                case 3:
+                    //Date
+                    LocalDate date1 = null;
+                    boolean isValid = false;
+                    while (!isValid) {
+                        System.out.print("Enter start date (dd/MM/yyyy): ");
+                        String dateStr1 = scanner.nextLine();
+
+                        try {
+                            date1 = LocalDate.parse(dateStr1, formatter); // Try to parse the date
+                            isValid = true; // If parsing is successful, set the flag to true
+                        } catch (DateTimeParseException e) {
+                            System.out.println("Invalid date format. Please enter the date in dd/MM/yyyy format.");
+                        }
+                    }
+                    
+                    LocalDate date2 = null;
+                    isValid = false;
+                    while (!isValid) {
+                        System.out.print("Enter end date (dd/MM/yyyy): ");
+                        String dateStr2 = scanner.nextLine();
+
+                        try {
+                            date2 = LocalDate.parse(dateStr2, formatter); // Try to parse the date
+                            isValid = true; // If parsing is successful, set the flag to true
+                            if(date2.isBefore(date1)){
+                                System.out.println("End date cannot be before Start date.");
+                                isValid = false;
+                            }
+                        } catch (DateTimeParseException e) {
+                            System.out.println("Invalid date format. Please enter the date in dd/MM/yyyy format.");
+                        }
+                    }
+                    
+                    
+                    donationUI.printDonationHeader();
+                    for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
+                        Donation donation = donationList.getEntry(i);
+                        if ((donation.getDate().isAfter(date1) || donation.getDate().isEqual(date1))
+                                && (donation.getDate().isBefore(date2) || donation.getDate().isEqual(date2))) {
+                            displayDonation(donation, false,false);
+                        }
+                            
+                            
+                        
+                    } 
+                    break;
+                default:
+                    MessageUI.displayInvalidChoiceMessage();
+                    break;
+            }
+        } while (choice != 0);
+    }
+    
     public boolean report(Donation donation) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
     public void displayAll(){
-        ArrayList<Donation> donationList = map.values(); 
+        ListInterface<Donation> donationList = donationMap.values(); 
         for(int i = 1; i <= donationList.getNumberOfEntries();i++){
             Donation d = donationList.getEntry(i);
-            System.out.printf("%-15s%-15s%-50s%-30s%-30s%-15s%-15s\n",
-                    d.getId(),
-                    d.getQuantity(),
-                    d.getMessage(),
-                    "donor replacement",//no way to set donor yet
-                    "event replacement",
-                    d.getType(),
-                    d.getDate().format(formatter));
+            displayDonation(d,false,false);
         }
         
     }
@@ -277,7 +533,7 @@ public class DonationMaintenance{
     
     // <editor-fold defaultstate="collapsed" desc="other support function">
     public void saveDonationList(){
-        dao.saveToFile(map,FILENAME);
+        dao.saveToFile(donationMap,FILENAME);
     }
     
     public static String getIdCount(){
@@ -322,6 +578,37 @@ public class DonationMaintenance{
             writer.write(newId);
         } catch (IOException e) {
             System.out.println("Cannot initialize donation count file");
+        }
+    }
+    
+    public void displayDonation(Donation d, boolean donorShowId, boolean eventShowId){
+        String donorInfo = d.getDonor().getName();
+        if(donorShowId){
+            donorInfo = d.getDonor().getId();
+        }
+        
+        String eventInfo = d.getEvent().getName();
+        if(eventShowId){
+            eventInfo = d.getEvent().getId();
+        }
+        
+        
+        System.out.printf("%-15s%-15s%-50s%-30s%-30s%-15s%-15s\n",
+                d.getId(),
+                d.getQuantity(),
+                d.getMessage(),
+                donorInfo,//no way to set donor yet
+                eventInfo,
+                d.getType(),
+                d.getDate().format(formatter));
+    }
+    
+    public boolean isInteger(String str){
+        try{
+            int i = Integer.parseInt(str);
+            return true;
+        }catch(NumberFormatException ex){
+            return false;
         }
     }
     // </editor-fold>

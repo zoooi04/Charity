@@ -3,8 +3,9 @@ package adt;
 import java.util.Iterator;
 
 /**
- * LinkedList.java A class that implements the ADT list by using a chain of nodes,
- with the node implemented as an inner class.
+ * @author huaiern
+ * implemented Iterator
+ * @param <T>
  */
 public class LinkedList<T> implements ListInterface<T>, Iterable<T> {
 
