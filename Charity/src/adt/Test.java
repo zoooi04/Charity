@@ -38,6 +38,7 @@ public class Test {
         graph.addEdge(e1, d1, 2000);//weight=donation amount
         graph.addEdge(e1, d2, 3000);//weight=donation amount
         graph.addEdge(e2, d2, 3000);//weight=donation amount
+        graph.addEdge(e1, d1, 5000);//weight=donation amount
         System.out.println(graph.removeEdge(e1,d1));
         
         //graph.test(e1);
