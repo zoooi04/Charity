@@ -69,7 +69,7 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
                         newEntry.setName(personUI.inputPersonName());
                         break;
                     case 2:
-                        newEntry.setAge(personUI.inputPersonAge());
+                        newEntry.setPhoneNo(personUI.inputPersonPhoneNo());
                         break;
                     case 3:
                         newEntry.setBirthday(personUI.inputPersonBirthday());
@@ -78,9 +78,6 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
                         newEntry.setGender(personUI.inputPersonGender());
                         break;
                     case 5:
-                        newEntry.setPhoneNo(personUI.inputPersonPhoneNo());
-                        break;
-                    case 6:
                         newEntry.setIsActive(!((Person) newEntry).isIsActive());
                         personUI.printPersonActivate((Person) newEntry);
                         break;
