@@ -16,9 +16,10 @@ public class Test {
     public static void main(String[] args){
         //for every donation map event to donor
         WeightedBipartiteGraph<Event, Donor> graph = new WeightedBipartiteGraph<>(Event.class,Donor.class);
-        
+        //Event e1 = new Event("E1001")
         Event e1 = new Event();
         e1.setName("Cancer Fundraising Event");
+        e1.setLocation("Cancer Region");
         //WeightedBipartiteGraph<Event,Donor>.Vertex<Event> vE = (WeightedBipartiteGraph<Event,Donor>.Vertex<Event>) graph.constructVertex(e1);
         System.out.println("Add event vertex: " + graph.addVertex(e1));
         

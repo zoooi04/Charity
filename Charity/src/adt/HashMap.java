@@ -16,6 +16,8 @@ public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
         table = new Node[SIZE];
         size = 0;
     }
+    
+    
 
     @Override
     public V get(K key) {
