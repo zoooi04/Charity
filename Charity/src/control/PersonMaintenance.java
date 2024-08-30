@@ -6,6 +6,7 @@ package control;
 
 import boundary.PersonMaintenanceUI;
 import entity.Person;
+import java.time.LocalDate;
 import utility.MessageUI;
 
 /**
@@ -63,20 +64,50 @@ public class PersonMaintenance<T extends Person & Comparable<T>>{
                         MessageUI.displayExitMessage();
                         break;
                     case 1:
-                        newEntry.setName(personUI.inputPersonName());
+                        String newName = personUI.inputPersonName();
+                        if (newEntry.getName().equals(newName)) {
+                            System.out.println("The new name is the same as the existing name.");
+                            MessageUI.displayErrorMessage();
+                        } else {
+                            newEntry.setName(newName);
+                        }
                         break;
                     case 2:
-                        newEntry.setPhoneNo(personUI.inputPersonPhoneNo());
+                        String newPhoneNo = personUI.inputPersonPhoneNo();
+                        if (newEntry.getPhoneNo().equals(newPhoneNo)) {
+                            System.out.println("The new phone number is the same as the existing phone number.");
+                            MessageUI.displayErrorMessage();
+                        } else {
+                            newEntry.setPhoneNo(newPhoneNo);
+                        }
                         break;
                     case 3:
-                        newEntry.setBirthday(personUI.inputPersonBirthday());
+                        LocalDate newBirthday = personUI.inputPersonBirthday();
+                        if (newEntry.getBirthday().equals(newBirthday)) {
+                            System.out.println("The new birthday is the same as the existing birthday.");
+                            MessageUI.displayErrorMessage();
+                        } else {
+                            newEntry.setBirthday(newBirthday);
+                        }
                         break;
                     case 4:
-                        newEntry.setGender(personUI.inputPersonGender());
+                        Person.Gender newGender = personUI.inputPersonGender();
+                        if (newEntry.getGender().equals(newGender)) {
+                            System.out.println("The new gender is the same as the existing gender.");
+                            MessageUI.displayErrorMessage();
+                        } else {
+                            newEntry.setGender(newGender);
+                        }
                         break;
                     case 5:
-                        newEntry.setIsActive(!((Person) newEntry).isIsActive());
-                        personUI.printPersonActivate((Person) newEntry);
+                        boolean newIsActive = !((Person) newEntry).isIsActive();
+                        if (((Person) newEntry).isIsActive() == newIsActive) {
+                            System.out.println("The active status is already " + newIsActive);
+                            MessageUI.displayErrorMessage();
+                        } else {
+                            newEntry.setIsActive(newIsActive);
+                            personUI.printPersonActivate((Person) newEntry);
+                        }
                         break;
                     case 99:
                         return true;
