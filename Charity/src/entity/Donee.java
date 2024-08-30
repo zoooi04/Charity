@@ -53,7 +53,7 @@ public class Donee extends Person implements Serializable, Comparable<Donee> {
 
     @Override
     public String toString() {
-        return super.toString() + String.format("%-20s%-20s", id, type);
+        return super.toString() + String.format("%-12s%-15s", id, type);
     }
 
     @Override

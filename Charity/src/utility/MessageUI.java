@@ -35,5 +35,26 @@ public class MessageUI {
     public static void displaySearchNotFoundMessage(String object){
         System.out.println("\n"+ object+" not found...\n");
     }
-        
+    
+    public static void displayExitMenuMessage(){
+        System.out.println("\nReturn to menu");
+    }
+
+    public static void displayCancellationMessage() {
+        System.out.println("\nCancelled delete");
+    }
+
+    public static void displayNotFoundMessage(String doneeId) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public static void displayErrorMessage() {
+        System.out.println("\nPlease try again");
+    }
+
+    public static void displayDoneeNotFoundMessage() {
+         System.out.println("\nDonee not found");
+    }
+    
+    
 }
