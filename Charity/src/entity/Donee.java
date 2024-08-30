@@ -3,6 +3,7 @@ package entity;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Donee extends Person implements Serializable, Comparable<Donee> {
 
@@ -53,19 +54,31 @@ public class Donee extends Person implements Serializable, Comparable<Donee> {
 
     @Override
     public String toString() {
-        return super.toString() + String.format("%-20s%-20s", id, type);
-    }
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+        String formattedRegisterDate = this.getRegisterDate().format(dateTimeFormatter);
+
+        // Formatting the attributes
+        return String.format("%-30s%-10d%-20s%-10s%-20s%-30s%-20s%-20s%-20s",
+                this.getName(), 
+                this.getAge(), 
+                this.getBirthday(), 
+                this.getGender(), 
+                this.getPhoneNo(), 
+                formattedRegisterDate, 
+                this.isIsActive() ? "Active" : "De-activated", 
+                this.getId(), 
+                this.getType());
+    }
+    
     @Override
     public int compareTo(Donee other) {
         // Category comparison: FAMILY > ORGANISATION > INDIVIDUAL
         int typeComparison = this.type.compareTo(other.type);
-        if (typeComparison != 0) {
-            return typeComparison;
-        }
-        // If types are the same, compare by registerDate (earlier dates come first)
-        return this.getRegisterDate().compareTo(other.getRegisterDate());
+        
+        return typeComparison;
     }
+
 
     public void updateFrom(Donee other) {
         this.setId(other.getId());

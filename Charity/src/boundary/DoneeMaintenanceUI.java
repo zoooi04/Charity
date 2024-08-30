@@ -1,18 +1,27 @@
 package boundary;
 
 import entity.Donee;
+import entity.Person;
 import java.util.Scanner;
+import adt.ListHeap;
+import adt.Heap;
+import dao.DAO;
+import utility.MessageUI;
 
 public class DoneeMaintenanceUI {
     
     private PersonMaintenanceUI personUI = new PersonMaintenanceUI();
     private final Scanner scanner = new Scanner(System.in);
-    private static int idCounter = 2400001;  // Starting point for ID generation
-    private static final String ID_PREFIX = "DN";
+    private static final String ID_PREFIX = "DN24";
+    private ListHeap<Donee> doneeHeap = new Heap<>();
+    private final DAO<ListHeap<Donee>> dao = new DAO<>();
+    private static final String FILENAME = "donee.dat";
     
+    
+    // <editor-fold defaultstate="collapsed" desc="menu">
     // Display main menu and get user's choice
     public int getMenuChoice() {
-        System.out.println("Donee Maintenance Menu:");
+        System.out.println("\nDonee Maintenance Menu:");
         System.out.println("1. List all donees");
         System.out.println("2. Search donee");
         System.out.println("3. Add new donee");
@@ -23,21 +32,10 @@ public class DoneeMaintenanceUI {
         return Integer.parseInt(scanner.nextLine());
     }
     
-    // Get search criteria from user
-    public int getSearchMenuChoice() {
-        System.out.println("Select search criteria:");
-        System.out.println("1. Search by ID");
-        System.out.println("2. Search by Name");
-        System.out.println("3. Search by Phone Number");
-        System.out.println("4. Search by Type");
-        System.out.print("Enter your choice: ");
-        return Integer.parseInt(scanner.nextLine());
-    }
-    
     public void printDoneeHeader() {
         String outputStr = "";
-        outputStr += "\n" + "=".repeat(150) + "\n";
-        outputStr += String.format("%-30s%-5s%-13s%-10s%-15s%-22s%-15s%-12s%-15s%-13s",
+        outputStr += "\n" + "=".repeat(200) + "\n";
+        outputStr += String.format("%-30s%-10s%-20s%-10s%-20s%-30s%-20s%-20s%-20s",
                 "Name",
                 "Age",
                 "BirthDay",
@@ -46,18 +44,88 @@ public class DoneeMaintenanceUI {
                 "Register Date",
                 "Status",
                 "Id",
-                "Type",
-                "Amount Request");
-        outputStr += "\n" + "=".repeat(150) + "\n";
+                "Type");
+        outputStr += "\n" + "=".repeat(200) + "\n";
         System.out.print(outputStr);
     }
+    
+    // Get update menu choice from user
+    public int getUpdateMenuChoice()  {
+        System.out.println("\nUPDATE MENU");
+        System.out.println("1. Update Donee Type");
+        System.out.println("99. Confirm");
+        System.out.println("0. Exit");
+        System.out.print("Enter your choice: ");
+        return Integer.parseInt(scanner.nextLine());
+    }
+    
+    public int inputSearchOption() {
+        System.out.println("\nSelect a search option:");
+        System.out.println("1. Search by ID");
+        System.out.println("2. Search by Name");
+        System.out.println("3. Search by Gender");
+        System.out.println("4. Search by Phone Number");
+        System.out.println("5. Search by Type");
+        
+        int option = 0;
+        
+        // Input validation to ensure user selects a valid option
+        while (option < 1 || option > 5) {
+            System.out.print("Enter your choice (1-5): ");
+            if (scanner.hasNextInt()) {
+                option = scanner.nextInt();
+                scanner.nextLine(); // Consume the leftover newline character here
+                if (option < 1 || option > 5) {
+                    System.out.println("Invalid choice. Please select a valid option.");
+                }
+            } else {
+                System.out.println("Invalid input. Please enter a number between 1 and 5.");
+                scanner.next(); // Clear invalid input
+            }
+        }
 
+        return option;
+    }
+    
+        // Method to prompt the user to input the search criteria
+    public String inputSearchCriteria() {
+        System.out.println("Please choose a search criterion:");
+        System.out.println("1. ID");
+        System.out.println("2. Name");
+        System.out.println("3. Gender");
+        System.out.println("4. Phone Number");
+
+        int choice = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        switch (choice) {
+            case 1:
+                return "id";
+            case 2:
+                return "name";
+            case 3:
+                return "gender";
+            case 4:
+                return "phone";
+            default:
+                System.out.println("Invalid choice. Please select a valid option.");
+                return inputSearchCriteria(); // Recursively prompt again for valid input
+        }
+    }
+    
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="input">
     // Input donee details from user
     public void inputDoneeDetails(Donee donee) {
+        doneeHeap =  (ListHeap<Donee>) dao.retrieveFromFile(FILENAME);
         
-        String generatedId = ID_PREFIX + idCounter;
+        if (doneeHeap == null) {
+            doneeHeap = new Heap<>(); // Initialize the heap if it is null
+        }
+        
+        String generatedId = ID_PREFIX + String.format("%05d", doneeHeap.size() + 1);
         donee.setId(generatedId);
-        idCounter++;  // Increment the counter for the next ID
         
         System.out.println("Donee ID: " + donee.getId());
 
@@ -66,11 +134,13 @@ public class DoneeMaintenanceUI {
 
     // Get donee type from user
     public Donee.Type inputDoneeType() {
-        System.out.println("Select Donee Type:");
+        System.out.println("\n==========");
+        System.out.println("Donee Type");
+        System.out.println("==========");
         System.out.println("1. Individual");
         System.out.println("2. Organisation");
         System.out.println("3. Family");
-
+        System.out.println("Select Donee Type:");
         int choice = Integer.parseInt(scanner.nextLine());
 
         switch (choice) {
@@ -82,7 +152,7 @@ public class DoneeMaintenanceUI {
                 return Donee.Type.FAMILY;
             default:
                 System.out.println("Invalid choice. Please select 1, 2, or 3.");
-                return inputDoneeType(); // Recursively prompt until a valid choice is made
+                return inputDoneeType();
         }
     }
 
@@ -99,21 +169,46 @@ public class DoneeMaintenanceUI {
     public String inputDoneePhone() {
         return personUI.inputPersonPhoneNo();
     }
+    
+    public Person.Gender inputDoneeGender() {
+        Person.Gender inputGender = null;
 
-    // Get update menu choice from user
-    public int getUpdateMenuChoice() {
-        System.out.println("Update Menu:");
-        System.out.println("1. Update Donee Type");
-        System.out.println("2. Update Received Amount");
-        System.out.println("99. Confirm");
-        System.out.println("0. Exit");
-        System.out.print("Enter your choice: ");
-        return Integer.parseInt(scanner.nextLine());
+        do {
+            System.out.print("Enter person gender(M/F): ");
+            String inputValue = scanner.nextLine();
+            switch (inputValue) {
+                case "m", "M" ->
+                    inputGender = Person.Gender.MALE;
+                case "f", "F" ->
+                    inputGender = Person.Gender.FEMALE;
+                default ->
+                    MessageUI.displayInvalidChoiceMessage();
+            }
+        } while (inputGender == null);
+        return inputGender;
     }
 
+    // Method to prompt the user to input the search value based on the selected criteria
+    public String inputSearchValue(String searchCriteria) {
+        switch (searchCriteria.toLowerCase()) {
+            case "id":
+                return inputDoneeId();
+            case "name":
+                return inputDoneeName();
+            case "gender":
+                return inputDoneeGender().toString();
+            case "phone":
+                return inputDoneePhone();
+            default:
+                throw new IllegalArgumentException("Invalid search criteria: " + searchCriteria);
+        }
+    }
+
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="others">
     // List all donees
     public void listAllDonee(String doneeList) {
-
         System.out.println(doneeList);
     }
 
@@ -131,4 +226,16 @@ public class DoneeMaintenanceUI {
     public void displayExitMessage() {
         System.out.println("Exiting Donee Maintenance...");
     }
+    
+    public boolean confirmDeletion(Donee doneeToRemove) {
+        // Display the Donee details and ask for confirmation
+        printDoneeHeader();
+        System.out.println(doneeToRemove.toString());
+        System.out.println("\nAre you sure you want to delete the following Donee?");
+        System.out.print("Type 'Y' to confirm deletion or 'N' to cancel: ");
+        String input = scanner.nextLine();
+
+        return input.equalsIgnoreCase("Y");
+    }
+    // </editor-fold>
 }
