@@ -1,8 +1,8 @@
+E00005|sdasdsssssss|Charity|01/01/2022|03/01/2022|Cringe|5|10|5|0.00|30000.00|false
+E00006|Mcd Run|CS|29/12/2024|31/12/2024|MCD Greenlane|15|25|15|0.00|3000.00|false
+E00007|cHANGE 2|Fund|28/09/2023|29/09/2023|MCD KFC|13|13|0|0.00|2000.00|false
+E00008|Mouse Mouse Fair|CS|28/08/2024|29/08/2024|mousetown|20|20|0|0.00|1000.00|false
 E00001|Andrew Charity Run|Charity|26/08/2023|27/08/2023|Greenlane, Penang|10|20|10|20000.00|10000.00|false
 E00002|Lily Charity Run|Fund|28/08/2023|29/08/2023|Bluelane, Penang|15|30|15|25000.00|5000.00|false
 E00003|Wowo Charity Run|CS|29/08/2023|30/08/2023|Blacklane, Penang|20|40|20|50000.00|30000.00|false
 E00004|Bayan Lepas Gotong Royong|CS|01/09/2023|01/09/2023|Yellowlane, Penang|30|50|30|0.00|0.00|false
-E00005|sdasdsssssss|Charity|01/01/2022|03/01/2022|Cringe|5|10|5|0.00|30000.00|false
-E00006|Mcd Run|CS|29/12/2024|31/12/2024|MCD Greenlane|15|25|15|0.00|3000.00|false
-E00007|Oooi Choon Choong|Fund|27/09/2023|29/09/2023|MCD KFC|13|13|0|0.00|2000.00|false
-E00008|Mouse Mouse Fair|CS|28/08/2024|29/08/2024|mousetown|20|20|0|0.00|1000.00|false
