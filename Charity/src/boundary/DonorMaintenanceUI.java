@@ -104,6 +104,7 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
         System.out.println("\nSelection of Type: ");
         System.out.println("1. Organisation");
         System.out.println("2. Individual");
+        System.out.println("9. Clear");
         System.out.println("0. Back");
         System.out.print("Enter Selection: ");
     }
@@ -124,6 +125,7 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
         System.out.println("1. Government");
         System.out.println("2. Private");
         System.out.println("3. Public");
+        System.out.println("9. Clear");
         System.out.println("0. Back");
         System.out.print("Enter Selection: ");
     }
@@ -139,8 +141,19 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
         return choice;
     }
 
-    private void getDisplaySortMenu() {
-        System.out.println("\nSort by Details: ");
+    private void getDisplaySortMenu(Donor.Type enumType, Donor.Category enumCategory) {
+        System.out.print("\nSort by Details: ");
+        String filterStr = "\nFilter by: ";
+        if(enumType == null && enumCategory == null){
+            filterStr += "None";
+        }
+        if(enumType != null){
+            filterStr += enumType + " ";
+        }
+        if(enumCategory != null){
+            filterStr += enumCategory + " ";
+        }
+        System.out.println(filterStr);
         System.out.println("1. ID");
         System.out.println("2. Name");
         System.out.println("3. Phone Number");
@@ -148,11 +161,11 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
         System.out.println("0. Back");
     }
 
-    public int getDisplaySortMenuChoice() {
-        getDisplaySortMenu();
+    public int getDisplaySortMenuChoice(Donor.Type enumType, Donor.Category enumCategory) {
+        getDisplaySortMenu(enumType, enumCategory);
         while (!scanner.hasNextInt()) {
             scanner.next();
-            getDisplaySortMenu();
+            getDisplaySortMenu(enumType, enumCategory);
         }
         int choice = scanner.nextInt();
         scanner.nextLine();  // consume the leftover newline character
