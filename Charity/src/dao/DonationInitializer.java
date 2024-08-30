@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter;
  * @author huaiern
  */
 public class DonationInitializer {
+    
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     
     static Donation donation1 = new Donation("DNTA0001", 200, "Good Work, Keep Going!", DonationMaintenance.getDonorById("AA2400001"), DonationMaintenance.getEventById("E00001"),Donation.DonationType.CASH,DonationMaintenance.getEventById("E00001").getStartDate());
@@ -30,18 +31,19 @@ public class DonationInitializer {
 
 //  Method to return a collection of with hard-coded entity values
     public static MapInterface<String,Donation> initializeDonation() {
-        
+        DAO<MapInterface<String, Donation>> dao = new DAO<>();
         
         MapInterface<String,Donation> donationMap = new HashMap<>();
         donationMap.put(donation1.getId(),donation1);
         donationMap.put(donation2.getId(), donation2);
         donationMap.put(donation3.getId(), donation3);
+        
+        dao.saveToFile(donationMap,DonationMaintenance.getFileName());
         return donationMap;
     }
 
     public static void main(String[] args) {
         // To illustrate how to use the initializeProducts() method
-        DonationInitializer p = new DonationInitializer();
         MapInterface<String,Donation> donationMap = DonationInitializer.initializeDonation();
         System.out.println("\nDonation:\n" + donationMap);
         String id = "DNTA0001";

@@ -20,11 +20,7 @@ import adt.WeightedGraph;
 import dao.DAO;
 import entity.Donor;
 import entity.Event;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
+
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -39,7 +35,11 @@ public class DonationMaintenance{
     private static final String FILENAME = "donationHashMap.dat";
     private static final Scanner scanner = new Scanner(System.in);
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     
+    private static DonorMaintenance donorM = new DonorMaintenance();
+
+
     //private static final String ID_COUNT_FILE = "donationIdCount.txt";
     
     
@@ -556,29 +556,10 @@ int quantity = -1;  // Initialize with an invalid value
         } while (choice != 0);
     }
     
-    /*
-    public void report() {
-        GraphInterface<String> graph = new WeightedGraph<>();
-        
-        DonorMaintenance dm = new DonorMaintenance();
-        EventMaintenance em = new EventMaintenance();
-        
-        ListInterface<Donor> donorList = dm.getDonorList();
-        for(int i = 1; i <= donorList.getNumberOfEntries();i++){
-            graph.addVertex(donorList.getEntry(i).getId());
-        }
-        
-        SortedListInterface<Event> eventList = em.createSortedEventList();
-        for(int i = 1; i<=eventList.getNumberOfEntries();i++){
-            graph.addVertex(eventList.getEntry(i).getId());
-        }
-        
-        
-        
-    }
-    */
-    
+
+ 
     public void report(){}
+
     
     public void displayAll(){
         SortedListInterface<Donation> sortedDonations = getDonationListSortedById();
@@ -594,6 +575,11 @@ int quantity = -1;  // Initialize with an invalid value
     // <editor-fold defaultstate="collapsed" desc="other support function">
     public void saveDonationList(){
         dao.saveToFile(donationMap,FILENAME);
+    }
+    
+
+    public static String getFileName(){
+        return FILENAME;
     }
     
     public String getNextId(){
@@ -615,40 +601,7 @@ int quantity = -1;  // Initialize with an invalid value
         
         return newId;
     }
-    /*
-    public static String getIdCount(){
-        String data = null;
-        try {
-            File idCountFile = new File(ID_COUNT_FILE);
-            if(!idCountFile.exists() || idCountFile.length()==0){
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(ID_COUNT_FILE))) {
-                    writer.write("DNTA0001");
-                }catch(IOException e){
-                    System.out.println("Cannot initialize donation count file");
-                }
-                return "DNTA0001";
-            }
-            Scanner myReader = new Scanner(idCountFile);
-            while (myReader.hasNextLine()) {
-                data = myReader.nextLine();
-            }
-            myReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("Cannot read donation Id Count.");
-            e.printStackTrace();
-            
-        }
-        return data;
-    }
     
-    public void incrementIdCount(String idCount){
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ID_COUNT_FILE))) {
-
-            
-        } catch (IOException e) {
-            System.out.println("Cannot initialize donation count file");
-        }
-    }*/
     
     public void displayDonation(Donation d, boolean donorShowId, boolean eventShowId){
         String donorInfo = d.getDonor().getName();
@@ -682,10 +635,15 @@ int quantity = -1;  // Initialize with an invalid value
     }
     
     public static Donor getDonorById(String id){
-        //DonorMaintenance donorM = new DonorMaintenance();
-        //ListInterface<Donor> list = donorM.getDonorList();
-        //MapInterface<String,Donor> donorMap = donorM.toHashMap(list);
-        //return donorMap.get(id);
+
+        ListInterface<Donor> list = donorM.getDonorList();
+        for(int i = 1; i <= list.getNumberOfEntries(); i++){
+            if(list.getEntry(i).getId().equals(id)){
+                //found donor
+                return list.getEntry(i);
+            }
+        }
+
         return null;
     }
     
