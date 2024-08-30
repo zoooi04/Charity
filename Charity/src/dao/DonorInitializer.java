@@ -44,8 +44,7 @@ public class DonorInitializer {
 
     public static void main(String[] args) {
         // To illustrate how to use the initializeProducts() method
-        DonorInitializer p = new DonorInitializer();
-        ListInterface<Donor> donorList = p.initializeDonor();
+        ListInterface<Donor> donorList = DonorInitializer.initializeDonor();
         System.out.println("\nDonor:\n" + donorList);
     }
 

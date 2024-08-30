@@ -378,7 +378,10 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                         if (choiceDetail > 0 && choiceDetail < 5) {
                             BinarySearchTreeInterface<Donor> bstBy = new BinarySearchTree<>(compareBy);
                             for (int i = 1; i <= newEntry.getNumberOfEntries(); ++i) {
-                                bstBy.insert(newEntry.getEntry(i));
+                                // insert into binary tree if donor is not deleted
+                                if (!newEntry.getEntry(i).isIsDeleted()) {
+                                    bstBy.insert(newEntry.getEntry(i));
+                                }
                             }
                             donorUI.printDonorHeader();
                             Iterator it = bstBy.iterator();
