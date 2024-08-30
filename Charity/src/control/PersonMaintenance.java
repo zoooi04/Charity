@@ -4,8 +4,11 @@
  */
 package control;
 
+import boundary.DoneeMaintenanceUI;
 import boundary.PersonMaintenanceUI;
 import entity.Person;
+import java.time.LocalDate;
+import java.util.Date;
 import utility.MessageUI;
 
 /**
@@ -16,6 +19,7 @@ import utility.MessageUI;
 public class PersonMaintenance<T extends Person & Comparable<T>> implements ControlInterface<T> {
 
     protected final PersonMaintenanceUI personUI = new PersonMaintenanceUI();
+    private final DoneeMaintenanceUI doneeUI = new DoneeMaintenanceUI();
 
     public PersonMaintenance() {
     }
@@ -60,29 +64,68 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
         if (newEntry instanceof Person) {
             int choice = -1;
             do {
+                doneeUI.printDoneeHeader();
+                System.out.println(newEntry.toString());
                 choice = personUI.getUpdateMenuChoice();
                 switch (choice) {
-                    case 0:
-                        MessageUI.displayExitMessage();
-                        break;
-                    case 1:
-                        newEntry.setName(personUI.inputPersonName());
-                        break;
-                    case 2:
-                        newEntry.setAge(personUI.inputPersonAge());
-                        break;
-                    case 3:
-                        newEntry.setBirthday(personUI.inputPersonBirthday());
-                        break;
-                    case 4:
-                        newEntry.setGender(personUI.inputPersonGender());
-                        break;
-                    case 5:
-                        newEntry.setPhoneNo(personUI.inputPersonPhoneNo());
-                        break;
-                    case 6:
-                        newEntry.setIsActive(!((Person) newEntry).isIsActive());
+                case 0:
+                    MessageUI.displayExitMenuMessage();
+                    break;
+                case 1:
+                    String newName = personUI.inputPersonName();
+                    if (newEntry.getName().equals(newName)) {
+                        System.out.println("The new name is the same as the existing name.");
+                        MessageUI.displayErrorMessage();
+                    } else {
+                        newEntry.setName(newName);
+                    }
+                    break;
+                case 2:
+                    int newAge = personUI.inputPersonAge();
+                    if (newEntry.getAge() == newAge) {
+                        System.out.println("The new age is the same as the existing age. Please enter a different age.");
+                        MessageUI.displayErrorMessage();
+                    } else {
+                        newEntry.setAge(newAge);
+                    }
+                    break;
+                case 3:
+                    LocalDate newBirthday = personUI.inputPersonBirthday();
+                    if (newEntry.getBirthday().equals(newBirthday)) {
+                        System.out.println("The new birthday is the same as the existing birthday.");
+                        MessageUI.displayErrorMessage();
+                    } else {
+                        newEntry.setBirthday(newBirthday);
+                    }
+                    break;
+
+                case 4:
+                    Person.Gender newGender = personUI.inputPersonGender();
+                    if (newEntry.getGender().equals(newGender)) {
+                        System.out.println("The new gender is the same as the existing gender.");
+                        MessageUI.displayErrorMessage();
+                    } else {
+                        newEntry.setGender(newGender);
+                    }
+                    break;
+                case 5:
+                    String newPhoneNo = personUI.inputPersonPhoneNo();
+                    if (newEntry.getPhoneNo().equals(newPhoneNo)) {
+                        System.out.println("The new phone number is the same as the existing phone number.");
+                        MessageUI.displayErrorMessage();
+                    } else {
+                        newEntry.setPhoneNo(newPhoneNo);
+                    }
+                    break;
+                case 6:
+                    boolean newIsActive = !((Person) newEntry).isIsActive();
+                    if (((Person) newEntry).isIsActive() == newIsActive) {
+                        System.out.println("The active status is already " + newIsActive);
+                        MessageUI.displayErrorMessage();
+                    } else {
+                        newEntry.setIsActive(newIsActive);
                         personUI.printPersonActivate((Person) newEntry);
+                    }
                         break;
                     case 99:
                         return true;

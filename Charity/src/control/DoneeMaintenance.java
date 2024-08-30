@@ -76,7 +76,7 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
                     }
                     break;
                 case 6:
-                    generateDistributionSummaryReport();
+                    summaryReport();
                     break;
                 default:
                     MessageUI.displayInvalidChoiceMessage();
@@ -188,7 +188,7 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
         }
     }
         
-    public boolean update(ListHeap<Donee> donorHeap) {
+    public boolean update(ListHeap<Donee> donorHeap)    {
         int[] position = {-1};
 
         // Search for the donor in the heap
@@ -237,7 +237,7 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
                     confirm = true;
                 }
             } while (!confirm);
-
+               
             saveDoneeList();
             return true;
         } else {
@@ -335,7 +335,7 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
         doneeUI.listAllDonee(getAllDonee());
     }
     
-    public void generateDistributionSummaryReport() {
+    public void summaryReport() {
 
         // If no records are retrieved, return
         if (records == null || records.isEmpty()) {
@@ -346,7 +346,6 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
         // Initialize summary maps
         MapInterface<String, MapInterface<String, Integer>> totalAmountsByDoneeTypeAndDonation = new HashMap<>();
         MapInterface<String, Integer> distributionCountsByDonee = new HashMap<>();
-        int totalAmount = 0;
 
         for (int i = 1; i <= records.getNumberOfEntries(); i++) {
             Distribution record = records.getEntry(i);
@@ -402,18 +401,22 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
             String doneeId = doneeIds.getEntry(i);
             Integer count = distributionCountsByDonee.get(doneeId);
 
-            // Calculate the total amount received by the donee
-            int totalAmountForDonee = 0;
+            System.out.println("\nDonee ID: " + doneeId);
+            System.out.println("  Number of Distribution " + (count != null ? count : 0));
+            System.out.println("  Donation Details:");
+
+            // Display the donation types and their amounts for each donee
             for (int j = 1; j <= records.getNumberOfEntries(); j++) {
                 Distribution record = records.getEntry(j);
                 if (record.getDonee().getId().equals(doneeId)) {
-                    totalAmountForDonee += record.getDonation().getQuantity();
+                    String donationType = record.getDonation().getType().name();
+                    int amount = record.getDonation().getQuantity();
+                    System.out.println("    Donation Type: " + donationType + " - Amount: " + amount);
                 }
             }
-
-            System.out.println("Donee ID: " + doneeId + " - Count: " + (count != null ? count : 0) + " - Total Amount Received: " + totalAmountForDonee);
         }
     }
+
 
     private int searchForID(ListHeap<Donee> doneeHeap, String doneeId) {
         // Traverse the heap to find the Donee with the matching ID

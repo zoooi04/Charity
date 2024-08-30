@@ -3,6 +3,7 @@ package entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 public class Distribution implements Serializable {
 
@@ -71,5 +72,9 @@ public class Distribution implements Serializable {
                 donationType,
                 donationQuantity,
                 dateTime.format(formatter));
+    }
+
+    public Date getDate() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
