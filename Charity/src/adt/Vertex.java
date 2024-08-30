@@ -34,6 +34,6 @@ public class Vertex<T extends Comparable<T>, N extends Comparable<N>> {
         nextVertex=next;
         firstEdge=null;
     }
-
+    
 
 }

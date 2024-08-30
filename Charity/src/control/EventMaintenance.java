@@ -421,7 +421,7 @@ public class EventMaintenance {
                         event.setLocation(eventUI.inputLocation("new"));
                         break;
                     case 6:
-                        int[] volunteers = new int[2];
+                        int[] volunteers = eventUI.inputNumVolunteer();
                         event.setMinVolunteer(volunteers[0]);
                         event.setMaxVolunteer(volunteers[1]);
                         break;
@@ -431,9 +431,12 @@ public class EventMaintenance {
                     case 8:
                         if (!undoStack.isEmpty()) {
 
+                            
+                            redoStack.push(event);
+                            
                             // Save current state to redo stack
-                            Event addToUndo = new Event(event.getId(), event.getName(), event.getType(), event.getStartDate(), event.getEndDate(), event.getLocation(), event.getMinVolunteer(), event.getMaxVolunteer(), event.getCurrentVolunteer(), event.getCurrentAmount(), event.getGoalAmount(), event.getIsDeleted());
-                            redoStack.push(addToUndo);
+                          //  Event addToUndo = new Event(event.getId(), event.getName(), event.getType(), event.getStartDate(), event.getEndDate(), event.getLocation(), event.getMinVolunteer(), event.getMaxVolunteer(), event.getCurrentVolunteer(), event.getCurrentAmount(), event.getGoalAmount(), event.getIsDeleted());
+                           // redoStack.push(addToUndo);
 
                             // Pop the previous state from the undo stack
                             Event undoEvent = undoStack.pop();
@@ -443,8 +446,8 @@ public class EventMaintenance {
                             eventsMap.put(id, undoEvent);
 
                             // Update the current event reference
-                            event = new Event(undoEvent.getId(), undoEvent.getName(), undoEvent.getType(), undoEvent.getStartDate(), undoEvent.getEndDate(), undoEvent.getLocation(), undoEvent.getMinVolunteer(), undoEvent.getMaxVolunteer(), undoEvent.getCurrentVolunteer(), undoEvent.getCurrentAmount(), undoEvent.getGoalAmount(), undoEvent.getIsDeleted());
-
+                            //event = new Event(undoEvent.getId(), undoEvent.getName(), undoEvent.getType(), undoEvent.getStartDate(), undoEvent.getEndDate(), undoEvent.getLocation(), undoEvent.getMinVolunteer(), undoEvent.getMaxVolunteer(), undoEvent.getCurrentVolunteer(), undoEvent.getCurrentAmount(), undoEvent.getGoalAmount(), undoEvent.getIsDeleted());
+                            event = undoEvent;
                             System.out.println("Undo successful. Current event details:");
 
                         } else {
@@ -455,7 +458,7 @@ public class EventMaintenance {
                     case 9:
                         if (!redoStack.isEmpty()) {
                             // Save current state to undo stack
-                            undoStack.push(event.deepCopy());
+                            undoStack.push(event);
 
                             // Pop the previous state from the redo stack
                             Event redoEvent = redoStack.pop();

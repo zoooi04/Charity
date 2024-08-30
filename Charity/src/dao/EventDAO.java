@@ -103,4 +103,9 @@ public class EventDAO {
                 String.valueOf(event.getIsDeleted())
         );
     }
+    
+    
+    
+    
+    
 }

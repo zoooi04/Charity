@@ -33,8 +33,9 @@ public class DonationMaintenance{
     private static final String FILENAME = "donationHashMap.dat";
     private static final Scanner scanner = new Scanner(System.in);
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static DonorMaintenance donorM = new DonorMaintenance();
-
+    private static final DonorMaintenance donorM = new DonorMaintenance();
+    private static final EventMaintenance eventM = new EventMaintenance();
+    
     //private static final String ID_COUNT_FILE = "donationIdCount.txt";
     
     
@@ -159,10 +160,6 @@ public class DonationMaintenance{
         }
         
         
-
-        
-        
-        
         LocalDate startDate = event.getStartDate();
         LocalDate endDate = event.getEndDate();
         String startDateStr = startDate.format(formatter);
@@ -244,6 +241,7 @@ public class DonationMaintenance{
         
         if(donation != null && !donation.getIsDeleted()){
             donation.setIsDeleted(true);
+            dao.saveToFile(donationMap, FILENAME);
             return true;
         }else{
             System.out.println("Donation does not exist");
@@ -290,10 +288,18 @@ public class DonationMaintenance{
                 }
             } while (inputEnum == null);
             
+            Donation donation = donationMap.get(id);
+            Event event = donation.getEvent();
+            LocalDate startDate = event.getStartDate();
+            LocalDate endDate = event.getEndDate();
+            String startDateStr = startDate.format(formatter);
+            String endDateStr = endDate.format(formatter);
+            
             LocalDate date = null;
             boolean isValid = false;
             while (!isValid) {
-                System.out.print("Enter date (dd/MM/yyyy): ");
+                System.out.println("\nEvent period: " + startDateStr + " -- " + endDateStr);
+                System.out.print("Enter date within event period (dd/MM/yyyy): ");
                 String inputDate = scanner.nextLine();
 
                 try {
@@ -302,9 +308,16 @@ public class DonationMaintenance{
                 } catch (DateTimeParseException e) {
                     System.out.println("Invalid date format. Please enter the date in dd/MM/yyyy format.");
                 }
+
+                if (date != null) {
+                    if (date.isBefore(startDate) || date.isAfter(endDate)) {
+                        isValid = false;
+                    }
+                }
+
             }
             
-            Donation donation = donationMap.get(id);
+            
             donation.setQuantity(quantity);
             donation.setMessage(message);
             donation.setType(inputEnum);
@@ -313,6 +326,7 @@ public class DonationMaintenance{
             //put can overwrite existing key value
             donationMap.put(id,donation);
             System.out.println("Successfully updated");
+            dao.saveToFile(donationMap, FILENAME);
             return true;
         }else{
             MessageUI.displayObjectNotFoundMessage();
@@ -325,7 +339,6 @@ public class DonationMaintenance{
     public Donation searchById() {
         System.out.print("Enter donation Id to search: ");
         String id = scanner.nextLine().toUpperCase();
-        
         return donationMap.get(id.toUpperCase());
     }
     
@@ -551,20 +564,57 @@ public class DonationMaintenance{
     }
     
     public void report() {
-        GraphInterface<String,Donation> graph = new WeightedGraph<>();
-        
-        DonorMaintenance dm = new DonorMaintenance();
-        EventMaintenance em = new EventMaintenance();
-        
-        ListInterface<Donor> donorList = dm.getDonorList();
-        for(int i = 1; i <= donorList.getNumberOfEntries();i++){
-            graph.addVertex(donorList.getEntry(i).getId());
+        GraphInterface<String, Donation> graph = new WeightedGraph<>();
+
+        ListInterface<Donation> list = donationMap.values();
+
+        for (int i = 1; i <= list.getNumberOfEntries(); i++) {
+            Donation donation = list.getEntry(i);
+            Event event = donation.getEvent();
+            Donor donor = donation.getDonor();
+
+            //form relationship between entity for each donation
+            graph.addVertex(event.getId());
+            graph.addVertex(donor.getId());
+            graph.addUndirectedEdge(donor.getId(), event.getId(), donation);
         }
         
-        SortedListInterface<Event> eventList = em.createSortedEventList();
-        for(int i = 1; i<=eventList.getNumberOfEntries();i++){
-            graph.addVertex(eventList.getEntry(i).getId());
-        }
+        
+        
+        
+        graph.printEdges();
+        
+        
+        System.out.println(("=").repeat(50));
+        System.out.println("Events Donor Engagement Report");
+        System.out.println("Most Popular Event: ");
+        System.out.println("1. ");
+        System.out.println("2. ");
+        System.out.println("3. ");
+        System.out.println(("-").repeat(50));
+        System.out.println("Top organization donated event: ");
+        System.out.println("1. ");
+        System.out.println("2. ");
+        System.out.println("3. ");
+        System.out.println("Top individual donated event: ");
+        System.out.println("1. ");
+        System.out.println("2. ");
+        System.out.println("3. ");
+        System.out.println("Most funded event: ");
+        System.out.println("Most donated type:  ");
+        System.out.println("Highest donation amount:  ");
+        
+        
+        
+//        ListInterface<Donor> donorList = donorM.getDonorList();
+//        for(int i = 1; i <= donorList.getNumberOfEntries();i++){
+//            graph.addVertex(donorList.getEntry(i).getId());
+//        }
+//        
+//        SortedListInterface<Event> eventList = eventM.createSortedEventList();
+//        for(int i = 1; i<=eventList.getNumberOfEntries();i++){
+//            graph.addVertex(eventList.getEntry(i).getId());
+//        }
         
         
         
@@ -669,6 +719,8 @@ public class DonationMaintenance{
         }
         return sortedDonations;
     }
+    
+ 
     // </editor-fold>
 
     
