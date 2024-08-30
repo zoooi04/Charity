@@ -39,9 +39,11 @@ public class Test {
         graph.addEdge(e1, d1, 2000);//weight=donation amount
         graph.addEdge(e1, d2, 3000);//weight=donation amount
         graph.addEdge(e2, d2, 3000);//weight=donation amount
+
         //graph.addEdge(e1, d1, 5000);//weight=donation amount
         System.out.println("REMOVE: "+graph.removeEdge(d1,e1));
         System.out.println(graph.size());
+
         
         //graph.test(e1);
         graph.printGraph();//depends on entity toString()

@@ -8,8 +8,10 @@ import adt.ArrayList;
 import adt.BinarySearchTree;
 import adt.BinarySearchTreeInterface;
 import adt.HashMap;
+import adt.LinkedQueue;
 import adt.ListInterface;
 import adt.MapInterface;
+import adt.QueueInterface;
 import boundary.DonorMaintenanceUI;
 import dao.DAO;
 import dao.DonorInitializer;
@@ -30,6 +32,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     private ListInterface<Donor> donorList = new ArrayList<>();
     private final DAO<ListInterface<Donor>> dao = new DAO<>();
     private static final String FILENAME = "donor.dat";
+    private static Donor lastSearchDonor = null;
 
     public DonorMaintenance() {
         donorList = dao.retrieveFromFile(FILENAME);
@@ -51,26 +54,26 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                     display(donorList);
                     break;
                 case 2:
-                    Donor donor = new Donor();
-                    if (search(donorList, donor)) {
-                        donorUI.printDonorHeader();
-                        System.out.println(donor);
+//                    Donor donor = new Donor();
+//                    if (search(donorList, donor)) {
+//                        donorUI.printDonorHeader();
+//                        System.out.println(donor);
+//                    }
+
+                    int[] position = {-1};
+                    if (search(donorList, position)) {
+                        donorUI.printDonorDetails(lastSearchDonor);
+//                        System.out.println(lastSearchDonor);
                     }
                     break;
                 case 3:
-                    if (create(donorList)) {
-                        // display(donorList);
-                    }
+                    create(donorList);
                     break;
                 case 4:
-                    if (remove(donorList)) {
-                        // display(donorList);
-                    }
+                    remove(donorList);
                     break;
                 case 5:
-                    if (update(donorList)) {
-                        // display(donorList);
-                    }
+                    update(donorList);
                     break;
                 case 6:
                     break;
@@ -81,7 +84,6 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     }
     // </editor-fold>
 
-    
     // <editor-fold defaultstate="collapsed" desc="CRUD">
     // Add a new donor
     public boolean create(ListInterface<Donor> newEntry) {
@@ -93,7 +95,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                 donorUI.inputDonorDetails(newDonor);
                 DateTimeFormatter yearFormatter = DateTimeFormatter.ofPattern("yy");
                 String year = LocalDate.now().format(yearFormatter);
-                String newId = "AA" + year + String.format("%05d", newEntry.getNumberOfEntries()+1);
+                String newId = "AA" + year + String.format("%05d", newEntry.getNumberOfEntries() + 1);
                 newDonor.setId(newId);
                 arrListDonor.add(newDonor);
                 saveDonorList();
@@ -128,19 +130,44 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
 
     // Update donors details
     public boolean update(ListInterface<Donor> newEntry) {
+        boolean searchNewDonor = true, updateSelectedDonor = false;
         if (newEntry instanceof ArrayList<?>) {
             int[] position = {-1};
-            if (search(newEntry, position)) {
+            if (lastSearchDonor != null) {
+                int choice = donorUI.getUpdateDonorConfirmation(lastSearchDonor.getId());
+                do {
+                    switch (choice) {
+                        case 0:
+                            return false;
+                        case 1:
+                            searchNewDonor = false;
+                            updateSelectedDonor = true;
+                            break;
+                        case 2:
+                            break;
+                        default:
+                            break;
+                    }
+                } while (choice < 0 || choice > 2);
+            }
+
+            if (searchNewDonor) {
+                if (search(newEntry, position)) {
+                    updateSelectedDonor = true;
+                }
+            }
+
+            if (updateSelectedDonor) {
+
                 boolean confirm = false;
                 do {
-                    Donor updateDonor = (Donor) newEntry.getEntry(position[0]);
+                    Donor updateDonor = lastSearchDonor;
                     if (super.update(updateDonor)) {
                         int choice;
                         do {
                             choice = donorUI.getUpdateMenuChoice();
                             switch (choice) {
                                 case 0:
-                                    MessageUI.displayExitMessage();
                                     break;
                                 case 1:
                                     updateDonor.setType(donorUI.inputDonorType());
@@ -161,10 +188,8 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                     }
                 } while (!confirm);
                 saveDonorList();
-            } else {
-                MessageUI.displayObjectNotFoundMessage();
-                return false;
             }
+
         } else {
             return false;
         }
@@ -174,18 +199,78 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     // Search donor details
     public boolean search(ListInterface<Donor> newEntry, Object newObject) {
         boolean found = false;
-        MapInterface<String, Donor> donorHMap = toHashMap(newEntry);
+        MapInterface<String, QueueInterface<Donor>> donorHMap;
+        String selectedDonorId = "";
+        int choice = 0;
+        while (choice == 0) {
+            switch (donorUI.getSearchMenuChoice()) {
+                case 0:
+                    choice = -1;
+                    break;
+                case 1:
+                    selectedDonorId = donorUI.inputDonorId().trim();
+                    choice = -1;
+                    break;
+                case 2:
+                    String selectedDonorName = donorUI.inputPersonName().trim().toLowerCase();
+                    donorHMap = toHashMap(newEntry, false);
+                    if (!donorHMap.containsKey(selectedDonorName)) {
+                        MessageUI.displayObjectNotFoundMessage();
+                    } else {
+                        QueueInterface<Donor> foundDonorInMap = donorHMap.get(selectedDonorName);
+                        Iterator<Donor> itr = foundDonorInMap.getIterator();
+                        int i = 1;
+                        MapInterface<Integer, String> selectedDonorHMap = new HashMap<>();
+                        while (itr.hasNext()) {
+                            selectedDonorHMap.put(i++, itr.next().getId());
+                        }
+                        // list donor base on name
+                        // let user select numbering
+                        donorUI.printDonorSearchHeader();
+                        do {
+                            i = 1;
+                            itr = foundDonorInMap.getIterator();
+                            while (itr.hasNext()) {
+                                System.out.println(" [" + i++ + "] " + itr.next() + "\n");
+                            }
+                            choice = donorUI.inputSelection();
+                            if (choice > 0 && choice < i) {
+                                selectedDonorId = selectedDonorHMap.get(choice);
+                            } else if (choice == 0) {
+                                break;
+                            }
+                        } while (choice <= 0 || choice >= i);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
 
-        String inputDonorId = donorUI.inputDonorId().trim();
-        Donor foundDonorInMap = donorHMap.get(inputDonorId);
+        if (choice == 0) {
+            return false;
+        }
 
-        if (!donorHMap.containsKey(inputDonorId)) {
+        if (selectedDonorId == null) {
             return false;
         }
 
         if (newObject instanceof Donor) {
+            donorHMap = toHashMap(newEntry);
+            if (!donorHMap.containsKey(selectedDonorId)) {
+                return false;
+            }
+            if (donorHMap.get(selectedDonorId) == null) {
+                return false;
+            }
+            if (donorHMap.get(selectedDonorId).getFront() == null) {
+                return false;
+            }
+            Donor donorInMap = (Donor) donorHMap.get(selectedDonorId).getFront();
+
             Donor foundDonor = (Donor) newObject;
-            foundDonor.updateFrom(foundDonorInMap);
+            foundDonor.updateFrom(donorInMap);
+            lastSearchDonor = foundDonor;
             found = true;
         } else if (newObject instanceof int[]) {
 
@@ -194,7 +279,8 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
 
                 if (entry instanceof Donor) {
                     Donor donor = (Donor) entry;
-                    if (inputDonorId.equals(donor.getId())) {
+                    if (selectedDonorId.equals(donor.getId())) {
+                        lastSearchDonor = (Donor) entry;
                         found = true;
                         if (newObject instanceof int[]) {
                             int[] foundPosition = (int[]) newObject;
@@ -206,7 +292,6 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                 }
             }
         }
-
         if (!found) {
             MessageUI.displayObjectNotFoundMessage();
         }
@@ -354,23 +439,27 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     public void saveDonorList() {
         dao.saveToFile(donorList, FILENAME);
     }
-    
-    public ListInterface<Donor> getDonorList(){
+
+    public ListInterface<Donor> getDonorList() {
         return donorList;
     }
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="adt convertor">
+    public MapInterface<String, QueueInterface<Donor>> toHashMap(ListInterface<Donor> donorArrList) {
+        return toHashMap(donorArrList, true);
+    }
+
     /**
      * Converts the ArrayList to a Map using a key extractor function.
      *
-     * @param keyExtractor A function that extracts the key from an element of
-     * type T.
+     * @param donorArrList
+     * @param useIDAsKey
      * @return A Map where the keys are strings and the values are the elements
      * of the ArrayList.
      */
-    public MapInterface<String, Donor> toHashMap(ListInterface<Donor> donorArrList) {
-        MapInterface<String, Donor> donorMap = new HashMap<>();
+    public MapInterface<String, QueueInterface<Donor>> toHashMap(ListInterface<Donor> donorArrList, boolean useIDAsKey) {
+        MapInterface<String, QueueInterface<Donor>> donorMap = new HashMap<>();
 
         for (int i = 1; i <= donorArrList.getNumberOfEntries(); i++) {
 
@@ -378,7 +467,16 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
             if (donor == null) {
                 continue;  // Skip this entry
             }
-            donorMap.put(donor.getId(), donor);
+            String key = useIDAsKey ? donor.getId() : donor.getName().trim().toLowerCase();
+            QueueInterface<Donor> queue = donorMap.get(key);
+
+            if (queue == null) {
+                // If no queue exists for this key, create a new one
+                queue = new LinkedQueue<>();
+                donorMap.put(key, queue);
+            }
+            // Enqueue the donor into the existing or newly created queue
+            queue.enqueue(donor);
         }
 
         return donorMap;
