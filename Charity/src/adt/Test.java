@@ -14,13 +14,14 @@ import entity.Event;
  */
 public class Test {
     public static void main(String[] args){
+        
         //for every donation map event to donor
         WeightedBipartiteGraph<Event, Donor> graph = new WeightedBipartiteGraph<>(Event.class,Donor.class);
         
         Event e1 = new Event();
         e1.setName("Cancer Fundraising Event");
         //WeightedBipartiteGraph<Event,Donor>.Vertex<Event> vE = (WeightedBipartiteGraph<Event,Donor>.Vertex<Event>) graph.constructVertex(e1);
-        System.out.println("Add event vertex: " + graph.addVertex(e1));
+        //System.out.println("Add event vertex: " + graph.addVertex(e1));
         
         //System.out.println("Type of v.data: " + e1.getClass().getName());
         
@@ -30,7 +31,7 @@ public class Test {
         Donor d2 = new Donor();
         d2.setName("Jian Hui");
         //WeightedBipartiteGraph<Event, Donor>.Vertex<Donor> vD = (WeightedBipartiteGraph<Event,Donor>.Vertex<Donor>)graph.constructVertex(d1);
-        System.out.println("Add donor vertex: " + graph.addVertex(d1));
+        //System.out.println("Add donor vertex: " + graph.addVertex(d1));
         
         Event e2 = new Event();
         e2.setName("Challenge Hunger Event");
@@ -38,9 +39,14 @@ public class Test {
         graph.addEdge(e1, d1, 2000);//weight=donation amount
         graph.addEdge(e1, d2, 3000);//weight=donation amount
         graph.addEdge(e2, d2, 3000);//weight=donation amount
-        System.out.println(graph.removeEdge(e1,d1));
+        //graph.addEdge(e1, d1, 5000);//weight=donation amount
+        System.out.println("REMOVE: "+graph.removeEdge(d1,e1));
+        System.out.println(graph.size());
         
         //graph.test(e1);
         graph.printGraph();//depends on entity toString()
+        // </editor-fold>
+        
+        
     }
 }

@@ -4,7 +4,8 @@
  */
 package control;
 
-import adt.ArrayList;
+import adt.GraphInterface;
+import dao.DonationInitializer;
 import entity.Donation;
 import java.util.Scanner;
 import boundary.DonationMaintenanceUI;
@@ -12,6 +13,9 @@ import utility.MessageUI;
 import adt.MapInterface;
 import adt.HashMap;
 import adt.ListInterface;
+import adt.SortedLinkedList;
+import adt.SortedListInterface;
+import adt.WeightedGraph;
 import dao.DAO;
 import entity.Donor;
 import entity.Event;
@@ -35,15 +39,13 @@ public class DonationMaintenance{
     private static final Scanner scanner = new Scanner(System.in);
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     
-    private static final String ID_COUNT_FILE = "donationIdCount.txt";
+    //private static final String ID_COUNT_FILE = "donationIdCount.txt";
     
     
     public DonationMaintenance(){
-        HashMap fileMap = (HashMap<String,Donation>) dao.retrieveFromFile(FILENAME);
-        if(fileMap!=null){
-            donationMap = fileMap;
-        }else{
-            donationMap = new HashMap<>();
+        donationMap = (HashMap<String,Donation>) dao.retrieveFromFile(FILENAME);
+        if(donationMap==null){
+            donationMap = DonationInitializer.initializeDonation();
         }
     }
     
@@ -111,6 +113,7 @@ public class DonationMaintenance{
                     break;
                 case 9:
                     //donation report
+                    report();
                     break;
                 default:
                     MessageUI.displayInvalidChoiceMessage();
@@ -118,6 +121,7 @@ public class DonationMaintenance{
         } while (choice != 0);
     }
     // </editor-fold>
+    
     
     // <editor-fold defaultstate="collapsed" desc="Main Functions">
     public boolean create() {
@@ -211,7 +215,7 @@ public class DonationMaintenance{
 
         
         //assign properties
-        donation.setId(getIdCount());
+        donation.setId(getNextId());
         donation.setQuantity(quantity);
         donation.setMessage(message);
         donation.setDonor(donor);
@@ -225,7 +229,6 @@ public class DonationMaintenance{
         if(!donationMap.containsKey(donation.getId())){
             donationMap.put(donation.getId(), donation);
             saveDonationList();
-            incrementIdCount(getIdCount());
             System.out.println("Successfully added");
             return true;
         }else{
@@ -336,7 +339,7 @@ int quantity = -1;  // Initialize with an invalid value
     }
     
     public void trackByCategories(){
-        ListInterface<Donation> donationList = donationMap.values();        
+        SortedListInterface<Donation> donationList = getDonationListSortedById();        
         
         int choice = 0;
         do {
@@ -381,7 +384,8 @@ int quantity = -1;  // Initialize with an invalid value
     }
     
     public void listDonationByDonor(){
-        ListInterface<Donation> donationList = donationMap.values();
+        SortedListInterface<Donation> donationList = getDonationListSortedById();
+
         
         int choice = 0;
         do {
@@ -423,7 +427,7 @@ int quantity = -1;  // Initialize with an invalid value
     }
     
     public void filterDonationByCriteria(){
-        ListInterface<Donation> donationList = donationMap.values();
+        SortedListInterface<Donation> donationList = getDonationListSortedById();
         
         int choice = 0;
         do {
@@ -551,26 +555,62 @@ int quantity = -1;  // Initialize with an invalid value
         } while (choice != 0);
     }
     
-    public boolean report(Donation donation) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-    
-    public void displayAll(){
-        ListInterface<Donation> donationList = donationMap.values(); 
-        for(int i = 1; i <= donationList.getNumberOfEntries();i++){
-            Donation d = donationList.getEntry(i);
-            displayDonation(d,false,false);
+    public void report() {
+        GraphInterface<String> graph = new WeightedGraph<>();
+        
+        DonorMaintenance dm = new DonorMaintenance();
+        EventMaintenance em = new EventMaintenance();
+        
+        ListInterface<Donor> donorList = dm.getDonorList();
+        for(int i = 1; i <= donorList.getNumberOfEntries();i++){
+            graph.addVertex(donorList.getEntry(i).getId());
         }
+        
+        SortedListInterface<Event> eventList = em.createSortedEventList();
+        for(int i = 1; i<=eventList.getNumberOfEntries();i++){
+            graph.addVertex(eventList.getEntry(i).getId());
+        }
+        
+        
         
     }
     
+    public void displayAll(){
+        SortedListInterface<Donation> sortedDonations = getDonationListSortedById();
+        for(int i = 1; i <= sortedDonations.getNumberOfEntries();i++){
+            Donation d = sortedDonations.getEntry(i);
+            displayDonation(d,false,false);
+        }
+    }
+    
     // </editor-fold>
+    
     
     // <editor-fold defaultstate="collapsed" desc="other support function">
     public void saveDonationList(){
         dao.saveToFile(donationMap,FILENAME);
     }
     
+    public String getNextId(){
+        
+        SortedListInterface<Donation> donationList = getDonationListSortedById();
+        String idCount = donationList.getEntry(1).getId();
+        
+        int intCount = Integer.parseInt(idCount.substring(4));
+        intCount++;
+
+        int alphaAsci = (int) idCount.charAt(3);
+        if (intCount == 0) {
+            alphaAsci++;
+        }
+        char alpha = (char) alphaAsci;
+        String strCount = String.format("%04d", intCount);
+
+        String newId = "DNT" + alpha + strCount;
+        
+        return newId;
+    }
+    /*
     public static String getIdCount(){
         String data = null;
         try {
@@ -598,23 +638,12 @@ int quantity = -1;  // Initialize with an invalid value
     
     public void incrementIdCount(String idCount){
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(ID_COUNT_FILE))) {
-            int intCount = Integer.parseInt(idCount.substring(5));
-            intCount++;
+
             
-            int alphaAsci = (int) idCount.charAt(3);
-            if(intCount == 0){
-                alphaAsci++;
-            }
-            char alpha = (char) alphaAsci;
-            String strCount = String.format("%04d",intCount);
-            
-            String newId = "DNT"+ alpha + strCount;
-            System.out.println("new incremented Id: "+ newId);
-            writer.write(newId);
         } catch (IOException e) {
             System.out.println("Cannot initialize donation count file");
         }
-    }
+    }*/
     
     public void displayDonation(Donation d, boolean donorShowId, boolean eventShowId){
         String donorInfo = d.getDonor().getName();
@@ -647,18 +676,27 @@ int quantity = -1;  // Initialize with an invalid value
         }
     }
     
-    public Donor getDonorById(String id){
+    public static Donor getDonorById(String id){
         DonorMaintenance donorM = new DonorMaintenance();
         ListInterface<Donor> list = donorM.getDonorList();
         MapInterface<String,Donor> donorMap = donorM.toHashMap(list);
         return donorMap.get(id);
     }
     
-    public Event getEventById(String id){
+    public static Event getEventById(String id){
         EventMaintenance eventM = new EventMaintenance();
         MapInterface<String,Event> eventMap = eventM.getEventMap();
         return eventMap.get(id);
         
+    }
+    
+    public SortedListInterface<Donation> getDonationListSortedById(){
+        SortedListInterface<Donation> sortedDonations = new SortedLinkedList<>();
+        ListInterface<Donation> donationList = donationMap.values();
+        for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
+            sortedDonations.add(donationList.getEntry(i));
+        }
+        return sortedDonations;
     }
     // </editor-fold>
 
