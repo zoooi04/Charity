@@ -430,7 +430,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     //       event
     // Generate summary reports
     public boolean report(ListInterface<Donor> newEntry) {
-
+        
         return true;
     }
     // </editor-fold>

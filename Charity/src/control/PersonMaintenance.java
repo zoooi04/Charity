@@ -13,7 +13,7 @@ import utility.MessageUI;
  * @author Ooi Choon Chong
  * @param <T>
  */
-public class PersonMaintenance<T extends Person & Comparable<T>> implements ControlInterface<T> {
+public class PersonMaintenance<T extends Person & Comparable<T>>{
 
     protected final PersonMaintenanceUI personUI = new PersonMaintenanceUI();
 
@@ -21,7 +21,6 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
     }
 
     // <editor-fold defaultstate="collapsed" desc="CURD">
-    @Override
     public boolean create(T newEntry) {
         if (newEntry instanceof Person) {
             Person createdPerson = personUI.inputPersonDetails();
@@ -41,7 +40,6 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
         return true;
     }
 
-    @Override
     public boolean remove(T newEntry) {
         if (newEntry instanceof Person) {
         } else {
@@ -55,7 +53,6 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
      * @param newEntry
      * @return (false if select 0. Back), (true if select 99. Next Page)
      */
-    @Override
     public boolean update(T newEntry) {
         if (newEntry instanceof Person) {
             int choice = -1;
@@ -92,18 +89,15 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
         return false;
     }
 
-    @Override
     public void display(T newEntry) {
         System.out.println("Person does not have display, use it in child class");
     }
 
-    @Override
     public boolean search(T newEntry, T newObject) {
         System.out.println("Person does not have search, use it in child class");
         return true;
     }
 
-    @Override
     public boolean report(T newEntry) {
         if (newEntry instanceof Person) {
         } else {
