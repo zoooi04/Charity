@@ -178,10 +178,6 @@ public class Event implements Serializable, Comparable {
         return this.startDate.compareTo(otherEvent.startDate);
     }
 
-    public Event deepCopy() {
-        return new Event(this.id, this.name, this.type, this.startDate, this.endDate, this.location,
-                this.minVolunteer, this.maxVolunteer, this.currentVolunteer,
-                this.currentAmount, this.goalAmount, this.isDeleted);
-    }
+    
 
 }

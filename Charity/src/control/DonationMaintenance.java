@@ -1,3 +1,4 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -19,6 +20,7 @@ import adt.WeightedGraph;
 import dao.DAO;
 import entity.Donor;
 import entity.Event;
+
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -33,7 +35,10 @@ public class DonationMaintenance{
     private static final String FILENAME = "donationHashMap.dat";
     private static final Scanner scanner = new Scanner(System.in);
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    
     private static DonorMaintenance donorM = new DonorMaintenance();
+
 
     //private static final String ID_COUNT_FILE = "donationIdCount.txt";
     
@@ -551,25 +556,10 @@ int quantity = -1;  // Initialize with an invalid value
         } while (choice != 0);
     }
     
-    public void report() {
-        GraphInterface<String,Donation> graph = new WeightedGraph<>();
-        
-        DonorMaintenance dm = new DonorMaintenance();
-        EventMaintenance em = new EventMaintenance();
-        
-        ListInterface<Donor> donorList = dm.getDonorList();
-        for(int i = 1; i <= donorList.getNumberOfEntries();i++){
-            graph.addVertex(donorList.getEntry(i).getId());
-        }
-        
-        SortedListInterface<Event> eventList = em.createSortedEventList();
-        for(int i = 1; i<=eventList.getNumberOfEntries();i++){
-            graph.addVertex(eventList.getEntry(i).getId());
-        }
-        
-        
-        
-    }
+
+ 
+    public void report(){}
+
     
     public void displayAll(){
         SortedListInterface<Donation> sortedDonations = getDonationListSortedById();
@@ -587,6 +577,7 @@ int quantity = -1;  // Initialize with an invalid value
         dao.saveToFile(donationMap,FILENAME);
     }
     
+
     public static String getFileName(){
         return FILENAME;
     }
@@ -610,40 +601,7 @@ int quantity = -1;  // Initialize with an invalid value
         
         return newId;
     }
-    /*
-    public static String getIdCount(){
-        String data = null;
-        try {
-            File idCountFile = new File(ID_COUNT_FILE);
-            if(!idCountFile.exists() || idCountFile.length()==0){
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(ID_COUNT_FILE))) {
-                    writer.write("DNTA0001");
-                }catch(IOException e){
-                    System.out.println("Cannot initialize donation count file");
-                }
-                return "DNTA0001";
-            }
-            Scanner myReader = new Scanner(idCountFile);
-            while (myReader.hasNextLine()) {
-                data = myReader.nextLine();
-            }
-            myReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("Cannot read donation Id Count.");
-            e.printStackTrace();
-            
-        }
-        return data;
-    }
     
-    public void incrementIdCount(String idCount){
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ID_COUNT_FILE))) {
-
-            
-        } catch (IOException e) {
-            System.out.println("Cannot initialize donation count file");
-        }
-    }*/
     
     public void displayDonation(Donation d, boolean donorShowId, boolean eventShowId){
         String donorInfo = d.getDonor().getName();
@@ -677,6 +635,7 @@ int quantity = -1;  // Initialize with an invalid value
     }
     
     public static Donor getDonorById(String id){
+
         ListInterface<Donor> list = donorM.getDonorList();
         for(int i = 1; i <= list.getNumberOfEntries(); i++){
             if(list.getEntry(i).getId().equals(id)){
@@ -684,6 +643,7 @@ int quantity = -1;  // Initialize with an invalid value
                 return list.getEntry(i);
             }
         }
+
         return null;
     }
     
@@ -716,3 +676,4 @@ int quantity = -1;  // Initialize with an invalid value
     }
     // </editor-fold>
 }
+
