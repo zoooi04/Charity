@@ -302,102 +302,123 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     public void display(ListInterface<Donor> newEntry) {
         int choice = 0;
         int choiceDetail = 0;
-        String donorFilterResultStr = "";
+        Donor.Type donorFilterTypeEnum = null;
+        Donor.Category donorFilterCategoryEnum = null;
         do {
-            choice = donorUI.getDisplayMenuChoice();
-            switch (choice) {
-                case 0:
-                    break;
-                case 1:
-                    do {
-                        choiceDetail = donorUI.getDisplayTypeMenuChoice();
-                        switch (choiceDetail) {
-                            case 0:
-                                break;
-                            case 1:
-                                donorFilterResultStr = getAllDonor(Donor.Type.INDIVIDUAL);
-                                break;
-                            case 2:
-                                donorFilterResultStr = getAllDonor(Donor.Type.ORGANISATION);
-                                break;
-                            default:
-                                break;
-                        }
-                        if (choiceDetail > 0 && choiceDetail < 3) {
-                            donorUI.printDonorHeader();
-                            donorUI.listAllDonor(donorFilterResultStr);
-                        }
-                    } while (choiceDetail != 0);
-                    break;
-                case 2:
-                    do {
-                        choiceDetail = donorUI.getDisplayCategoryMenuChoice();
-                        switch (choiceDetail) {
-                            case 0:
-                                break;
-                            case 1:
-                                donorFilterResultStr = getAllDonor(Donor.Category.GOVERNMENT);
-                                break;
-                            case 2:
-                                donorFilterResultStr = getAllDonor(Donor.Category.PRIVATE);
-                                break;
-                            case 3:
-                                donorFilterResultStr = getAllDonor(Donor.Category.PUBLIC);
-                                break;
-                            default:
-                                break;
-                        }
-                        if (choiceDetail > 0 && choiceDetail < 4) {
-                            donorUI.printDonorHeader();
-                            donorUI.listAllDonor(donorFilterResultStr);
-                        }
-                    } while (choiceDetail != 0);
-                    break;
-                case 3:
-                    do {
-                        choiceDetail = donorUI.getDisplaySortMenuChoice();
-                        Comparator<Donor> compareBy = null;
-                        switch (choiceDetail) {
-                            case 0:
-                                break;
-                            case 1:
-                                compareBy = Comparator.comparing(Donor::getId);
-                                break;
-                            case 2:
-                                compareBy = Comparator.comparing(Donor::getName);
-                                break;
-                            case 3:
-                                compareBy = Comparator.comparing(Donor::getPhoneNo);
-                                break;
-                            case 4:
-                                compareBy = Comparator.comparing(Donor::getRegisterDate);
-                                break;
-                            default:
-                                break;
-                        }
-                        if (choiceDetail > 0 && choiceDetail < 5) {
-                            BinarySearchTreeInterface<Donor> bstBy = new BinarySearchTree<>(compareBy);
-                            for (int i = 1; i <= newEntry.getNumberOfEntries(); ++i) {
-                                // insert into binary tree if donor is not deleted
-                                if (!newEntry.getEntry(i).isIsDeleted()) {
+            do {
+                choice = donorUI.getDisplayMenuChoice();
+                switch (choice) {
+                    case 0:
+                        break;
+                    case 1:
+                        do {
+                            choiceDetail = donorUI.getDisplayTypeMenuChoice();
+                            switch (choiceDetail) {
+                                case 0:
+                                    break;
+                                case 1:
+                                    donorFilterTypeEnum = Donor.Type.ORGANISATION;
+                                    break;
+                                case 2:
+                                    donorFilterTypeEnum = Donor.Type.INDIVIDUAL;
+                                    break;
+                                case 9:
+                                    donorFilterTypeEnum = null;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } while ((choiceDetail < 0 || choiceDetail > 2) && choiceDetail != 9);
+                        break;
+                    case 2:
+                        do {
+                            choiceDetail = donorUI.getDisplayCategoryMenuChoice();
+                            switch (choiceDetail) {
+                                case 0:
+                                    break;
+                                case 1:
+                                    donorFilterCategoryEnum = Donor.Category.GOVERNMENT;
+                                    break;
+                                case 2:
+                                    donorFilterCategoryEnum = Donor.Category.PRIVATE;
+                                    break;
+                                case 3:
+                                    donorFilterCategoryEnum = Donor.Category.PUBLIC;
+                                    break;
+                                case 9:
+                                    donorFilterCategoryEnum = null;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        } while ((choiceDetail < 0 || choiceDetail > 3) && choiceDetail != 9);
+                        break;
+                    case 3:
+                        // exit and jump to sort
+                        break;
+
+                    default:
+                        break;
+                }
+
+            } while (choice != 0 && choice != 3);
+
+            if (choice == 3) {
+                do {
+                    choiceDetail = donorUI.getDisplaySortMenuChoice(donorFilterTypeEnum, donorFilterCategoryEnum);
+                    Comparator<Donor> compareBy = null;
+                    switch (choiceDetail) {
+                        case 0:
+                            break;
+                        case 1:
+                            compareBy = Comparator.comparing(Donor::getId);
+                            break;
+                        case 2:
+                            compareBy = Comparator.comparing(Donor::getName);
+                            break;
+                        case 3:
+                            compareBy = Comparator.comparing(Donor::getPhoneNo);
+                            break;
+                        case 4:
+                            compareBy = Comparator.comparing(Donor::getRegisterDate);
+                            break;
+                        default:
+                            break;
+                    }
+                    if (choiceDetail > 0 && choiceDetail < 5) {
+                        BinarySearchTreeInterface<Donor> bstBy = new BinarySearchTree<>(compareBy);
+                        for (int i = 1; i <= newEntry.getNumberOfEntries(); ++i) {
+                            // insert into binary tree if donor is not deleted
+                            if (!newEntry.getEntry(i).isIsDeleted()) {
+
+                                if (donorFilterTypeEnum == null && donorFilterCategoryEnum == null) {
+                                    bstBy.insert(newEntry.getEntry(i));
+                                }
+
+                                if (donorFilterTypeEnum == newEntry.getEntry(i).getType() && donorFilterCategoryEnum == null) {
+                                    bstBy.insert(newEntry.getEntry(i));
+                                }
+
+                                if (donorFilterTypeEnum == null && donorFilterCategoryEnum == newEntry.getEntry(i).getCategory()) {
+                                    bstBy.insert(newEntry.getEntry(i));
+                                }
+
+                                if (donorFilterTypeEnum == newEntry.getEntry(i).getType() && donorFilterCategoryEnum == newEntry.getEntry(i).getCategory()) {
                                     bstBy.insert(newEntry.getEntry(i));
                                 }
                             }
-                            donorUI.printDonorHeader();
-                            Iterator it = bstBy.iterator();
-                            while (it.hasNext()) {
-                                System.out.print(it.next() + "\n");
-                            }
-                            System.out.println("\n");
                         }
-                    } while (choiceDetail != 0);
-                    break;
+                        donorUI.printDonorHeader();
+                        Iterator it = bstBy.iterator();
+                        while (it.hasNext()) {
+                            System.out.print(it.next() + "\n");
+                        }
+                        System.out.println("\n");
+                    }
+                } while (choiceDetail != 0);
 
-                default:
-                    break;
             }
-
-        } while (choice != 0);
+        } while (choiceDetail == 0 && choice != 0);
     }
 
     // List donors with all the donations made
@@ -409,7 +430,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     //       event
     // Generate summary reports
     public boolean report(ListInterface<Donor> newEntry) {
-
+        
         return true;
     }
     // </editor-fold>

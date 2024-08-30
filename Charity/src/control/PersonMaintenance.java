@@ -6,6 +6,7 @@ package control;
 
 import boundary.PersonMaintenanceUI;
 import entity.Person;
+import java.time.LocalDate;
 import utility.MessageUI;
 
 /**
@@ -13,7 +14,7 @@ import utility.MessageUI;
  * @author Ooi Choon Chong
  * @param <T>
  */
-public class PersonMaintenance<T extends Person & Comparable<T>> implements ControlInterface<T> {
+public class PersonMaintenance<T extends Person & Comparable<T>>{
 
     protected final PersonMaintenanceUI personUI = new PersonMaintenanceUI();
 
@@ -21,7 +22,6 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
     }
 
     // <editor-fold defaultstate="collapsed" desc="CURD">
-    @Override
     public boolean create(T newEntry) {
         if (newEntry instanceof Person) {
             Person createdPerson = personUI.inputPersonDetails();
@@ -41,7 +41,6 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
         return true;
     }
 
-    @Override
     public boolean remove(T newEntry) {
         if (newEntry instanceof Person) {
         } else {
@@ -55,7 +54,6 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
      * @param newEntry
      * @return (false if select 0. Back), (true if select 99. Next Page)
      */
-    @Override
     public boolean update(T newEntry) {
         if (newEntry instanceof Person) {
             int choice = -1;
@@ -66,20 +64,50 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
                         MessageUI.displayExitMessage();
                         break;
                     case 1:
-                        newEntry.setName(personUI.inputPersonName());
+                        String newName = personUI.inputPersonName();
+                        if (newEntry.getName().equals(newName)) {
+                            System.out.println("The new name is the same as the existing name.");
+                            MessageUI.displayErrorMessage();
+                        } else {
+                            newEntry.setName(newName);
+                        }
                         break;
                     case 2:
-                        newEntry.setPhoneNo(personUI.inputPersonPhoneNo());
+                        String newPhoneNo = personUI.inputPersonPhoneNo();
+                        if (newEntry.getPhoneNo().equals(newPhoneNo)) {
+                            System.out.println("The new phone number is the same as the existing phone number.");
+                            MessageUI.displayErrorMessage();
+                        } else {
+                            newEntry.setPhoneNo(newPhoneNo);
+                        }
                         break;
                     case 3:
-                        newEntry.setBirthday(personUI.inputPersonBirthday());
+                        LocalDate newBirthday = personUI.inputPersonBirthday();
+                        if (newEntry.getBirthday().equals(newBirthday)) {
+                            System.out.println("The new birthday is the same as the existing birthday.");
+                            MessageUI.displayErrorMessage();
+                        } else {
+                            newEntry.setBirthday(newBirthday);
+                        }
                         break;
                     case 4:
-                        newEntry.setGender(personUI.inputPersonGender());
+                        Person.Gender newGender = personUI.inputPersonGender();
+                        if (newEntry.getGender().equals(newGender)) {
+                            System.out.println("The new gender is the same as the existing gender.");
+                            MessageUI.displayErrorMessage();
+                        } else {
+                            newEntry.setGender(newGender);
+                        }
                         break;
                     case 5:
-                        newEntry.setIsActive(!((Person) newEntry).isIsActive());
-                        personUI.printPersonActivate((Person) newEntry);
+                        boolean newIsActive = !((Person) newEntry).isIsActive();
+                        if (((Person) newEntry).isIsActive() == newIsActive) {
+                            System.out.println("The active status is already " + newIsActive);
+                            MessageUI.displayErrorMessage();
+                        } else {
+                            newEntry.setIsActive(newIsActive);
+                            personUI.printPersonActivate((Person) newEntry);
+                        }
                         break;
                     case 99:
                         return true;
@@ -92,18 +120,15 @@ public class PersonMaintenance<T extends Person & Comparable<T>> implements Cont
         return false;
     }
 
-    @Override
     public void display(T newEntry) {
         System.out.println("Person does not have display, use it in child class");
     }
 
-    @Override
     public boolean search(T newEntry, T newObject) {
         System.out.println("Person does not have search, use it in child class");
         return true;
     }
 
-    @Override
     public boolean report(T newEntry) {
         if (newEntry instanceof Person) {
         } else {
