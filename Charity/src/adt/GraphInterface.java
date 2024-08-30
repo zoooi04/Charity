@@ -7,10 +7,19 @@ package adt;
 /**
  *
  * @author huaiern
+ * @param <T>
+ * @param <N>
  */
-public interface GraphInterface<T> {
-    void addVertex(T vertex);                           //add vertex
-    void addEdge(T source, T destination, int weight); // add edge
-    boolean removeEdge(T v1, T v2);    //remove edge between 2 vertex
-    void printGraph();              //print graph as hashmap
+public interface GraphInterface<T extends Comparable<T>,N extends Comparable<N>> {
+    boolean addVertex(T vertex);                        //add vertex
+    boolean hasVertex(T vertex);                        //check has vertex
+    T getVertex(int position);                          //get vertex based on position
+    int getIndex(T vertex);                             //with node information, find the index of the vertex
+    boolean addEdge(T source, T destination, N weight); // add edge
+    boolean removeEdge(T v1, T v2);                     //remove edge between 2 vertex
+    void printEdges();                                  //print edges
+    ArrayList<T> getAllVertexObjects();                 //get all vertex objects
+    ArrayList<T> getNeighbours(T vertex);               //get neighbours of given vertex
+
+
 }

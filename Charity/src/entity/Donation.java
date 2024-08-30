@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
  *
  * @author huaiern
  */
-public class Donation implements Serializable{
+public class Donation implements Serializable, Comparable<Donation>{
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private String id;
@@ -29,14 +29,15 @@ public class Donation implements Serializable{
     }
     
     public Donation(){
-        this("",0,"",null,null,null);
+        
     }
     
-    public Donation(String id, int quantity, String message, Donor donor,DonationType type, LocalDate date){
+    public Donation(String id, int quantity, String message, Donor donor, Event event, DonationType type, LocalDate date){
         this.id = id;
         this.quantity = quantity;
         this.message = message;
         this.donor = donor;
+        this.event = event;
         this.type = type;
         this.date = date;
     }
@@ -126,5 +127,19 @@ public class Donation implements Serializable{
                              Date: %s
                              Donor: %s
                              Event: %s""", id, quantity, type, message, date.format(formatter),donor.getId(),event.getId());
+    }
+    
+    @Override
+    public int compareTo(Donation d){
+        int idCount = Integer.parseInt(id.substring(5));
+        int anotherIdCount = Integer.parseInt(d.id.substring(5));
+        
+        if(idCount>anotherIdCount){
+            return 0;
+        }else if(idCount==anotherIdCount){
+            return -1;
+        }else{
+            return 1;
+        }
     }
 }

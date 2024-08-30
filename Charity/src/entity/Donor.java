@@ -106,4 +106,22 @@ public class Donor extends Person implements Serializable, Comparable<Donor> {
         return super.hashCode();
     }
 
+    @Override
+    public boolean equals(Object o){
+        if(this==o){
+            return true;
+        }
+        
+        if(o==null){
+            return false;
+        }
+        
+        if(o instanceof Donor){
+            Donor d = (Donor)o;
+            return id.equals(d.getId());
+        }
+        
+        return false;
+    }
+    
 }
