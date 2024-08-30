@@ -217,7 +217,7 @@ public class DonationMaintenance{
         donation.setDonor(donor);
         donation.setEvent(event);
         donation.setType(inputEnum);
-        
+        donation.setIsDeleted(false);
         
         donation.setDate(date);
         
@@ -242,16 +242,9 @@ public class DonationMaintenance{
         //use id to get the donation object
         Donation donation = donationMap.get(id);
         
-        if(!donationMap.isEmpty()&& donation!=null){
-            if(donationMap.remove(donation.getId())!=null){
-                saveDonationList();
-                System.out.println("Successfully removed");
-                return true;
-            }else{
-                System.out.println("This donation does not exist!");
-                return false;
-            }
-            
+        if(donation != null && !donation.getIsDeleted()){
+            donation.setIsDeleted(true);
+            return true;
         }else{
             System.out.println("Donation does not exist");
             return false;
@@ -265,15 +258,17 @@ public class DonationMaintenance{
         String id = scanner.nextLine().toUpperCase();
         
         if(!donationMap.isEmpty() && donationMap.containsKey(id)){
-int quantity = -1;  // Initialize with an invalid value
-        System.out.print("Enter quantity: ");
-        // Keep looping until a valid, non-negative integer is provided
-        while (!scanner.hasNextInt() || (quantity = scanner.nextInt()) < 0) {
-            System.out.println("Invalid input. Please enter a valid quantity.");
-            scanner.nextLine();  // Consume the invalid input
+            int quantity = -1;  // Initialize with an invalid value
+        
             System.out.print("Enter quantity: ");
-        }
-        scanner.nextLine();  // Consume the newline character after the valid integer input
+            // Keep looping until a valid, non-negative integer is provided
+            while (!scanner.hasNextInt() || (quantity = scanner.nextInt()) < 0) {
+                System.out.println("Invalid input. Please enter a valid quantity.");
+                scanner.nextLine();  // Consume the invalid input
+                System.out.print("Enter quantity: ");
+            }
+            
+            scanner.nextLine();  // Consume the newline character after the valid integer input
 
             System.out.print("Enter new message: ");
             String message = scanner.nextLine();
@@ -348,7 +343,7 @@ int quantity = -1;  // Initialize with an invalid value
                     donationUI.printDonationHeader();
                     for(int i = 1; i<= donationList.getNumberOfEntries();i++){
                         Donation donation = donationList.getEntry(i);
-                        if(donation.getType().equals(Donation.DonationType.CASH)){
+                        if(donation.getType().equals(Donation.DonationType.CASH) && !donation.getIsDeleted()){
                             displayDonation(donation,false,false);
                         }
                     }
@@ -358,7 +353,7 @@ int quantity = -1;  // Initialize with an invalid value
                     donationUI.printDonationHeader();
                     for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                         Donation donation = donationList.getEntry(i);
-                        if (donation.getType().equals(Donation.DonationType.FOOD)) {
+                        if (donation.getType().equals(Donation.DonationType.FOOD) && !donation.getIsDeleted()) {
                             displayDonation(donation,false,false);
                         }
                     }
@@ -368,7 +363,7 @@ int quantity = -1;  // Initialize with an invalid value
                     donationUI.printDonationHeader();
                     for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                         Donation donation = donationList.getEntry(i);
-                        if (donation.getType().equals(Donation.DonationType.ITEM)) {
+                        if (donation.getType().equals(Donation.DonationType.ITEM) && !donation.getIsDeleted()) {
                             displayDonation(donation,false,false);
                         }
                     }
@@ -397,7 +392,7 @@ int quantity = -1;  // Initialize with an invalid value
                     donationUI.printDonationHeader();
                     for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                         Donation donation = donationList.getEntry(i);
-                        if (donation.getDonor().getId().equals(id)) {
+                        if (donation.getDonor().getId().equals(id) && !donation.getIsDeleted()) {
                             displayDonation(donation, true,false);
                         }
                     }
@@ -410,7 +405,7 @@ int quantity = -1;  // Initialize with an invalid value
                     donationUI.printDonationHeader();
                     for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                         Donation donation = donationList.getEntry(i);
-                        if (donation.getDonor().getName().toUpperCase().equals(name.toUpperCase())) {
+                        if (donation.getDonor().getName().toUpperCase().equals(name.toUpperCase())&& !donation.getIsDeleted()) {
                             displayDonation(donation, false,false);
                         }
                     }
@@ -444,14 +439,14 @@ int quantity = -1;  // Initialize with an invalid value
                     if(message.equals("Y")){
                         for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                             Donation donation = donationList.getEntry(i);
-                            if (!donation.getMessage().isBlank()) {
+                            if (!donation.getMessage().isBlank()&& !donation.getIsDeleted()) {
                                 displayDonation(donation, false,false);
                             }
                         }
                     }else if (message.equals("N")){
                         for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                             Donation donation = donationList.getEntry(i);
-                            if (donation.getMessage().isBlank()) {
+                            if (donation.getMessage().isBlank()&& !donation.getIsDeleted()) {
                                 displayDonation(donation, false,false);
                             }
                         }
@@ -473,7 +468,7 @@ int quantity = -1;  // Initialize with an invalid value
                                 donationUI.printDonationHeader();
                                 for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                                     Donation donation = donationList.getEntry(i);
-                                    if (donation.getEvent().getId().equals(id)) {
+                                    if (donation.getEvent().getId().equals(id)&& !donation.getIsDeleted()) {
                                         displayDonation(donation, true,true);
                                     }
                                 }
@@ -486,7 +481,7 @@ int quantity = -1;  // Initialize with an invalid value
                                 donationUI.printDonationHeader();
                                 for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                                     Donation donation = donationList.getEntry(i);
-                                    if (donation.getEvent().getName().toUpperCase().equals(name.toUpperCase())) {
+                                    if (donation.getEvent().getName().toUpperCase().equals(name.toUpperCase())&& !donation.getIsDeleted()) {
                                         displayDonation(donation, false,false);
                                     }
                                 }
@@ -537,7 +532,11 @@ int quantity = -1;  // Initialize with an invalid value
                         Donation donation = donationList.getEntry(i);
                         if ((donation.getDate().isAfter(date1) || donation.getDate().isEqual(date1))
                                 && (donation.getDate().isBefore(date2) || donation.getDate().isEqual(date2))) {
-                            displayDonation(donation, false,false);
+                            
+                            if(!donation.getIsDeleted()){
+                                displayDonation(donation, false, false);
+                            }
+                            
                         }
                             
                             
@@ -575,7 +574,10 @@ int quantity = -1;  // Initialize with an invalid value
         SortedListInterface<Donation> sortedDonations = getDonationListSortedById();
         for(int i = 1; i <= sortedDonations.getNumberOfEntries();i++){
             Donation d = sortedDonations.getEntry(i);
-            displayDonation(d,false,false);
+            if(!d.getIsDeleted()){
+                displayDonation(d, false, false);
+            }
+            
         }
     }
     
@@ -592,7 +594,6 @@ int quantity = -1;  // Initialize with an invalid value
     }
     
     public String getNextId(){
-        
         SortedListInterface<Donation> donationList = getDonationListSortedById();
         String idCount = donationList.getEntry(1).getId();
         
@@ -610,40 +611,6 @@ int quantity = -1;  // Initialize with an invalid value
         
         return newId;
     }
-    /*
-    public static String getIdCount(){
-        String data = null;
-        try {
-            File idCountFile = new File(ID_COUNT_FILE);
-            if(!idCountFile.exists() || idCountFile.length()==0){
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(ID_COUNT_FILE))) {
-                    writer.write("DNTA0001");
-                }catch(IOException e){
-                    System.out.println("Cannot initialize donation count file");
-                }
-                return "DNTA0001";
-            }
-            Scanner myReader = new Scanner(idCountFile);
-            while (myReader.hasNextLine()) {
-                data = myReader.nextLine();
-            }
-            myReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("Cannot read donation Id Count.");
-            e.printStackTrace();
-            
-        }
-        return data;
-    }
-    
-    public void incrementIdCount(String idCount){
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ID_COUNT_FILE))) {
-
-            
-        } catch (IOException e) {
-            System.out.println("Cannot initialize donation count file");
-        }
-    }*/
     
     public void displayDonation(Donation d, boolean donorShowId, boolean eventShowId){
         String donorInfo = d.getDonor().getName();
