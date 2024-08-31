@@ -302,7 +302,7 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
     public void printDonorReportBody(ArrayList<Donor> arrList, int group, int total) {
         String outputStr = "";
         String groupName = "";
-        switch(group){
+        switch (group) {
             case 1:
                 groupName = String.format("%s", arrList.getEntry(1).getGender());
                 break;
@@ -316,13 +316,68 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
         outputStr += String.format("%-24s%12s%12s",
                 groupName,
                 arrList.getNumberOfEntries(),
-                arrList.getNumberOfEntries()*100/total+"%");
+                arrList.getNumberOfEntries() * 100 / total + "%");
         System.out.println(outputStr);
     }
 
-    public void printDonorReportSeperateLine() {
+    public void printActiveDonorReportHeader() {
         String outputStr = "";
-        outputStr += "-".repeat(48) + "\n";
+        outputStr += "\n\t\tReport of active donor";
+        outputStr += "\n" + "=".repeat(64) + "\n";
+        outputStr += String.format("%-16s%12s%12s%12s%12s",
+                "Group",
+                "Active",
+                "Non-Active",
+                "Total",
+                "Active(%)");
+        outputStr += "\n" + "=".repeat(64) + "\n";
+        System.out.print(outputStr);
+    }
+
+    public void printActiveDonorReportBody(int[] active, int[] inActive) {
+        for (int i = 0; i < active.length; i++) {
+            String outputStr = "";
+            String group = "";
+            switch (i) {
+                case 0:
+                    group = "age below 21";
+                    break;
+                case 1:
+                    group = "age  21 - 40";
+                    break;
+                case 2:
+                    group = "age  41 - 60";
+                    break;
+                case 3:
+                    group = "age  61 - 80";
+                    break;
+                case 4:
+                    group = "age  over 80";
+                    break;
+                case 5:
+                    group = "All Donor";
+                    break;
+            }
+
+            int total = active[i] + inActive[i];
+            int percentage = (total == 0 ? 0 : active[i] * 100 / total);
+            if(i==5){
+                printDonorReportSeperateLine(64);
+            }
+            outputStr += String.format("%-16s%12s%12s%12s%12s\n",
+                    group,
+                    active[i],
+                    inActive[i],
+                    total,
+                    percentage+"%");
+            System.out.print(outputStr);
+        }
+        System.out.print("=".repeat(64) + "\n");
+    }
+
+    public void printDonorReportSeperateLine(int repeat) {
+        String outputStr = "";
+        outputStr += "-".repeat(repeat) + "\n";
         System.out.print(outputStr);
     }
     // </editor-fold>
