@@ -74,9 +74,7 @@ public class DonationInitializer {
         DAO<MapInterface<String, Donation>> dao = new DAO<>();
         
         MapInterface<String,Donation> donationMap = new HashMap<>();
-        donationMap.put(donation1.getId(),donation1);
-        donationMap.put(donation2.getId(), donation2);
-        donationMap.put(donation3.getId(), donation3);
+
         donationMap.put(donation1.getId(), donation1);
         donationMap.put(donation2.getId(), donation2);
         donationMap.put(donation3.getId(), donation3);

@@ -3,7 +3,7 @@ package adt;
 import java.util.Iterator;
 
 /**
- * @author huaiern
+ * @author huaiern referenced and modified fromm sample code
  * 
  * @param <T>
  */
@@ -90,6 +90,7 @@ public class LinkedList<T> implements ListInterface<T>, Iterable<T> {
     return result; // return removed entry, or null if operation fails
   }
   
+    //added another enhanced remove to remove by element instead
     public boolean remove(T element) {
         Node currentNode = firstNode;
         int index = 0;
@@ -143,6 +144,7 @@ public class LinkedList<T> implements ListInterface<T>, Iterable<T> {
     Node currentNode = firstNode;
 
     while (!found && (currentNode != null)) {
+
       if (anEntry.equals(currentNode.data)) {
         found = true;
       } else {
@@ -159,11 +161,7 @@ public class LinkedList<T> implements ListInterface<T>, Iterable<T> {
 
   @Override
   public boolean isEmpty() {
-    boolean result;
-
-    result = numberOfEntries == 0;
-
-    return result;
+    return numberOfEntries==0;
   }
 
   @Override
@@ -171,6 +169,15 @@ public class LinkedList<T> implements ListInterface<T>, Iterable<T> {
     return false;
   }
 
+  //additional method for returning a copy of list
+  public LinkedList<T> copyList(){
+      LinkedList<T> newList = new LinkedList<>();
+      for(T item: this){
+          newList.add(item);
+      }
+      return newList;
+  }
+  
   @Override
   public String toString() {
     String outputStr = "[";

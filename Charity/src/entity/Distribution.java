@@ -62,9 +62,9 @@ public class Distribution implements Serializable {
         String doneeType = donee.getType().name();
         String donationId = donation.getId();
         String donationType = donation.getType().name();
-        int donationQuantity = donation.getQuantity();
+        double donationQuantity = donation.getQuantity();
 
-        return String.format("%-15s %-15s %-15s %-15s %-15s %-10d %-20s",
+        return String.format("%-15s %-15s %-15s %-15s %-15s %-10.2f %-20s",
                 id,
                 doneeId,
                 doneeType,

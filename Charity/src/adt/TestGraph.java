@@ -39,7 +39,8 @@ public class TestGraph {
         System.out.println("add edge Alor Setar - Kuching: " + graph1.addEdge("Alor Setar", "Kuching", 1200));
         System.out.println("add edge Tawau - Alor Setar: " + graph1.addEdge("Tawau", "Alor Setar", 1900));
         System.out.println("add edge Kuching - Tawau: " + graph1.addEdge("Kuching", "Tawau", 900));
-        System.out.println("add edge Langkawi - Ipoh: " + graph1.addEdge("Langkawi", "Ipoh", 200));
+        System.out.println("add edge Langkawi - Ipoh: " + graph1.addEdge("Langkawi", "Tawau", 200));
+        System.out.println("add edge Langkawi - Ipoh: " + graph1.addEdge("Langkawi", "Tawau", 500));
 //        graph1.addVertex("KL");
 //        System.out.println("add edge Langkawi - Ipoh: " + graph1.addEdge("Kuching", "KL", 400));
 //        System.out.println("add edge Langkawi - Ipoh: " + graph1.addEdge("Kuching", "KL", 200));

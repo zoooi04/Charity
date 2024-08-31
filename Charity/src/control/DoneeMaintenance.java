@@ -344,7 +344,7 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
         }
 
         // Initialize summary maps
-        MapInterface<String, MapInterface<String, Integer>> totalAmountsByDoneeTypeAndDonation = new HashMap<>();
+        MapInterface<String, MapInterface<String, Double>> totalAmountsByDoneeTypeAndDonation = new HashMap<>();
         MapInterface<String, Integer> distributionCountsByDonee = new HashMap<>();
 
         for (int i = 1; i <= records.getNumberOfEntries(); i++) {
@@ -353,17 +353,17 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
             // Extract donee type, donation type, and amount from the record
             String doneeType = record.getDonee().getType().name();  // Assuming getType() returns an enum
             String donationType = record.getDonation().getType().name();  // Assuming getType() returns an enum
-            int amount = record.getDonation().getQuantity();  // Assuming getQuantity() returns the donation amount
+            double amount = record.getDonation().getQuantity();  // Assuming getQuantity() returns the donation amount
 
             // Update total amounts by donee type and donation type
-            MapInterface<String, Integer> donationAmounts = totalAmountsByDoneeTypeAndDonation.get(doneeType);
+            MapInterface<String, Double> donationAmounts = totalAmountsByDoneeTypeAndDonation.get(doneeType);
             if (donationAmounts == null) {
                 donationAmounts = new HashMap<>();
                 totalAmountsByDoneeTypeAndDonation.put(doneeType, donationAmounts);
             }
-            Integer currentAmount = donationAmounts.get(donationType);
+            Double currentAmount = donationAmounts.get(donationType);
             if (currentAmount == null) {
-                currentAmount = 0;
+                currentAmount = 0.0;
             }
             donationAmounts.put(donationType, currentAmount + amount);
 
@@ -384,13 +384,13 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
         ArrayList<String> doneeTypes = totalAmountsByDoneeTypeAndDonation.keySet();
         for (int i = 1; i <= doneeTypes.getNumberOfEntries(); i++) {
             String doneeType = doneeTypes.getEntry(i);
-            MapInterface<String, Integer> donationAmounts = totalAmountsByDoneeTypeAndDonation.get(doneeType);
+            MapInterface<String, Double> donationAmounts = totalAmountsByDoneeTypeAndDonation.get(doneeType);
 
             System.out.println(doneeType);
             ArrayList<String> donationTypes = donationAmounts.keySet();
             for (int j = 1; j <= donationTypes.getNumberOfEntries(); j++) {
                 String donationType = donationTypes.getEntry(j);
-                Integer amount = donationAmounts.get(donationType);
+                Double amount = donationAmounts.get(donationType);
                 System.out.println("    Donation Type: " + donationType + " - Amount: " + (amount != null ? amount : 0));
             }
         }
@@ -410,7 +410,7 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
                 Distribution record = records.getEntry(j);
                 if (record.getDonee().getId().equals(doneeId)) {
                     String donationType = record.getDonation().getType().name();
-                    int amount = record.getDonation().getQuantity();
+                    double amount = record.getDonation().getQuantity();
                     System.out.println("    Donation Type: " + donationType + " - Amount: " + amount);
                 }
             }

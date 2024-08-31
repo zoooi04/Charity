@@ -14,7 +14,7 @@ public class Donation implements Serializable, Comparable<Donation>{
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private String id;
-    private int quantity;
+    private double quantity;
     private String message;
     private Donor donor;
     private Event event;
@@ -26,14 +26,14 @@ public class Donation implements Serializable, Comparable<Donation>{
     public enum DonationType {
         CASH,
         FOOD,
-        ITEM
+        ITEM,
     }
     
     public Donation(){
         
     }
     
-    public Donation(String id, int quantity, String message, Donor donor, Event event, DonationType type, LocalDate date){
+    public Donation(String id, double quantity, String message, Donor donor, Event event, DonationType type, LocalDate date){
         this.id = id;
         this.quantity = quantity;
         this.message = message;
@@ -48,7 +48,7 @@ public class Donation implements Serializable, Comparable<Donation>{
         return id;
     }
     
-    public int getQuantity(){
+    public double getQuantity(){
         return quantity;
     }
     
@@ -80,7 +80,7 @@ public class Donation implements Serializable, Comparable<Donation>{
         this.id = id;
     }
     
-    public void setQuantity(int quantity){
+    public void setQuantity(double quantity){
         this.quantity = quantity;
     }
     
@@ -131,7 +131,7 @@ public class Donation implements Serializable, Comparable<Donation>{
                              Donation Details
                              =================
                              Donation ID: %s
-                             Quantity: %d
+                             Quantity: %.2f
                              Type: %s
                              Message: %s
                              Date: %s
@@ -140,16 +140,17 @@ public class Donation implements Serializable, Comparable<Donation>{
     }
     
     @Override
-    public int compareTo(Donation d){
+    public int compareTo(Donation d){       
         int idCount = Integer.parseInt(id.substring(5));
         int anotherIdCount = Integer.parseInt(d.id.substring(5));
-        
-        if(idCount>anotherIdCount){
+
+        if (idCount > anotherIdCount) {
             return 0;
-        }else if(idCount==anotherIdCount){
+        } else if (idCount == anotherIdCount) {
             return -1;
-        }else{
+        } else {
             return 1;
         }
+        
     }
 }

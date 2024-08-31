@@ -55,7 +55,7 @@ public class DonationMaintenanceUI {
         scanner.nextLine();
         return choice;
     }
-    // </editor-fold>
+    
 
     public int getCategoriesMenuChoice(){
         System.out.println("\nSELECT CATEGORIES");
@@ -122,6 +122,25 @@ public class DonationMaintenanceUI {
         scanner.nextLine();
         return choice;
     }
+    
+    public int getReportChoice() {
+        System.out.println("\nREPORT:");
+        System.out.println("1. Event Donation Top Chart Report");
+        System.out.println("2. Donation Summary Report");
+        System.out.println("3. Monthly donation report");
+        System.out.println("0. Back");
+        System.out.print("Enter choice: ");
+        while (!scanner.hasNextInt()) {
+            System.out.println("Invalid input. Please enter a valid integer.");
+            scanner.next(); // Consume the invalid input  
+            System.out.print("Enter choice: ");
+        }
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+        return choice;
+    }
+    // </editor-fold>
+    
     
     // <editor-fold defaultstate="collapsed" desc="output">
     public void listAllDonation(String outputStr) {

@@ -12,15 +12,10 @@ import boundary.DonationMaintenanceUI;
 import utility.MessageUI;
 import adt.MapInterface;
 import adt.HashMap;
-import adt.Heap;
 import adt.LinkedList;
-import adt.LinkedQueue;
-import adt.LinkedStack;
 import adt.ListInterface;
-import adt.QueueInterface;
 import adt.SortedLinkedList;
 import adt.SortedListInterface;
-import adt.Vertex;
 import adt.WeightedGraph;
 import dao.DAO;
 import entity.Donor;
@@ -130,10 +125,10 @@ public class DonationMaintenance{
     public boolean create() {
         Donation donation = new Donation();
         
-        int quantity = -1;  // Initialize with an invalid value
+        double quantity = -1;  // Initialize with an invalid value
         System.out.print("Enter quantity: ");
         // Keep looping until a valid, non-negative integer is provided
-        while (!scanner.hasNextInt() || (quantity = scanner.nextInt()) < 0) {
+        while (!scanner.hasNextDouble() || (quantity = scanner.nextDouble()) < 0) {
             System.out.println("Invalid input. Please enter a valid quantity.");
             scanner.nextLine();  // Consume the invalid input
             System.out.print("Enter quantity: ");
@@ -236,7 +231,7 @@ public class DonationMaintenance{
             return false;
         }
     }
-
+    
     
     public boolean remove() {
         System.out.print("Enter donation ID to remove: ");
@@ -255,18 +250,18 @@ public class DonationMaintenance{
         }
         
     }
-
+    
     
     public boolean update() {
         System.out.print("Enter donation ID to update: ");
         String id = scanner.nextLine().toUpperCase();
         
         if(!donationMap.isEmpty() && donationMap.containsKey(id)){
-            int quantity = -1;  // Initialize with an invalid value
+            double quantity = -1;  // Initialize with an invalid value
         
             System.out.print("Enter quantity: ");
             // Keep looping until a valid, non-negative integer is provided
-            while (!scanner.hasNextInt() || (quantity = scanner.nextInt()) < 0) {
+            while (!scanner.hasNextDouble() || (quantity = scanner.nextDouble()) < 0) {
                 System.out.println("Invalid input. Please enter a valid quantity.");
                 scanner.nextLine();  // Consume the invalid input
                 System.out.print("Enter quantity: ");
@@ -340,7 +335,7 @@ public class DonationMaintenance{
         }
         
     }
-
+    
     
     public Donation searchById() {
         System.out.print("Enter donation Id to search: ");
@@ -399,6 +394,7 @@ public class DonationMaintenance{
         } while (choice != 0);
     }
     
+    
     /**
      * Lists donations made by a specific donor, filtered by donor ID or donor
      * name. 
@@ -444,6 +440,7 @@ public class DonationMaintenance{
             }
         } while (choice != 0);
     }
+    
     
     /**
      * Filters donations based on user-selected criteria, including message
@@ -582,7 +579,27 @@ public class DonationMaintenance{
         } while (choice != 0);
     }
     
-    public void report() {        
+    
+    public void report(){
+        int choice = 0;
+        do {
+            choice = donationUI.getReportChoice();
+            switch (choice) {
+                case 0:
+                    return;
+                case 1:
+                    topChartReport();
+                    break;
+                case 2:
+                    summaryReport();
+                default:
+                    MessageUI.displayInvalidChoiceMessage();
+            }
+        } while (choice != 0);
+    }
+    
+    
+    public void topChartReport() {        
         /*
         *   Convert Map values to Graph
         *   Using graph, map out the relationship of Donor and Event
@@ -600,11 +617,17 @@ public class DonationMaintenance{
             graph.addVertex(donor.getId());
             graph.addUndirectedEdge(donor.getId(), event.getId(), donation);
         }
-        //graph.printEdges();
+        
 
         
         //get all donor and event in the graph
         ListInterface<String> idList = graph.getAllVertexObjects();
+        
+        /*
+        *   Filter out the Donor vertices and get the Event vertices
+        *   Bubble sort the IDs based on their donation received(indeg)
+        *   Function: List the top 3 most donation received Event
+        */
         ListInterface<String> eventIdList = new LinkedList<>();
         //filter out donors id and get only event ids
         for(int i = 1; i <= idList.getNumberOfEntries(); i++){
@@ -633,6 +656,128 @@ public class DonationMaintenance{
             }
         }
         
+        
+        
+        
+        /*
+        *   Get the highest donation (edge) connected to each event
+        *   bubble sort the highest donations of each event and sort them compare highest
+        *   Function: List the top 3 with the largest single donation
+        */
+        //loop through event list
+        ListInterface<Donation> highestDonationList = new LinkedList<>(); 
+        for(int i = 1; i <= eventIdList.getNumberOfEntries(); i++){
+            //get all donation of this event into a list
+            ListInterface<Donation> eventDonationList = new LinkedList<>();
+            String eventId = eventIdList.getEntry(i);
+            //get the event donor vertices
+            ListInterface<String> neighbourList = graph.getNeighbours(eventId);
+            for(int j = 1; j <= neighbourList.getNumberOfEntries(); j++){
+                String donorId = neighbourList.getEntry(j);
+                //get the donation (edge's weight) between them
+                Donation donation = graph.getEdgeWeight(donorId, eventId);
+                if(donation.getType() == Donation.DonationType.CASH){
+                    eventDonationList.add(donation);
+                }
+            }
+
+            //find the highest donation for this event
+            double highest = 0;
+            Donation highestDonation = null;
+            for(int j = 1; j <= eventDonationList.getNumberOfEntries(); j++){
+                Donation donation = eventDonationList.getEntry(j);
+                //filter only the money
+                if(donation.getType() == Donation.DonationType.CASH){
+                    //get the highest single donation of this event i
+                    if (donation.getQuantity() > highest) {
+                        highest = donation.getQuantity();
+                        highestDonation = donation;
+                    }
+                }
+
+            }
+            
+            //save this event highest donation into a list
+            highestDonationList.add(highestDonation);
+
+        }
+        
+        
+        // Bubble sort donations based on their highest quantity in ascending order        
+        n = highestDonationList.getNumberOfEntries();
+        for (int i = 1; i <= n - 1; i++) {
+            for (int j = 1; j <= n - i; j++) {
+                // Get the donation of the current and next position
+                Donation d1 = highestDonationList.getEntry(j);
+                Donation d2 = highestDonationList.getEntry(j + 1);
+
+
+                // Swap if the first donation quantity is greater than the second
+                if (d1.getQuantity() > d2.getQuantity()) {
+                    // Replace entries based on position
+                    highestDonationList.replace(j, d2);
+                    highestDonationList.replace(j + 1, d1);
+                }
+            }
+        }
+        
+        
+        
+        /*
+        *   Store the eventid and their respective total donor into a map interface
+        *   Sort it and get the top 3
+        *   Function: get the top 3 event with the highest number of donor
+        */
+        MapInterface<String,Integer> eventDonorNoMap = new HashMap<>();
+        for(int i = 1; i <= eventIdList.getNumberOfEntries(); i++){
+            String eventId = eventIdList.getEntry(i);
+            //get a list of edges (donation) connected to this event
+            ListInterface<String> donors = graph.getNeighbours(eventId);
+            ListInterface<String> existedDonorId = new LinkedList<>();
+            int totalDonor = 0;
+            for(int j = 1; j <= donors.getNumberOfEntries(); j++){
+
+                String donorId = donors.getEntry(j);
+                System.out.println(donorId);
+                //filter out the same donor
+                if(existedDonorId.isEmpty()||!existedDonorId.contains(donorId)){
+                    totalDonor++;
+                    existedDonorId.add(donorId);
+                }
+                
+            }
+            //put event and their total donors in pair
+            eventDonorNoMap.put(eventId, totalDonor);
+        }
+        
+
+        
+        //get a copy of eventIdList
+        ListInterface<String> topDonorEventIdList = ((LinkedList<String>)eventIdList).copyList();
+        //previously sorted according to donations, now is donor
+        // Bubble sort events id based on their number of donor in ascending order        
+        n = topDonorEventIdList.getNumberOfEntries();
+        for (int i = 1; i <= n - 1; i++) {
+            for (int j = 1; j <= n - i; j++) {
+                // Get the totaldonor of the current and next event IDs
+                String eventId = topDonorEventIdList.getEntry(j);
+                String eventId2 = topDonorEventIdList.getEntry(j+1);
+                int totalDonor1 = eventDonorNoMap.get(eventId);
+                int totalDonor2 = eventDonorNoMap.get(eventId2);
+                
+                // Swap if the first total donor is greater than the second
+                if (totalDonor1 > totalDonor2) {
+                    // Replace entries based on position
+                    topDonorEventIdList.replace(j, eventId);
+                    topDonorEventIdList.replace(j + 1, eventId2);
+                }
+            }
+        }
+        
+        for(String id :(LinkedList<String>)topDonorEventIdList){
+            System.out.println(id);
+        }
+        
         //Display report
         System.out.println();
         System.out.println(("=").repeat(50));
@@ -641,39 +786,47 @@ public class DonationMaintenance{
         System.out.println(("-").repeat(50));
         System.out.println("Event with the Highest Number of Donation: ");
         //get top 3 from the list (last 3)
-        for(int i = 0; i <= 3; i++){
+        for(int i = 0; i < 3; i++){
             String eventId = eventIdList.getEntry(eventIdList.getNumberOfEntries() - i);
             Event event = getEventById(eventId);
-            System.out.println((i+1) + ". " + event.getName() + " (" + graph.getIndeg(eventId) + " donations)");
+            System.out.printf((i+1) + ". %-20s\t(" + graph.getIndeg(eventId) + " donations)\n",event.getName());
             
         }
         
         System.out.println(("-").repeat(50));
-        System.out.println("Event with the Highest Total Donation Fund: ");
-        
-        
-        
-        System.out.println(("-").repeat(50));
         //pop stack to get back the top 3 most highest;
-        System.out.println("Event with the Highest Single Donation Amount: ");
-        //pop stack to get back the top 3 most highest;
-//        System.out.println("1. " + topDonatedEventStack.pop().getName());
-//        System.out.println("2. " + topDonatedEventStack.pop().getName());
-//        System.out.println("3. " + topDonatedEventStack.pop().getName());
+        System.out.println("Event with the Largest Single Donation: ");
+        for (int i = 0; i < 3; i++) {
+            Donation donation = highestDonationList.getEntry(highestDonationList.getNumberOfEntries() - i);
+            System.out.printf((i+1) + ". %-20s\t(RM %.2f)\n", donation.getEvent().getName(),donation.getQuantity());
+        }
+        
         System.out.println(("-").repeat(50));
         System.out.println("Event with the Highest Number of Donor: ");
-        System.out.println(("-").repeat(50));
-        System.out.println("Most donated event: ");
-        System.out.println("Most donated type:  ");
-        System.out.println("Average donation amount:  ");
-        System.out.println("Average donation amount:  ");
-        System.out.println("Average number of Donor per Event:  ");
-        System.out.println("Highest donation amount:  ");
+        for (int i = 0; i < 3; i++) {
+            String eventId = topDonorEventIdList.getEntry(topDonorEventIdList.getNumberOfEntries() - i);
+            Event event = getEventById(eventId);
+            System.out.printf((i + 1) + ". %-20s\t(%d donors)\n", event.getName(), eventDonorNoMap.get(eventId));
+        }
         System.out.println(("=").repeat(50));
+
+        
 
     
     }
     
+    
+    public void  summaryReport(){
+        
+        
+        System.out.println("Summary Report:");
+        System.out.println("Total donation amount:");
+        System.out.println("Average donation amount:");
+        System.out.println("Highest donation amount received: id");
+        System.out.println("Average number of donor per event:");
+    }
+    
+            
     public void displayAll(){
         SortedListInterface<Donation> sortedDonations = getDonationListSortedById();
         for(int i = 1; i <= sortedDonations.getNumberOfEntries();i++){
@@ -728,7 +881,7 @@ public class DonationMaintenance{
         }
         
         
-        System.out.printf("%-15s%-15s%-50s%-30s%-30s%-15s%-15s\n",
+        System.out.printf("%-15s%-15.2f%-50s%-30s%-30s%-15s%-15s\n",
                 d.getId(),
                 d.getQuantity(),
                 d.getMessage(),
