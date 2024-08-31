@@ -87,12 +87,14 @@ public class WeightedGraph<T extends Comparable<T>, N extends Comparable<N>> imp
             {
                 head = newVertex;
             } else {
+
                 Vertex<T, N> previous = head;
                 //use previous to move to the last vertex
                 while (temp != null) {
                     previous = temp;
                     temp = temp.nextVertex;//add the vertex as last in the list
                 }
+                previous.nextVertex = newVertex;
             }
             size++;
             return true;
@@ -122,8 +124,8 @@ public class WeightedGraph<T extends Comparable<T>, N extends Comparable<N>> imp
 
     @Override
     //Return ArrayList that stores T
-    public ArrayList<T> getAllVertexObjects() {
-        ArrayList<T> list = new ArrayList<>();
+    public ListInterface<T> getAllVertexObjects() {
+        ListInterface<T> list = new ArrayList<>();
         Vertex<T, N> temp = head;
         while (temp != null) {
             //use add method of ArrayList to add each vertexInfo
@@ -142,6 +144,7 @@ public class WeightedGraph<T extends Comparable<T>, N extends Comparable<N>> imp
         }
 
         Vertex<T, N> temp = head;
+
         for (int i = 0; i < pos; i++) {
             temp = temp.nextVertex;
         }
@@ -180,6 +183,24 @@ public class WeightedGraph<T extends Comparable<T>, N extends Comparable<N>> imp
         return false;
     }
 
+//    public ArrayList<Edge<T, N>> getEdges(T v) {
+//        ArrayList<Edge<T, N>> edges = new ArrayList<>();
+//        Vertex<T, N> vertex = head;
+//
+//        while (vertex != null) {
+//            if (vertex.vertexInfo.compareTo(v) == 0) {
+//                Edge<T, N> currentEdge = vertex.firstEdge;
+//                while (currentEdge != null) {
+//                    edges.add(currentEdge);
+//                    currentEdge = currentEdge.nextEdge;
+//                }
+//                return edges; // Found the vertex and collected all edges
+//            }
+//            vertex = vertex.nextVertex;
+//        }
+//
+//        return edges; // Return empty list if vertex is not found
+//    }
     @Override
     public boolean addUndirectedEdge(T source, T destination, N weight) {
         return addEdge(source, destination, weight) && addEdge(destination, source, weight);
@@ -271,11 +292,11 @@ public class WeightedGraph<T extends Comparable<T>, N extends Comparable<N>> imp
     }
 
     @Override
-    public ArrayList<T> getNeighbours(T v) {
+    public ListInterface<T> getNeighbours(T v) {
         if (!hasVertex(v)) {
             return null;
         }
-        ArrayList<T> list = new ArrayList<>();
+        ListInterface<T> list = new ArrayList<>();
         Vertex<T, N> temp = head;
         //loop to find vertex and create a reference to edge if found
         while (temp != null) {

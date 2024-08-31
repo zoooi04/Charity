@@ -9,7 +9,7 @@ package adt;
  * @author Chew Huai Ern & Andrew
  * @param <T>
  */
-public class Vertex<T extends Comparable<T>, N extends Comparable<N>> {
+public class Vertex<T extends Comparable<T>, N extends Comparable<N>> implements Comparable<Vertex<T,N>>{
     //Vertex Info
     T vertexInfo;
     int indeg; 
@@ -34,6 +34,9 @@ public class Vertex<T extends Comparable<T>, N extends Comparable<N>> {
         nextVertex=next;
         firstEdge=null;
     }
-
-
+    
+    @Override
+    public int compareTo(Vertex<T,N> other){
+        return Integer.compare(other.indeg, this.indeg);
+    }
 }
