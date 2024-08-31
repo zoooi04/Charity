@@ -825,9 +825,7 @@ public class DonationMaintenance{
         }
         double averageTotalAmount = totalDonationAmount/donationMap.size();
         
-        for(int i = 1; i <=){
-            
-        }
+        
         
         System.out.println("Summary Report:");
         System.out.println("Total donation received: " + donationMap.size() + " donations");
