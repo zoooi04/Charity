@@ -4,6 +4,7 @@
  */
 package boundary;
 
+import adt.ArrayList;
 import entity.Donor;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -144,13 +145,13 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
     private void getDisplaySortMenu(Donor.Type enumType, Donor.Category enumCategory) {
         System.out.print("\nSort by Details: ");
         String filterStr = "\nFilter by: ";
-        if(enumType == null && enumCategory == null){
+        if (enumType == null && enumCategory == null) {
             filterStr += "None";
         }
-        if(enumType != null){
+        if (enumType != null) {
             filterStr += enumType + " ";
         }
-        if(enumCategory != null){
+        if (enumCategory != null) {
             filterStr += enumCategory + " ";
         }
         System.out.println(filterStr);
@@ -172,7 +173,7 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
         return choice;
     }
 
-    public void getSearchMenu() {
+    private void getSearchMenu() {
         System.out.println("\nSelection of Search: ");
         System.out.println("1. ID");
         System.out.println("2. Name");
@@ -185,6 +186,46 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
         while (!scanner.hasNextInt()) {
             scanner.next();
             getSearchMenu();
+        }
+        int choice = scanner.nextInt();
+        scanner.nextLine();  // consume the leftover newline character
+        return choice;
+    }
+
+    private void getDisplayReportMenu() {
+        System.out.println("\nSelection of Report: ");
+        System.out.println("1. Analysis of Donor");
+        System.out.println("2. Analysis of Donor Age Level");
+        System.out.println("3. Top 10 Active Donor");
+        System.out.println("0. Back");
+        System.out.print("Enter Selection: ");
+    }
+
+    public int getDisplayReportMenuChoice() {
+        getDisplayReportMenu();
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+            getDisplayReportMenu();
+        }
+        int choice = scanner.nextInt();
+        scanner.nextLine();  // consume the leftover newline character
+        return choice;
+    }
+
+    private void getDisplayReportMenuDonor() {
+        System.out.println("\nSelection of Donor Report: ");
+        System.out.println("1. Gender");
+        System.out.println("2. Type");
+        System.out.println("3. Category");
+        System.out.println("0. Back");
+        System.out.print("Enter Selection: ");
+    }
+
+    public int getDisplayReportMenuDonorChoice() {
+        getDisplayReportMenuDonor();
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+            getDisplayReportMenuDonor();
         }
         int choice = scanner.nextInt();
         scanner.nextLine();  // consume the leftover newline character
@@ -243,6 +284,45 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
                 "type",
                 "category");
         outputStr += "\n" + "=".repeat(150) + "\n";
+        System.out.print(outputStr);
+    }
+
+    public void printDonorReportHeader() {
+        String outputStr = "";
+        outputStr += "\n\t\tReport of donor";
+        outputStr += "\n" + "=".repeat(48) + "\n";
+        outputStr += String.format("%-24s%12s%12s",
+                "Group",
+                "Number",
+                "Percentage");
+        outputStr += "\n" + "=".repeat(48) + "\n";
+        System.out.print(outputStr);
+    }
+
+    public void printDonorReportBody(ArrayList<Donor> arrList, int group, int total) {
+        String outputStr = "";
+        String groupName = "";
+        switch(group){
+            case 1:
+                groupName = String.format("%s", arrList.getEntry(1).getGender());
+                break;
+            case 2:
+                groupName = String.format("%s", arrList.getEntry(1).getType());
+                break;
+            case 3:
+                groupName = String.format("%s", arrList.getEntry(1).getCategory());
+                break;
+        }
+        outputStr += String.format("%-24s%12s%12s",
+                groupName,
+                arrList.getNumberOfEntries(),
+                arrList.getNumberOfEntries()*100/total+"%");
+        System.out.println(outputStr);
+    }
+
+    public void printDonorReportSeperateLine() {
+        String outputStr = "";
+        outputStr += "-".repeat(48) + "\n";
         System.out.print(outputStr);
     }
     // </editor-fold>
