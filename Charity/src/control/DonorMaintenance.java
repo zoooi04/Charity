@@ -438,6 +438,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
         // Iterating HashMap through for loop
         ListInterface<Donation> donationArrList = donationM.getDonationMap().values();
         ListInterface<Donor> donorActiveArrList = new ArrayList<>();
+        int z = 0;
 
         for (int i = 1; i <= donationArrList.getNumberOfEntries(); i++) {
             donorActiveArrList.add(donationArrList.getEntry(i).getDonor());
@@ -453,13 +454,6 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
 
                     // 1.
                     // Report for all Donor
-                    // 数量，percentage
-                    // Gender       
-                    // Type         
-                    // Category     
-                    // HashMap<Donor.Gender, ArrayList<Donor>>
-                    // HashMap<Donor.Type, ArrayList<Donor>>
-                    // HashMap<Donor.Category, ArrayList<Donor>>
                     //
                     // Gender
                     MapInterface<Donor.Gender, ListInterface<Donor>> donorGenderMap = new HashMap<>();
@@ -579,51 +573,91 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                         // Enqueue the donor into the existing or newly created queue
                         list.add(donor);
                     }
-                    
+
                     donorUI.printDonorReportHeader();
-                    
-                    donorUI.printDonorReportBody((ArrayList)donorGenderMap.get(Donor.Gender.MALE), 1, newEntry.getNumberOfEntries());
-                    donorUI.printDonorReportBody((ArrayList)donorGenderMap.get(Donor.Gender.FEMALE), 1, newEntry.getNumberOfEntries());
-                    donorUI.printDonorReportBody((ArrayList)donorGenderMap.get(Donor.Gender.OTHER), 1, newEntry.getNumberOfEntries());
-                    donorUI.printDonorReportSeperateLine();
-                    donorUI.printDonorReportBody((ArrayList)donorTypeMap.get(Donor.Type.ORGANISATION), 2, newEntry.getNumberOfEntries());
-                    donorUI.printDonorReportBody((ArrayList)donorTypeMap.get(Donor.Type.INDIVIDUAL), 2, newEntry.getNumberOfEntries());
-                    donorUI.printDonorReportSeperateLine();
-                    donorUI.printDonorReportBody((ArrayList)donorCategoryMap.get(Donor.Category.GOVERNMENT), 3, newEntry.getNumberOfEntries());
-                    donorUI.printDonorReportBody((ArrayList)donorCategoryMap.get(Donor.Category.PRIVATE), 3, newEntry.getNumberOfEntries());
-                    donorUI.printDonorReportBody((ArrayList)donorCategoryMap.get(Donor.Category.PUBLIC), 3, newEntry.getNumberOfEntries());
-                    donorUI.printDonorReportSeperateLine();
-                    
+
+                    donorUI.printDonorReportBody((ArrayList) donorGenderMap.get(Donor.Gender.MALE), 1, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportBody((ArrayList) donorGenderMap.get(Donor.Gender.FEMALE), 1, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportBody((ArrayList) donorGenderMap.get(Donor.Gender.OTHER), 1, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportSeperateLine(48);
+                    donorUI.printDonorReportBody((ArrayList) donorTypeMap.get(Donor.Type.ORGANISATION), 2, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportBody((ArrayList) donorTypeMap.get(Donor.Type.INDIVIDUAL), 2, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportSeperateLine(48);
+                    donorUI.printDonorReportBody((ArrayList) donorCategoryMap.get(Donor.Category.GOVERNMENT), 3, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportBody((ArrayList) donorCategoryMap.get(Donor.Category.PRIVATE), 3, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportBody((ArrayList) donorCategoryMap.get(Donor.Category.PUBLIC), 3, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportSeperateLine(48);
+
                     break;
                 case 2:
+                    // Report of Active Donor
+                    // number of donor in each level of age
+                    int participant = 0;
+                    int[] ageActive = new int[6];
+                    int[] ageInActive = new int[6];
+
+                    ListInterface<Donor> donorActiveOnceArrList = new ArrayList<>();
+                    for (int i = 1; i <= donorActiveArrList.getNumberOfEntries(); i++) {
+                        if (!donorActiveOnceArrList.contains(donorActiveArrList.getEntry(i))) {
+                            donorActiveOnceArrList.add(donorActiveArrList.getEntry(i));
+                        }
+                    }
+                    System.out.println(newEntry.getNumberOfEntries() + "");
+
+                    for (int i = 1; i <= newEntry.getNumberOfEntries(); i++) {
+                        if (donorActiveOnceArrList.contains(newEntry.getEntry(i))) {
+                            participant++;
+                            if (newEntry.getEntry(i).getAge() < 21) {
+                                ageActive[0]++;
+                            } else if (newEntry.getEntry(i).getAge() < 41) {
+                                ageActive[1]++;
+                            } else if (newEntry.getEntry(i).getAge() < 61) {
+                                ageActive[2]++;
+                            } else if (newEntry.getEntry(i).getAge() < 81) {
+                                ageActive[3]++;
+                            } else { // over 80
+                                ageActive[4]++;
+                            }
+                        } else {
+                            if (newEntry.getEntry(i).getAge() < 21) {
+                                ageInActive[0]++;
+                            } else if (newEntry.getEntry(i).getAge() < 41) {
+                                ageInActive[1]++;
+                            } else if (newEntry.getEntry(i).getAge() < 61) {
+                                ageInActive[2]++;
+                            } else if (newEntry.getEntry(i).getAge() < 81) {
+                                ageInActive[3]++;
+                            } else { // over 80
+                                ageInActive[4]++;
+                            }
+                        }
+                    }
+
+                    ageActive[5] = participant;
+                    ageInActive[5] = newEntry.getNumberOfEntries() - participant;
+
+                    System.out.println((z++) + "");
+                    donorUI.printActiveDonorReportHeader();
+                    donorUI.printActiveDonorReportBody(ageActive, ageInActive);
+
                     break;
                 case 3:
+                    
                     break;
                 default:
                     break;
             }
 
         } while (choice != 0);
-
-        // 2.
-        // Report of Active Donor
-        // total no of donor: participate, non-paticipate percentage
-        // - arrayList.contain(); check
-        //
-        // number of donor in each level of age
-        // below 0 - 20     inactive, active, total, active percentage
-        // below 21 - 40    
-        // below 22 - 60    
-        // below 23 - 80    
-        // over  24 - 80   
         // 3.
         // Number of participate for donor list top 10
         // Top 10 Active donor
         // if make one donation count++;
         return false;
-    } // </editor-fold>
-    // <editor-fold defaultstate="collapsed" desc="other support function">
+    }
+    // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="other support function">
     public String getAllDonor(Enum<?> filter) {
         StringBuilder outputStr = new StringBuilder();
         if (filter instanceof Donor.Type) {
