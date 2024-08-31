@@ -5,6 +5,7 @@
 package boundary;
 
 import adt.ArrayList;
+import entity.Donation;
 import entity.Donor;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -361,7 +362,7 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
 
             int total = active[i] + inActive[i];
             int percentage = (total == 0 ? 0 : active[i] * 100 / total);
-            if(i==5){
+            if (i == 5) {
                 printDonorReportSeperateLine(64);
             }
             outputStr += String.format("%-16s%12s%12s%12s%12s\n",
@@ -369,10 +370,47 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
                     active[i],
                     inActive[i],
                     total,
-                    percentage+"%");
+                    percentage + "%");
             System.out.print(outputStr);
         }
         System.out.print("=".repeat(64) + "\n");
+    }
+
+    public void printDonorTop3ReportHeader() {
+        String outputStr = "";
+        outputStr += "\n\t\tReport of Top 3 Donor";
+        outputStr += "\n" + "=".repeat(70) + "\n";
+        outputStr += String.format("%-16s%-30s%-12s%12s",
+                "Type Donation",
+                "Donor Name",
+                "Donor ID",
+                "Quantity");
+        outputStr += "\n" + "=".repeat(70) + "\n";
+        System.out.print(outputStr);
+    }
+
+    public void printDonorTop3ReportBody(Donation.DonationType type, ArrayList<Donor> donor, ArrayList<Integer> qty) {
+        String outputStr = "";
+        String typeStr = "";
+        int count = 3;
+        if (donor.getNumberOfEntries() < 3) {
+            count = donor.getNumberOfEntries();
+        }
+        for (int i = 1; i <= count; i++) {
+            if (i == 1) {
+                typeStr = type.toString();
+            } else {
+                typeStr = "";
+            }
+            if (donor.getEntry(i) != null && qty.getEntry(i) != null) {
+                outputStr += String.format("%-16s%-30s%-12s%12s\n",
+                        typeStr,
+                        donor.getEntry(i).getName(),
+                        donor.getEntry(i).getId(),
+                        qty.getEntry(i));
+            }
+        }
+        System.out.print(outputStr);
     }
 
     public void printDonorReportSeperateLine(int repeat) {

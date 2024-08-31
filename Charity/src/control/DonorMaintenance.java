@@ -440,8 +440,17 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
         ListInterface<Donor> donorActiveArrList = new ArrayList<>();
         int z = 0;
 
+        // all record
         for (int i = 1; i <= donationArrList.getNumberOfEntries(); i++) {
             donorActiveArrList.add(donationArrList.getEntry(i).getDonor());
+        }
+
+        // each donor only 1 time
+        ListInterface<Donor> donorActiveOnceArrList = new ArrayList<>();
+        for (int i = 1; i <= donorActiveArrList.getNumberOfEntries(); i++) {
+            if (!donorActiveOnceArrList.contains(donorActiveArrList.getEntry(i))) {
+                donorActiveOnceArrList.add(donorActiveArrList.getEntry(i));
+            }
         }
 
         int choice = 0, choiceDetail;
@@ -596,14 +605,6 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                     int[] ageActive = new int[6];
                     int[] ageInActive = new int[6];
 
-                    ListInterface<Donor> donorActiveOnceArrList = new ArrayList<>();
-                    for (int i = 1; i <= donorActiveArrList.getNumberOfEntries(); i++) {
-                        if (!donorActiveOnceArrList.contains(donorActiveArrList.getEntry(i))) {
-                            donorActiveOnceArrList.add(donorActiveArrList.getEntry(i));
-                        }
-                    }
-                    System.out.println(newEntry.getNumberOfEntries() + "");
-
                     for (int i = 1; i <= newEntry.getNumberOfEntries(); i++) {
                         if (donorActiveOnceArrList.contains(newEntry.getEntry(i))) {
                             participant++;
@@ -642,17 +643,82 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
 
                     break;
                 case 3:
-                    
+                    // list top 3 donor contribution
+                    MapInterface<Donation.DonationType, MapInterface<Donor, Integer>> donorDonation = new HashMap<>();
+
+                    for (int i = 1; i <= donationArrList.getNumberOfEntries(); i++) {
+                        Donation.DonationType type = donationArrList.getEntry(i).getType();
+                        Integer qty = donationArrList.getEntry(i).getQuantity();
+                        Donor donor = donationArrList.getEntry(i).getDonor();
+                        Integer totalQty = 0;
+
+                        if (donorDonation.containsKey(type)) {
+                            if (donorDonation.get(type).containsKey(donor)) {
+                                totalQty = donorDonation.get(type).get(donor) + qty;
+                            } else {
+                                totalQty = qty;
+                            }
+                        } else {
+                            totalQty = qty;
+                        }
+
+                        MapInterface<Donor, Integer> donorDonationDetail = new HashMap<>();
+                        donorDonationDetail.put(donor, totalQty);
+                        donorDonation.put(type, donorDonationDetail);
+                    }
+
+                    Donation.DonationType donationType = null;
+                    donorUI.printDonorTop3ReportHeader();
+                    for (int i = 0; i < donorDonation.size(); i++) {
+                        switch (i) {
+                            case 0:
+                                donationType = Donation.DonationType.CASH;
+                                break;
+                            case 1:
+                                donationType = Donation.DonationType.FOOD;
+                                break;
+                            case 2:
+                                donationType = Donation.DonationType.ITEM;
+                                break;
+                            default:
+                                break;
+                        }
+                        ListInterface<Integer> HighestQty = new ArrayList<>();
+                        ListInterface<Donor> HighestDonor = new ArrayList<>();
+                        for (int j = 1; j <= donorActiveOnceArrList.getNumberOfEntries(); j++) {
+                            Donor donor = donorActiveOnceArrList.getEntry(j);
+                            Integer value = donorDonation.get(donationType).get(donor);
+
+                            if (value != null) {
+                                if (HighestQty.isEmpty() || value > HighestQty.getEntry(1)) {
+                                    HighestQty.add(1, value);
+                                    HighestDonor.add(1, donor);
+                                } else if (value > HighestQty.getEntry(2)) {
+                                    HighestQty.add(2, value);
+                                    HighestDonor.add(2, donor);
+                                } else if (value > HighestQty.getEntry(3)) {
+                                    HighestQty.add(3, value);
+                                    HighestDonor.add(3, donor);
+                                } else {
+                                    HighestQty.add(value);
+                                    HighestDonor.add(donor);
+                                }
+                            }
+                        }
+
+                        donorUI.printDonorTop3ReportBody(donationType, (ArrayList<Donor>) HighestDonor, (ArrayList<Integer>) HighestQty);
+                        donorUI.printDonorReportSeperateLine(70);
+                        HighestQty.clear();
+                        HighestDonor.clear();
+                    }
                     break;
+
                 default:
                     break;
             }
 
         } while (choice != 0);
-        // 3.
-        // Number of participate for donor list top 10
-        // Top 10 Active donor
-        // if make one donation count++;
+
         return false;
     }
     // </editor-fold>
