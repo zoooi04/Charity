@@ -817,15 +817,30 @@ public class DonationMaintenance{
     
     
     public void  summaryReport(){
+        //get total and average
+        ListInterface<Donation> list = donationMap.values();
+        double totalDonationAmount = 0.0;
+        for(int i = 1; i <= list.getNumberOfEntries(); i++){
+            totalDonationAmount+=list.getEntry(i).getQuantity();
+        }
+        double averageTotalAmount = totalDonationAmount/donationMap.size();
         
+        for(int i = 1; i <=){
+            
+        }
         
         System.out.println("Summary Report:");
-        System.out.println("Total donation amount:");
-        System.out.println("Average donation amount:");
+        System.out.println("Total donation received: " + donationMap.size() + " donations");
+        System.out.printf("Total donation amount (Cash): RM%.2f",totalDonationAmount);
+        System.out.printf("Average donation amount (Cash): RM%.2f",averageTotalAmount);
+        System.out.println("Most popular donation type: ");
         System.out.println("Highest donation amount received: id");
         System.out.println("Average number of donor per event:");
     }
     
+    public void popularDonationType(){
+        
+    }
             
     public void displayAll(){
         SortedListInterface<Donation> sortedDonations = getDonationListSortedById();
