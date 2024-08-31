@@ -129,12 +129,5 @@ public class PersonMaintenance<T extends Person & Comparable<T>>{
         return true;
     }
 
-    public boolean report(T newEntry) {
-        if (newEntry instanceof Person) {
-        } else {
-            return false;
-        }
-        return true;
-    }
     // </editor-fold>
 }
