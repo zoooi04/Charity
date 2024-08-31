@@ -662,6 +662,10 @@ int quantity = -1;  // Initialize with an invalid value
         }
         return sortedDonations;
     }
+
+    public MapInterface<String, Donation> getDonationMap() {
+        return donationMap;
+    }
     // </editor-fold>
 
     
