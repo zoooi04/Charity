@@ -378,7 +378,7 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
 
     public void printDonorTop3ReportHeader() {
         String outputStr = "";
-        outputStr += "\n\t\tReport of Top 3 Donor";
+        outputStr += "\n\t\tReport of Top 3 Donor for Each Type Donation";
         outputStr += "\n" + "=".repeat(70) + "\n";
         outputStr += String.format("%-16s%-30s%-12s%12s",
                 "Type Donation",
