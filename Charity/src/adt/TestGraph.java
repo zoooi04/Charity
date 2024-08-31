@@ -12,6 +12,7 @@ public class TestGraph {
    public static void main(String[] args) {
         WeightedGraph<String, Integer> graph1 = new WeightedGraph<>();
         String[] cities = {"Alor Setar", "Kuching", "Langkawi", "Melaka", "Penang", "Tawau","Tawau"};
+        
         for (String city : cities) {
             graph1.addVertex(city);
         }
@@ -20,9 +21,7 @@ public class TestGraph {
 
         System.out.println("Cities and their vertices ");
         for (int i = 0; i < graph1.getSize(); i++) {
-            
-            
-            //System.out.printf("%d: %s\t", i, graph1.getVertex(i));
+            System.out.printf("%d: %s\t", i, graph1.getVertex(i));
         }
         System.out.println();
 
@@ -41,9 +40,9 @@ public class TestGraph {
         System.out.println("add edge Tawau - Alor Setar: " + graph1.addEdge("Tawau", "Alor Setar", 1900));
         System.out.println("add edge Kuching - Tawau: " + graph1.addEdge("Kuching", "Tawau", 900));
         System.out.println("add edge Langkawi - Ipoh: " + graph1.addEdge("Langkawi", "Ipoh", 200));
-        graph1.addVertex("KL");
-        System.out.println("add edge Langkawi - Ipoh: " + graph1.addEdge("Kuching", "KL", 400));
-        System.out.println("add edge Langkawi - Ipoh: " + graph1.addEdge("Kuching", "KL", 200));
+//        graph1.addVertex("KL");
+//        System.out.println("add edge Langkawi - Ipoh: " + graph1.addEdge("Kuching", "KL", 400));
+//        System.out.println("add edge Langkawi - Ipoh: " + graph1.addEdge("Kuching", "KL", 200));
 
         
         System.out.println();
@@ -67,7 +66,7 @@ public class TestGraph {
         System.out.println("\nPrint Edges: ");
         graph1.removeEdge("Langkawi", "Penang");
         
-        ArrayList<String> list = graph1.getNeighbours("Kuching");
+        ListInterface<String> list = graph1.getNeighbours("Kuching");
         for(int i =0; i<list.getNumberOfEntries();i++){
             
             System.out.println(list.getEntry(i+1)+"hiii");
