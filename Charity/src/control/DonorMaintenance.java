@@ -15,6 +15,7 @@ import adt.QueueInterface;
 import boundary.DonorMaintenanceUI;
 import dao.DAO;
 import dao.DonorInitializer;
+import entity.Donation;
 import entity.Donor;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -76,6 +77,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                     update(donorList);
                     break;
                 case 6:
+                    report(donorList);
                     break;
                 default:
                     MessageUI.displayInvalidChoiceMessage();
@@ -430,12 +432,198 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
     //       event
     // Generate summary reports
     public boolean report(ListInterface<Donor> newEntry) {
-        
-        return true;
-    }
-    // </editor-fold>
 
+        DonationMaintenance donationM = new DonationMaintenance();
+
+        // Iterating HashMap through for loop
+        ListInterface<Donation> donationArrList = donationM.getDonationMap().values();
+        ListInterface<Donor> donorActiveArrList = new ArrayList<>();
+
+        for (int i = 1; i <= donationArrList.getNumberOfEntries(); i++) {
+            donorActiveArrList.add(donationArrList.getEntry(i).getDonor());
+        }
+
+        int choice = 0, choiceDetail;
+        do {
+            choice = donorUI.getDisplayReportMenuChoice();
+            switch (choice) {
+                case 0:
+                    break;
+                case 1:
+
+                    // 1.
+                    // Report for all Donor
+                    // 数量，percentage
+                    // Gender       
+                    // Type         
+                    // Category     
+                    // HashMap<Donor.Gender, ArrayList<Donor>>
+                    // HashMap<Donor.Type, ArrayList<Donor>>
+                    // HashMap<Donor.Category, ArrayList<Donor>>
+                    //
+                    // Gender
+                    MapInterface<Donor.Gender, ListInterface<Donor>> donorGenderMap = new HashMap<>();
+
+                    for (int i = 1; i <= newEntry.getNumberOfEntries(); i++) {
+
+                        Donor donor = newEntry.getEntry(i);
+                        if (donor == null) {
+                            continue;  // Skip this entry
+                        }
+
+                        Donor.Gender key = null;
+                        if (null != newEntry.getEntry(i).getGender()) {
+                            switch (newEntry.getEntry(i).getGender()) {
+                                case FEMALE: {
+                                    key = Donor.Gender.FEMALE;
+                                    break;
+                                }
+                                case MALE: {
+                                    key = Donor.Gender.MALE;
+                                    break;
+                                }
+                                case OTHER: {
+                                    key = Donor.Gender.OTHER;
+                                    break;
+                                }
+                                default:
+                                    break;
+                            }
+                        }
+
+                        ListInterface<Donor> list = donorGenderMap.get(key);
+
+                        if (list == null) {
+                            // If no queue exists for this key, create a new one
+                            list = new ArrayList<>();
+                            donorGenderMap.put(key, list);
+                        }
+                        // Enqueue the donor into the existing or newly created queue
+                        list.add(donor);
+                    }
+
+                    // Type
+                    MapInterface<Donor.Type, ListInterface<Donor>> donorTypeMap = new HashMap<>();
+
+                    for (int i = 1; i <= newEntry.getNumberOfEntries(); i++) {
+
+                        Donor donor = newEntry.getEntry(i);
+                        if (donor == null) {
+                            continue;  // Skip this entry
+                        }
+
+                        Donor.Type key = null;
+                        if (null != newEntry.getEntry(i).getType()) {
+                            switch (newEntry.getEntry(i).getType()) {
+                                case ORGANISATION: {
+                                    key = Donor.Type.ORGANISATION;
+                                    break;
+                                }
+                                case INDIVIDUAL: {
+                                    key = Donor.Type.INDIVIDUAL;
+                                    break;
+                                }
+                                default:
+                                    break;
+                            }
+                        }
+
+                        ListInterface<Donor> list = donorTypeMap.get(key);
+
+                        if (list == null) {
+                            // If no queue exists for this key, create a new one
+                            list = new ArrayList<>();
+                            donorTypeMap.put(key, list);
+                        }
+                        // Enqueue the donor into the existing or newly created queue
+                        list.add(donor);
+                    }
+
+                    // Category
+                    MapInterface<Donor.Category, ListInterface<Donor>> donorCategoryMap = new HashMap<>();
+
+                    for (int i = 1; i <= newEntry.getNumberOfEntries(); i++) {
+
+                        Donor donor = newEntry.getEntry(i);
+                        if (donor == null) {
+                            continue;  // Skip this entry
+                        }
+
+                        Donor.Category key = null;
+                        if (null != newEntry.getEntry(i).getCategory()) {
+                            switch (newEntry.getEntry(i).getCategory()) {
+                                case GOVERNMENT: {
+                                    key = Donor.Category.GOVERNMENT;
+                                    break;
+                                }
+                                case PRIVATE: {
+                                    key = Donor.Category.PRIVATE;
+                                    break;
+                                }
+                                case PUBLIC: {
+                                    key = Donor.Category.PUBLIC;
+                                    break;
+                                }
+                                default:
+                                    break;
+                            }
+                        }
+
+                        ListInterface<Donor> list = donorCategoryMap.get(key);
+
+                        if (list == null) {
+                            // If no queue exists for this key, create a new one
+                            list = new ArrayList<>();
+                            donorCategoryMap.put(key, list);
+                        }
+                        // Enqueue the donor into the existing or newly created queue
+                        list.add(donor);
+                    }
+                    
+                    donorUI.printDonorReportHeader();
+                    
+                    donorUI.printDonorReportBody((ArrayList)donorGenderMap.get(Donor.Gender.MALE), 1, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportBody((ArrayList)donorGenderMap.get(Donor.Gender.FEMALE), 1, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportBody((ArrayList)donorGenderMap.get(Donor.Gender.OTHER), 1, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportSeperateLine();
+                    donorUI.printDonorReportBody((ArrayList)donorTypeMap.get(Donor.Type.ORGANISATION), 2, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportBody((ArrayList)donorTypeMap.get(Donor.Type.INDIVIDUAL), 2, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportSeperateLine();
+                    donorUI.printDonorReportBody((ArrayList)donorCategoryMap.get(Donor.Category.GOVERNMENT), 3, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportBody((ArrayList)donorCategoryMap.get(Donor.Category.PRIVATE), 3, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportBody((ArrayList)donorCategoryMap.get(Donor.Category.PUBLIC), 3, newEntry.getNumberOfEntries());
+                    donorUI.printDonorReportSeperateLine();
+                    
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                default:
+                    break;
+            }
+
+        } while (choice != 0);
+
+        // 2.
+        // Report of Active Donor
+        // total no of donor: participate, non-paticipate percentage
+        // - arrayList.contain(); check
+        //
+        // number of donor in each level of age
+        // below 0 - 20     inactive, active, total, active percentage
+        // below 21 - 40    
+        // below 22 - 60    
+        // below 23 - 80    
+        // over  24 - 80   
+        // 3.
+        // Number of participate for donor list top 10
+        // Top 10 Active donor
+        // if make one donation count++;
+        return false;
+    } // </editor-fold>
     // <editor-fold defaultstate="collapsed" desc="other support function">
+
     public String getAllDonor(Enum<?> filter) {
         StringBuilder outputStr = new StringBuilder();
         if (filter instanceof Donor.Type) {
