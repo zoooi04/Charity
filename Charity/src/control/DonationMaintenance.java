@@ -774,7 +774,9 @@ public class DonationMaintenance{
         return sortedDonations;
     }
     
- 
+    public MapInterface<String, Donation> getDonationMap() {
+        return donationMap;
+    }
     // </editor-fold>
 
     
