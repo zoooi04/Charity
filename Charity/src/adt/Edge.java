@@ -22,10 +22,10 @@ public class Edge<T extends Comparable<T>, N extends Comparable<N>> {
         weight = w;
         nextEdge = a;
     }
-    
 
 
-     public Vertex<T, N> getToVertex() {
+
+    public Vertex<T, N> getToVertex() {
         return toVertex;
     }
 
