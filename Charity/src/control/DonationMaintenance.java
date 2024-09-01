@@ -828,7 +828,6 @@ public class DonationMaintenance {
             if (!d.getIsDeleted()) {
                 displayDonation(d, false, false);
             }
-
         }
     }
 

@@ -11,8 +11,8 @@ public class Donee extends Person implements Serializable, Comparable<Donee> {
 
     public enum Type {
         FAMILY(3),
-        ORGANISATION(2),
-        INDIVIDUAL(1);
+        ORGANISATION(1),
+        INDIVIDUAL(2);
 
         private final int priority;
 
@@ -50,7 +50,12 @@ public class Donee extends Person implements Serializable, Comparable<Donee> {
     public void setType(Type type) {
         this.type = type;
     }
-
+    
+    @Override
+    public LocalDateTime getRegisterDate() {
+        return super.getRegisterDate();
+    }
+    
     @Override
     public String toString() {
         return super.toString() + String.format("%-12s%-15s", id, type);

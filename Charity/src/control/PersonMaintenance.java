@@ -58,6 +58,7 @@ public class PersonMaintenance<T extends Person & Comparable<T>>{
         if (newEntry instanceof Person) {
             int choice = -1;
             do {
+                System.out.println("\n" + newEntry.toString());
                 choice = personUI.getUpdateMenuChoice();
                 switch (choice) {
                     case 0:

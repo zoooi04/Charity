@@ -1,3 +1,8 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+
 package control;
 
 import java.io.Serializable;
@@ -6,15 +11,22 @@ import adt.HashMap;
 import adt.MapInterface;
 import adt.Heap;
 import adt.ListHeap;
-import java.util.Scanner;
+import adt.ListInterface;
+import adt.ArrayList;
+import adt.SortedLinkedList;
+import adt.SortedListInterface;
 import entity.Donation;
 import entity.Donee;
-import entity.Person;
 import entity.Distribution;
-import control.DoneeMaintenance;
 import dao.DAO;
-import adt.ArrayList;
-import adt.ListInterface;
+import boundary.DistributionMaintenanceUI;
+import boundary.DoneeMaintenanceUI;
+import boundary.DistributionMaintenanceUI;
+
+/**
+ *
+ * @author BEH JING HEN
+ */
 
 public class DistributionMaintenance {
 
@@ -22,10 +34,12 @@ public class DistributionMaintenance {
     private ListHeap<Donee> queue;
     private ListHeap<Donee> doneeHeap;
     private ListInterface<Distribution> distributions;
+    
     private final DAO<HashMap<String, Donation>> dao = new DAO<>();
     private final DAO<ListHeap<Donee>> queueDao = new DAO<>();
     private final DAO<ListHeap<Donee>> doneeDao = new DAO<>();
     private final DAO<ListInterface<Distribution>> distributionDao = new DAO<>();
+    
     private static final String DONATION_FILENAME = "donationHashMap.dat";
     private static final String QUEUE_FILENAME = "doneeQueue.dat";
     private static final String DONEE_FILENAME = "donee.dat";
@@ -33,46 +47,34 @@ public class DistributionMaintenance {
     
     public DistributionMaintenance() {
         donations = dao.retrieveFromFile(DONATION_FILENAME);
-        
-        // Initialize donations as a new HashMap if the file is empty or doesn't exist
         if (donations == null) {
             donations = new HashMap<>();
         }
 
-        // Load the queue from the file
         queue = queueDao.retrieveFromFile(QUEUE_FILENAME);
-        
-        // Initialize queue as a new Heap if the file is empty or doesn't exist
         if (queue == null) {
             queue = new Heap<>();
         }
         
         doneeHeap = doneeDao.retrieveFromFile(DONEE_FILENAME);
-        
-        // Initialize queue as a new Heap if the file is empty or doesn't exist
         if (doneeHeap == null) {
             doneeHeap = new Heap<>();
         }
         
         distributions = distributionDao.retrieveFromFile(DISTRIBUTION_FILENAME);
-        
-        // Initialize queue as a new Heap if the file is empty or doesn't exist
         if (distributions == null) {
             distributions = new ArrayList<>();
         }
-        
     }
 
-    public void distributeDonation(DonationMaintenance donationMaintenance, DoneeMaintenance doneeMaintenance) {
-        Scanner scanner = new Scanner(System.in);
+    public void distributeDonation(DoneeMaintenance doneeMaintenance) {
 
         // Display available donations
         System.out.println("Available Donations:");
-        donationMaintenance.displayAll();
+        printAllDonations();
 
         // Ask the user to input a Donation ID
-        System.out.print("Enter Donation ID to distribute: ");
-        String donationId = scanner.nextLine().trim();
+        String donationId = DistributionMaintenanceUI.getInput("Enter Donation ID to distribute: ").trim();
 
         // Find the corresponding donation
         Donation selectedDonation = donations.get(donationId);
@@ -81,37 +83,46 @@ public class DistributionMaintenance {
             System.out.println("Donation not found!");
             return;
         }
-        Donee removedDonee = queue.peekMaxValue(); // Get the removed Donee
-        String doneeId = removedDonee.getId();
-        // Remove a Donee from the queue
-        
+
         if (!queue.isEmpty() && doneeMaintenance.removeQueue(queue)) {
+            // Get the removed Donee
+            Donee removedDonee = queue.peekMaxValue(); 
+            
+            // Generate a new Distribution ID
+            String newId = generateNewDistributionId();
+            
             // Create the Distribution record
-            Distribution distribution = new Distribution("D001", removedDonee, selectedDonation, LocalDateTime.now());
-            System.out.println("Distribution created: " + distribution);
-            
+            Distribution distribution = new Distribution(newId, removedDonee, selectedDonation, LocalDateTime.now());
+            System.out.println("Distribution created successful!! " );
+
+            // Save the distribution record
             saveDistribution(distribution);
-            printAllDistributions();
-            
-            // Remove the donation from the list
-            donations.remove(selectedDonation.getId());
+
+            // Set the donation's status to isDeleted
+            selectedDonation.setIsDeleted(true);
+
+            // Save the updated donations back to the file
+            saveDonations();
+
+
+            // Save the updated queue
             saveQueue();
-           
-            
+
+            // Print all distributions
+            printAllDistributions();
+
         } else {
             System.out.println("Heap is empty, no Donee to remove!");
             System.out.println("Failed to remove a Donee from the queue!");
         }
     }
 
-    // Method to save the donations map to the file
     public void saveDonations() {
         dao.saveToFile(donations, DONATION_FILENAME);
     }
     
     public void saveQueue(){
         queueDao.saveToFile(queue,QUEUE_FILENAME);
-        
     }
     
     private void saveDistribution(Distribution distribution) {
@@ -127,42 +138,10 @@ public class DistributionMaintenance {
         }
     }
 
-    // Display menu and handle user input
-    public void displayMenu(DonationMaintenance donationMaintenance, DoneeMaintenance doneeMaintenance) {
-        Scanner scanner = new Scanner(System.in);
-        boolean exit = false;
-
-        while (!exit) {
-            System.out.println("\nDistribution Maintenance Menu:");
-            System.out.println("1. Distribute Donation");
-            System.out.println("2. Requeue Donee");
-            System.out.println("0. Exit");
-            System.out.print("Enter your choice: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine(); 
-
-            switch (choice) {
-                case 1:
-                    distributeDonation(donationMaintenance, doneeMaintenance);
-                    break;
-                case 2:
-                    requeueDonee(doneeMaintenance);
-                    break;
-                case 3:
-                    printAllDistributions();
-                    break;
-                case 0:
-                    exit = true;
-                    System.out.println("Exiting Distribution Maintenance...");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
-            }
-        }
-    }
-
     public void printAllDistributions() {
+        
         System.out.println("All Distributions:");
+        printDistributionHeader();
         for (int i = 1; i <= distributions.getNumberOfEntries(); i++) {
             try {
                 Distribution distribution = distributions.getEntry(i); 
@@ -172,13 +151,108 @@ public class DistributionMaintenance {
             }
         }
     }
+    
+    public void printDistributionHeader(){
+        System.out.println("--------------------------------------------------------------------------------------------------------------");
+        System.out.printf("%15s %8s %16s %17s %15s %9s %12s",
+                          "DistributionID", "Donee ID", "DoneeType", 
+                          "Donation ID", "DonationType", "Quantity", "DateTime");
+        System.out.println("\n--------------------------------------------------------------------------------------------------------------");
 
+    }
 
+    public void restoreAllDonations() {
+        int numberOfEntries = donations.size();  
+        ArrayList<String> keys = donations.keySet();  
+
+        for (int i = 1; i <= numberOfEntries; i++) {
+            String key = keys.getEntry(i);  
+            Donation donation = donations.get(key);  
+
+            if (donation != null) {
+                donation.setIsDeleted(false);  
+            }
+        }
+        saveDonations();
+        System.out.println("All donations have been restored.");
+    }
+    
+    private String generateNewDistributionId() {
+        int maxId = 0;
+
+        for (int i = 1; i <= distributions.getNumberOfEntries(); i++) {
+            try {
+                Distribution distribution = distributions.getEntry(i);
+                String id = distribution.getId();
+                int idNumber = Integer.parseInt(id.substring(3));
+                if (idNumber > maxId) {
+                    maxId = idNumber;
+                }
+            } catch (IndexOutOfBoundsException e) {
+                System.err.println("Error accessing index " + i + ": " + e.getMessage());
+            }
+        }
+
+        // Increment the ID number and format it
+        maxId++;
+        return String.format("DIS%05d", maxId);
+    }
+
+    public HashMap<String, Donation> getDonations() {
+        return donations;
+    }
+
+    public ListHeap<Donee> getQueue() {
+        return queue;
+    }
+
+    public ListHeap<Donee> getDoneeHeap() {
+        return doneeHeap;
+    }
+
+    public ListInterface<Distribution> getDistributions() {
+        return distributions;
+    }
+    
+    public void printAllDonations() {
+        System.out.println("All Donations:");
+        System.out.println("========================================================================================================================================================================================================");
+        System.out.printf("%-15s %-20s %-50s %-30s %-30s %-15s %-15s%n", "ID", "Quantity(RM/KG)", "Message", "Donor", "Event", "Type", "Date");
+        System.out.println("========================================================================================================================================================================================================");
+        // Create a sorted list from the donations HashMap
+        SortedLinkedList<Donation> sortedDonations = new SortedLinkedList<>();
+        ArrayList<String> keys = donations.keySet();
+        for (int i = 1; i <= keys.getNumberOfEntries(); i++) {
+            String key = keys.getEntry(i);
+            Donation donation = donations.get(key);
+            if (donation != null && !donation.getIsDeleted()) {
+                sortedDonations.add(donation); // Add donations to the sorted list
+            }
+        }
+
+        // Second index-based loop to print all sorted donations
+    for (int i = 1; i <= sortedDonations.getNumberOfEntries(); i++) {
+        Donation donation = sortedDonations.getEntry(i);
+        String donationID = donation.getId();
+        String quantity = String.format("%.2f", donation.getQuantity());
+        String message = donation.getMessage().isEmpty() ? "-" : donation.getMessage();
+        String donorName = donation.getDonor().getName();
+        String eventName = donation.getEvent().getName();
+        String type = donation.getType().toString();
+        String date = donation.getDate().toString();
+
+        System.out.printf("%-15s %-20s %-50s %-30s %-30s %-15s %-15s%n",
+                donationID, quantity, message, donorName, eventName, type, date);
+    }
+        
+    }
+    
+    // Main method to start the application
     public static void main(String[] args) {
-        DistributionMaintenance distributionMaintenance = new DistributionMaintenance();
+        DistributionMaintenance maintenance = new DistributionMaintenance();
         DoneeMaintenance doneeMaintenance = new DoneeMaintenance();
-        DonationMaintenance donationMaintenance = new DonationMaintenance();
 
-        distributionMaintenance.displayMenu(donationMaintenance, doneeMaintenance);
+        DistributionMaintenanceUI ui = new DistributionMaintenanceUI(maintenance, doneeMaintenance);
+        ui.displayMenu();
     }
 }
