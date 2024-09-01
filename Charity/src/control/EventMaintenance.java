@@ -32,8 +32,8 @@ public class EventMaintenance {
     private static final String FILENAME3 = "volunteer.txt";
     private static final String FILENAME4 = "donationHashMap.dat";
 
-    private DonationMaintenance dm = new DonationMaintenance();
-    private DonorMaintenance donorm = new DonorMaintenance();
+    //private DonationMaintenance dm = new DonationMaintenance();
+    //private DonorMaintenance donorm = new DonorMaintenance();
 
     public EventMaintenance() {
         eventsMap = eventDAO.retrieveFromFile(FILENAME);
@@ -167,8 +167,8 @@ public class EventMaintenance {
         String id = eventUI.getEventID("");
         Event event = eventsMap.get(id);
         if (event != null) {
-            SortedListInterface<Donation> allDonations = dm.getDonationListSortedById();
-            ListInterface<Donor> allDonors = donorm.getDonorList();
+            //SortedListInterface<Donation> allDonations = dm.getDonationListSortedById();
+            //ListInterface<Donor> allDonors = donorm.getDonorList();
             
             
 

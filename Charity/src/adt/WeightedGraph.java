@@ -320,8 +320,7 @@ public class WeightedGraph<T extends Comparable<T>, N extends Comparable<N>> imp
     }
 
     @Override
-    public ListInterface<T> getNeighbours(T v
-    ) {
+    public ListInterface<T> getNeighbours(T v) {
         if (!hasVertex(v)) {
             return null;
         }

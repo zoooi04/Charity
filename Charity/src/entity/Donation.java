@@ -20,6 +20,7 @@ public class Donation implements Serializable, Comparable<Donation>{
     private Event event;
     private DonationType type;
     private LocalDate date;
+    private boolean isDeleted;
     
     // Enums for DonationType
     public enum DonationType {
@@ -40,6 +41,7 @@ public class Donation implements Serializable, Comparable<Donation>{
         this.event = event;
         this.type = type;
         this.date = date;
+        this.isDeleted = false;
     }
     
     public String getId(){
@@ -70,6 +72,10 @@ public class Donation implements Serializable, Comparable<Donation>{
         return event;
     }
     
+    public boolean getIsDeleted(){
+        return isDeleted;
+    }
+    
     public void setId(String id){
         this.id = id;
     }
@@ -96,6 +102,10 @@ public class Donation implements Serializable, Comparable<Donation>{
     
     public void setEvent(Event event){
         this.event = event;
+    }
+    
+    public void setIsDeleted(boolean isDeleted){
+        this.isDeleted = isDeleted;
     }
     
     @Override
