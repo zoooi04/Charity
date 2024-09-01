@@ -55,16 +55,9 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                     display(donorList);
                     break;
                 case 2:
-//                    Donor donor = new Donor();
-//                    if (search(donorList, donor)) {
-//                        donorUI.printDonorHeader();
-//                        System.out.println(donor);
-//                    }
-
                     int[] position = {-1};
                     if (search(donorList, position)) {
                         donorUI.printDonorDetails(lastSearchDonor);
-//                        System.out.println(lastSearchDonor);
                     }
                     break;
                 case 3:
@@ -418,19 +411,23 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                             // insert into binary tree if donor is not deleted
                             if (!newEntry.getEntry(i).isIsDeleted()) {
 
-                                if (donorFilterTypeEnum == null && donorFilterCategoryEnum == null) {
+                                if (donorFilterTypeEnum == null
+                                        && donorFilterCategoryEnum == null) {
                                     bstBy.insert(newEntry.getEntry(i));
                                 }
 
-                                if (donorFilterTypeEnum == newEntry.getEntry(i).getType() && donorFilterCategoryEnum == null) {
+                                if (donorFilterTypeEnum == newEntry.getEntry(i).getType()
+                                        && donorFilterCategoryEnum == null) {
                                     bstBy.insert(newEntry.getEntry(i));
                                 }
 
-                                if (donorFilterTypeEnum == null && donorFilterCategoryEnum == newEntry.getEntry(i).getCategory()) {
+                                if (donorFilterTypeEnum == null
+                                        && donorFilterCategoryEnum == newEntry.getEntry(i).getCategory()) {
                                     bstBy.insert(newEntry.getEntry(i));
                                 }
 
-                                if (donorFilterTypeEnum == newEntry.getEntry(i).getType() && donorFilterCategoryEnum == newEntry.getEntry(i).getCategory()) {
+                                if (donorFilterTypeEnum == newEntry.getEntry(i).getType()
+                                        && donorFilterCategoryEnum == newEntry.getEntry(i).getCategory()) {
                                     bstBy.insert(newEntry.getEntry(i));
                                 }
                             }
