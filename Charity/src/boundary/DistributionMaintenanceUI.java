@@ -21,12 +21,10 @@ public class DistributionMaintenanceUI {
 
     private final DistributionMaintenance distributionMaintenance;
     private final DoneeMaintenance doneeMaintenance;
-    private final DonationMaintenance donationMaintenance;
 
-    public DistributionMaintenanceUI(DistributionMaintenance distributionMaintenance, DoneeMaintenance doneeMaintenance, DonationMaintenance donationMaintenance) {
+    public DistributionMaintenanceUI(DistributionMaintenance distributionMaintenance, DoneeMaintenance doneeMaintenance) {
         this.distributionMaintenance = distributionMaintenance;
         this.doneeMaintenance = doneeMaintenance;
-        this.donationMaintenance = donationMaintenance;
     }
 
     public void displayMenu() {
@@ -46,7 +44,8 @@ public class DistributionMaintenanceUI {
 
             switch (choice) {
                 case 1:
-                    distributionMaintenance.distributeDonation(donationMaintenance, doneeMaintenance);
+                    distributionMaintenance.distributeDonation(doneeMaintenance);
+                    distributionMaintenance.saveDonations();
                     break;
                 case 2:
                     distributionMaintenance.requeueDonee(doneeMaintenance);

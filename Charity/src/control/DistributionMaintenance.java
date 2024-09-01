@@ -13,6 +13,8 @@ import adt.Heap;
 import adt.ListHeap;
 import adt.ListInterface;
 import adt.ArrayList;
+import adt.SortedLinkedList;
+import adt.SortedListInterface;
 import entity.Donation;
 import entity.Donee;
 import entity.Distribution;
@@ -65,10 +67,11 @@ public class DistributionMaintenance {
         }
     }
 
-    public void distributeDonation(DonationMaintenance donationMaintenance, DoneeMaintenance doneeMaintenance) {
+    public void distributeDonation(DoneeMaintenance doneeMaintenance) {
+
         // Display available donations
         System.out.println("Available Donations:");
-        donationMaintenance.displayAll();
+        printAllDonations();
 
         // Ask the user to input a Donation ID
         String donationId = DistributionMaintenanceUI.getInput("Enter Donation ID to distribute: ").trim();
@@ -100,6 +103,7 @@ public class DistributionMaintenance {
 
             // Save the updated donations back to the file
             saveDonations();
+
 
             // Save the updated queue
             saveQueue();
@@ -209,14 +213,46 @@ public class DistributionMaintenance {
     public ListInterface<Distribution> getDistributions() {
         return distributions;
     }
+    
+    public void printAllDonations() {
+        System.out.println("All Donations:");
+        System.out.println("========================================================================================================================================================================================================");
+        System.out.printf("%-15s %-20s %-50s %-30s %-30s %-15s %-15s%n", "ID", "Quantity(RM/KG)", "Message", "Donor", "Event", "Type", "Date");
+        System.out.println("========================================================================================================================================================================================================");
+        // Create a sorted list from the donations HashMap
+        SortedLinkedList<Donation> sortedDonations = new SortedLinkedList<>();
+        ArrayList<String> keys = donations.keySet();
+        for (int i = 1; i <= keys.getNumberOfEntries(); i++) {
+            String key = keys.getEntry(i);
+            Donation donation = donations.get(key);
+            if (donation != null && !donation.getIsDeleted()) {
+                sortedDonations.add(donation); // Add donations to the sorted list
+            }
+        }
 
+        // Second index-based loop to print all sorted donations
+    for (int i = 1; i <= sortedDonations.getNumberOfEntries(); i++) {
+        Donation donation = sortedDonations.getEntry(i);
+        String donationID = donation.getId();
+        String quantity = String.format("%.2f", donation.getQuantity());
+        String message = donation.getMessage().isEmpty() ? "-" : donation.getMessage();
+        String donorName = donation.getDonor().getName();
+        String eventName = donation.getEvent().getName();
+        String type = donation.getType().toString();
+        String date = donation.getDate().toString();
+
+        System.out.printf("%-15s %-20s %-50s %-30s %-30s %-15s %-15s%n",
+                donationID, quantity, message, donorName, eventName, type, date);
+    }
+        
+    }
+    
     // Main method to start the application
     public static void main(String[] args) {
         DistributionMaintenance maintenance = new DistributionMaintenance();
         DoneeMaintenance doneeMaintenance = new DoneeMaintenance();
-        DonationMaintenance donationMaintenance = new DonationMaintenance();
 
-        DistributionMaintenanceUI ui = new DistributionMaintenanceUI(maintenance, doneeMaintenance, donationMaintenance);
+        DistributionMaintenanceUI ui = new DistributionMaintenanceUI(maintenance, doneeMaintenance);
         ui.displayMenu();
     }
 }
