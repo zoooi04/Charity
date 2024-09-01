@@ -28,7 +28,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeParseException;
-
 /**
  *
  * @author huaiern
@@ -1000,7 +999,7 @@ public class DonationMaintenance {
         System.out.printf("%-15s%-20.2f%-50s%-30s%-30s%-15s%-15s\n",
                 d.getId(),
                 d.getQuantity(),
-                d.getMessage(),
+                truncate(d.getMessage(),35),
                 donorInfo,//no way to set donor yet
                 eventInfo,
                 d.getType(),
@@ -1058,6 +1057,16 @@ public class DonationMaintenance {
             graph.addUndirectedEdge(donor.getId(), event.getId(), donation);
         }
         return graph;
+    }
+    
+    public static String truncate(String text, int maxLength) {
+        if (text == null) {
+            return null;
+        }
+        if (text.length() <= maxLength) {
+            return text;
+        }
+        return text.substring(0, maxLength) + "...";
     }
 
     public MapInterface<String, Donation> getDonationMap() {
