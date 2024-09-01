@@ -698,17 +698,25 @@ public class DonationMaintenance {
     }
 
     public void summaryReport() {
+        // Generate a graph representation from the donation map
         GraphInterface<String, Donation> graph = getGraphFromMap();
-        //get total and average
+
+        // Retrieve all donations from the donation map
         ListInterface<Donation> list = donationMap.values();
+
+        // Initialize variables to calculate total amount, types, and highest donation
         double totalDonationAmount = 0.0;
         int type1 = 0, type2 = 0, type3 = 0;
         double totalFood = 0, totalItem = 0;
         double highest = 0;
         Donation highestDonation = null;
+
+        // Loop through all donations to calculate totals and counts
         for (int i = 1; i <= list.getNumberOfEntries(); i++) {
             Donation donation = list.getEntry(i);
-            totalDonationAmount += donation.getQuantity();
+            totalDonationAmount += donation.getQuantity();  // Sum total donation amount
+
+            // Count the number of each type of donation
             switch (donation.getType()) {
                 case CASH:
                     type1++;
@@ -721,13 +729,17 @@ public class DonationMaintenance {
                     break;
             }
 
+            // Check for the highest cash donation
             if (donation.getType() == Donation.DonationType.CASH && donation.getQuantity() > highest) {
                 highest = donation.getQuantity();
                 highestDonation = donation;
             }
         }
+
+        // Calculate average donation amount
         double averageTotalAmount = totalDonationAmount / donationMap.size();
 
+        // Determine the most popular donation type
         String popularType;
         if (type1 >= type2 && type1 >= type3) {
             popularType = "Cash";
@@ -737,22 +749,27 @@ public class DonationMaintenance {
             popularType = "Item";
         }
 
+        // Get all event IDs from the graph
         ListInterface<String> idList = graph.getAllVertexObjects();
         ListInterface<String> eventIdList = graph.getAllVertexObjects();
         for (int i = 1; i <= idList.getNumberOfEntries(); i++) {
             String id = idList.getEntry(i);
-            if (id.charAt(0) == 'A') {
+            if (id.charAt(0) == 'A') {  // Assuming event IDs start with 'A'
                 eventIdList.add(id);
             }
         }
 
+        // Calculate the total in-degrees (number of donations per event)
         int totalIndeg = 0;
         for (int i = 1; i <= eventIdList.getNumberOfEntries(); i++) {
             String id = eventIdList.getEntry(i);
             totalIndeg += graph.getIndeg(id);
         }
+
+        // Calculate the average number of donations per event
         int averageNoOfDonation = (int) Math.ceil(totalIndeg /= eventIdList.getNumberOfEntries());
 
+        // Print out the summary report
         System.out.println();
         System.out.println();
         System.out.println(("=").repeat(50));
@@ -765,62 +782,90 @@ public class DonationMaintenance {
         System.out.printf("%-40s: " + popularType + "\n", "Most popular donation type");
         System.out.printf("%-40s: RM %.2f by %s\n", "Highest donation amount received ", highest, highestDonation.getDonor().getName());
         System.out.println(("=").repeat(50));
-
     }
 
+    
     public void monthlyDonationAnalysisReport() {
         ListInterface<Donation> donationList = donationMap.values();
-        int[] arr = new int[12];
-        double[] totalAmount = new double[12];
-        double[] percentage = new double[12];
+
+        // Use ListInterface<> to store monthly donation counts and amounts
+        ListInterface<Integer> donationCounts = new LinkedList<>();
+        ListInterface<Double> totalAmounts = new LinkedList<>();
+        ListInterface<Double> percentages = new LinkedList<>();
+
+        // Initialize lists for each month
+        for (int i = 0; i < 12; i++) {
+            donationCounts.add(0);  // Initialize with 0 donations for each month
+            totalAmounts.add(0.0);  // Initialize with 0.0 total amount for each month
+            percentages.add(0.0);  // Initialize with 0.0 percentage for each month
+        }
+
+        // Calculate donation counts and total amounts per month
         for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
             Donation donation = donationList.getEntry(i);
-            int month = donation.getDate().getMonthValue();
+            int month = donation.getDate().getMonthValue() - 1;  // Convert to zero-based index for lists
+
             if (donation.getType() == Donation.DonationType.CASH) {
-                arr[month - 1]++;
-                totalAmount[month - 1] += donation.getQuantity();
+                // Update the count and total amount for the respective month
+                donationCounts.replace(month + 1, donationCounts.getEntry(month + 1) + 1);
+                totalAmounts.replace(month + 1, totalAmounts.getEntry(month + 1) + donation.getQuantity());
             }
         }
 
+        // Calculate total donation amount and identify the peak month
         double total = 0;
         double highest = 0.0;
-        int bestMonth = 1;
-        for (int i = 0; i < totalAmount.length; i++) {
-            total += totalAmount[i];
-            if (totalAmount[i] > highest) {
-                highest = totalAmount[i];
-                bestMonth = i + 1;
+        int bestMonth = 1;  
+
+        for (int i = 0; i < totalAmounts.getNumberOfEntries(); i++) {
+            total += totalAmounts.getEntry(i + 1);  // Sum up total amounts
+
+            if (totalAmounts.getEntry(i + 1) > highest) {
+                highest = totalAmounts.getEntry(i + 1);
+                bestMonth = i + 1;  // Store the month with the highest total donation amount
             }
         }
 
-        for (int i = 0; i < totalAmount.length; i++) {
-            percentage[i] = totalAmount[i] / total * 100;
+        // Calculate percentage of total donations for each month
+        for (int i = 0; i < totalAmounts.getNumberOfEntries(); i++) {
+            if (total > 0) {  // Validate 0 divisions
+                percentages.replace(i + 1, totalAmounts.getEntry(i + 1) / total * 100);
+            } else {
+                percentages.replace(i + 1, 0.0);  // Set percentage to 0 if total is 0
+            }
         }
 
+        // Print the report
         System.out.println();
         System.out.println();
         System.out.println(("=").repeat(80));
         System.out.println("Monthly Donation Performance Analysis:");
         System.out.println(("-").repeat(80));
         System.out.printf("%-20s%10s%20s%21s\n", "Month", "Donations", "Total Amount(RM)", "Proportion");
-        System.out.printf("%-20s%10d%20.2f%20.2f%%\n", "January", arr[0], totalAmount[0], percentage[0]);
-        System.out.printf("%-20s%10d%20.2f%20.2f%%\n", "February", arr[1], totalAmount[1], percentage[1]);
-        System.out.printf("%-20s%10d%20.2f%20.2f%%\n", "March", arr[2], totalAmount[2], percentage[2]);
-        System.out.printf("%-20s%10d%20.2f%20.2f%%\n", "April", arr[3], totalAmount[3], percentage[3]);
-        System.out.printf("%-20s%10d%20.2f%20.2f%%\n", "May", arr[4], totalAmount[4], percentage[4]);
-        System.out.printf("%-20s%10d%20.2f%20.2f%%\n", "June", arr[5], totalAmount[5], percentage[5]);
-        System.out.printf("%-20s%10d%20.2f%20.2f%%\n", "July", arr[6], totalAmount[6], percentage[6]);
-        System.out.printf("%-20s%10d%20.2f%20.2f%%\n", "August", arr[7], totalAmount[7], percentage[7]);
-        System.out.printf("%-20s%10d%20.2f%20.2f%%\n", "September", arr[8], totalAmount[8], percentage[8]);
-        System.out.printf("%-20s%10d%20.2f%20.2f%%\n", "November", arr[9], totalAmount[9], percentage[9]);
-        System.out.printf("%-20s%10d%20.2f%20.2f%%\n", "October", arr[10], totalAmount[10], percentage[10]);
-        System.out.printf("%-20s%10d%20.2f%20.2f%%\n", "December", arr[11], totalAmount[11], percentage[11]);
+
+        // List of month names for printing purposes
+        String[] monthNames = {
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        };
+
+        // Iterate through the months to print each row of the report
+        for (int i = 0; i < 12; i++) {
+            System.out.printf(
+                    "%-20s%10d%20.2f%20.2f%%\n",
+                    monthNames[i],
+                    donationCounts.getEntry(i + 1),
+                    totalAmounts.getEntry(i + 1),
+                    percentages.getEntry(i + 1)
+            );
+        }
+
         System.out.println(("-").repeat(80));
         System.out.println("Peak donation month : " + Month.of(bestMonth));
         System.out.println(("=").repeat(80));
-
     }
 
+    //list all donations
     public void displayAll() {
         SortedListInterface<Donation> sortedDonations = getDonationListSortedById();
         for (int i = 1; i <= sortedDonations.getNumberOfEntries(); i++) {
@@ -906,17 +951,21 @@ public class DonationMaintenance {
         }
         return success;
     }
-
     // </editor-fold>
+    
     // <editor-fold defaultstate="collapsed" desc="other support function">
+    
+    //save whole hashmap to file
     public void saveDonationList() {
         dao.saveToFile(donationMap, FILENAME);
     }
 
+    //get donation file name
     public static String getFileName() {
         return FILENAME;
     }
 
+    //get next id by checking the last id in the map
     public String getNextId() {
         SortedListInterface<Donation> donationList = getDonationListSortedById();
         String idCount = donationList.getEntry(1).getId();
@@ -936,6 +985,7 @@ public class DonationMaintenance {
         return newId;
     }
 
+    //display donations in lines
     public void displayDonation(Donation d, boolean donorShowId, boolean eventShowId) {
         String donorInfo = d.getDonor().getName();
         if (donorShowId) {
@@ -957,15 +1007,7 @@ public class DonationMaintenance {
                 d.getDate().format(formatter));
     }
 
-    public boolean isInteger(String str) {
-        try {
-            int i = Integer.parseInt(str);
-            return true;
-        } catch (NumberFormatException ex) {
-            return false;
-        }
-    }
-
+    //get donor object by their id
     public static Donor getDonorById(String id) {
         ListInterface<Donor> list = donorM.getDonorList();
         for (int i = 1; i <= list.getNumberOfEntries(); i++) {
@@ -977,6 +1019,7 @@ public class DonationMaintenance {
         return null;
     }
 
+    //get event object by their id
     public static Event getEventById(String id) {
         EventMaintenance eventM = new EventMaintenance();
         MapInterface<String, Event> eventMap = eventM.getEventMap();
@@ -984,6 +1027,8 @@ public class DonationMaintenance {
 
     }
 
+    
+    //convert this donation map into sorted list
     public SortedListInterface<Donation> getDonationListSortedById() {
         SortedListInterface<Donation> sortedDonations = new SortedLinkedList<>();
         ListInterface<Donation> donationList = donationMap.values();
@@ -993,12 +1038,13 @@ public class DonationMaintenance {
         return sortedDonations;
     }
 
-    public GraphInterface<String, Donation> getGraphFromMap() {
-        /*
+    
+    /*
         *   Convert Map values to Graph
         *   Using graph, map out the relationship of Donor and Event
         *   using Donation as weight
-         */
+     */
+    public GraphInterface<String, Donation> getGraphFromMap() {
         GraphInterface<String, Donation> graph = new WeightedGraph<>();
         ListInterface<Donation> list = donationMap.values();
         for (int i = 1; i <= list.getNumberOfEntries(); i++) {
