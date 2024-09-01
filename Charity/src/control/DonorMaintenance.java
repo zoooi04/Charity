@@ -448,13 +448,6 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
         } while (choiceDetail == 0 && choice != 0);
     }
 
-    // List donors with all the donations made
-    // not yet implement 
-    // donor event
-    //       event
-    //       event
-    // donor event
-    //       event
     // Generate summary reports
     public boolean report(ListInterface<Donor> newEntry) {
 
