@@ -102,7 +102,16 @@ public class DonorInitializer {
         
         donor = new Donor("AA2400021", Donor.Type.INDIVIDUAL, Donor.Category.PUBLIC, "Kyle", 34, LocalDate.of(1990, 9, 30), Donor.Gender.FEMALE, "0187890123");
         donorList.add(donor);
-        
+        try{Thread.sleep(1100);}catch(InterruptedException e){};
+        donor = new Donor("AA2400022", Donor.Type.INDIVIDUAL, Donor.Category.PUBLIC, "Mei Lin", 34, LocalDate.of(1990, 9, 30), Donor.Gender.FEMALE, "0188394857");
+        donorList.add(donor);
+        try{Thread.sleep(1100);}catch(InterruptedException e){};
+        donor = new Donor("AA2400023", Donor.Type.INDIVIDUAL, Donor.Category.PUBLIC, "Henry", 34, LocalDate.of(1990, 9, 30), Donor.Gender.MALE, "0189403910");
+        donorList.add(donor);
+        try{Thread.sleep(1100);}catch(InterruptedException e){};
+        donor = new Donor("AA2400024", Donor.Type.INDIVIDUAL, Donor.Category.PUBLIC, "William", 34, LocalDate.of(1990, 9, 30), Donor.Gender.MALE, "0180983909");
+        donorList.add(donor);
+        try{Thread.sleep(1100);}catch(InterruptedException e){};
         DAO<ListInterface<Donor>> dao = new DAO<>();
         dao.saveToFile(donorList, "donor.dat");
         

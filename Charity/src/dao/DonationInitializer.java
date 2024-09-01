@@ -361,6 +361,21 @@ static Donation donation249 = new Donation("DNTA0249", 1000, "Glad to support th
     static Donation donation268 = new Donation("DNTA0268", 20000, "Hope this helps", DonationMaintenance.getDonorById("AA2400020"), DonationMaintenance.getEventById("E00013"), Donation.DonationType.CASH, DonationMaintenance.getEventById("E00013").getStartDate());
     static Donation donation269 = new Donation("DNTA0269", 21000, "", DonationMaintenance.getDonorById("AA2400021"), DonationMaintenance.getEventById("E00013"), Donation.DonationType.CASH, DonationMaintenance.getEventById("E00013").getStartDate());
 
+// Donations for Event E00010
+    static Donation donation297 = new Donation("DNTA0297", 6000, "Support for a great cause!", DonationMaintenance.getDonorById("AA2400007"), DonationMaintenance.getEventById("E00007"), Donation.DonationType.CASH, DonationMaintenance.getEventById("E00007").getStartDate());
+    static Donation donation298 = new Donation("DNTA0298", 9000, "Hope this helps a lot!", DonationMaintenance.getDonorById("AA2400008"), DonationMaintenance.getEventById("E00010"), Donation.DonationType.CASH, DonationMaintenance.getEventById("E00010").getStartDate());
+    static Donation donation299 = new Donation("DNTA0299", 15000, "Pleased to contribute!", DonationMaintenance.getDonorById("AA2400009"), DonationMaintenance.getEventById("E00010"), Donation.DonationType.CASH, DonationMaintenance.getEventById("E00010").getStartDate());
+
+// Donations for Event E00009
+    static Donation donation300 = new Donation("DNTA0300", 32000, "Glad to be part of this!", DonationMaintenance.getDonorById("AA2400010"), DonationMaintenance.getEventById("E00013"), Donation.DonationType.CASH, DonationMaintenance.getEventById("E00013").getStartDate());
+    static Donation donation301 = new Donation("DNTA0301", 25000, "Best wishes for the event!", DonationMaintenance.getDonorById("AA2400011"), DonationMaintenance.getEventById("E00012"), Donation.DonationType.CASH, DonationMaintenance.getEventById("E00012").getStartDate());
+    static Donation donation302 = new Donation("DNTA0302", 23000, "Here's to a successful event!", DonationMaintenance.getDonorById("AA2400012"), DonationMaintenance.getEventById("E00011"), Donation.DonationType.CASH, DonationMaintenance.getEventById("E00011").getStartDate());
+
+    static Donation donation303 = new Donation("DNTA0303", 32000, "Glad to be part of this!", DonationMaintenance.getDonorById("AA2400022"), DonationMaintenance.getEventById("E00001"), Donation.DonationType.CASH, DonationMaintenance.getEventById("E00013").getStartDate());
+    static Donation donation304 = new Donation("DNTA0304", 25000, "Best wishes for the event!", DonationMaintenance.getDonorById("AA2400023"), DonationMaintenance.getEventById("E00007"), Donation.DonationType.CASH, DonationMaintenance.getEventById("E00012").getStartDate());
+    static Donation donation305 = new Donation("DNTA0305", 23000, "Here's to a successful event!", DonationMaintenance.getDonorById("AA2400024"), DonationMaintenance.getEventById("E00007"), Donation.DonationType.CASH, DonationMaintenance.getEventById("E00011").getStartDate());
+
+//    
 //  Method to return a collection of with hard-coded entity values
     public static MapInterface<String, Donation> initializeDonation() {
         DAO<MapInterface<String, Donation>> dao = new DAO<>();
@@ -665,6 +680,17 @@ static Donation donation249 = new Donation("DNTA0249", 1000, "Glad to support th
         donationMap.put(donation267.getId(), donation267);
         donationMap.put(donation268.getId(), donation268);
         donationMap.put(donation269.getId(), donation269);
+        
+        donationMap.put(donation297.getId(), donation297);
+        donationMap.put(donation298.getId(), donation298);
+        donationMap.put(donation299.getId(), donation299);
+        donationMap.put(donation300.getId(), donation300);
+        donationMap.put(donation301.getId(), donation301);
+        donationMap.put(donation302.getId(), donation302);
+        donationMap.put(donation303.getId(), donation303);
+        donationMap.put(donation304.getId(), donation304);
+        donationMap.put(donation305.getId(), donation305);
+
 
         dao.saveToFile(donationMap, DonationMaintenance.getFileName());
         return donationMap;

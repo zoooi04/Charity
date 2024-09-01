@@ -21,7 +21,7 @@ import utility.MessageUI;
  * @author huaiern
  */
 public class DonationMaintenanceUI {
-
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     Scanner scanner = new Scanner(System.in);
 
     // <editor-fold defaultstate="collapsed" desc="menu">
@@ -137,7 +137,7 @@ public class DonationMaintenanceUI {
     public int getReportChoice() {
         System.out.println("\nREPORT:");
         System.out.println("1. Event Performance Top Chart");
-        System.out.println("2. Overall Summary Report");
+        System.out.println("2. Summary Report");
         System.out.println("3. Monthly Donation Performance Analysis");
         System.out.println("0. Back");
         System.out.print("Enter choice: ");
@@ -264,6 +264,95 @@ public class DonationMaintenanceUI {
 
         return message.charAt(0) == 'Y';
 
+    }
+    
+    public int getMonthInput(){
+        int month = 0;
+        System.out.print("Enter month: ");
+        while (!scanner.hasNextInt() && (month < 1 || month > 12)) {
+            System.out.println("Invalid input. Please enter a valid integer.");
+            scanner.next(); // Consume the invalid input  
+            System.out.print("Enter month: ");
+        }
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+        return choice;
+    }
+    
+    public String getDonorInputSimple(){
+        System.out.print("Enter donor Id: ");
+        String id = scanner.nextLine();
+        return id;
+    }
+    
+    public String getDonorNameSimple(){
+        System.out.print("Enter donor name: ");
+        String name = scanner.nextLine();
+        return name;
+    }
+    
+    public String getMessageFilterOption(){
+        String message;
+        do {
+            System.out.print("Show donation with message? (Y/N): ");
+            message = scanner.nextLine().trim().toUpperCase();
+        } while (!message.equals("Y") && !message.equals("N"));
+
+        return message;
+    }
+    
+    public LocalDate getStartDate(){
+        LocalDate date1 = null;
+        boolean isValid = false;
+        while (!isValid) {
+            System.out.print("Enter start date (dd/MM/yyyy): ");
+            String dateStr1 = scanner.nextLine();
+
+            try {
+                date1 = LocalDate.parse(dateStr1, formatter); // Try to parse the date
+                isValid = true; // If parsing is successful, set the flag to true
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please enter the date in dd/MM/yyyy format.");
+            }
+        }
+        return date1;
+    }
+    
+    public LocalDate getEndDate(LocalDate date1){
+        LocalDate date2 = null;
+        boolean isValid = false;
+        while (!isValid) {
+            System.out.print("Enter end date (dd/MM/yyyy): ");
+            String dateStr2 = scanner.nextLine();
+
+            try {
+                date2 = LocalDate.parse(dateStr2, formatter); // Try to parse the date
+                isValid = true; // If parsing is successful, set the flag to true
+                if (date2.isBefore(date1)) {
+                    System.out.println("End date cannot be before Start date.");
+                    isValid = false;
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please enter the date in dd/MM/yyyy format.");
+            }
+        }
+        return date2;
+    }
+    
+    public String getEventIdSimple(){
+        System.out.print("Enter event Id: ");
+        String id = scanner.nextLine();
+        return id;
+    }
+    
+    public String getEventNameSimple(){
+        System.out.print("Enter event name: ");
+        String name = scanner.nextLine();
+        return name;
+    }
+    
+    public void bufferLine(){
+        scanner.nextLine();
     }
     // </editor-fold>
 
