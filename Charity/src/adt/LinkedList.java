@@ -3,8 +3,8 @@ package adt;
 import java.util.Iterator;
 
 /**
- * @author huaiern referenced and modified fromm sample code
- * 
+ * huaiern
+ * referenced from sample code and modified/enhanced
  * @param <T>
  */
 public class LinkedList<T> implements ListInterface<T>, Iterable<T> {

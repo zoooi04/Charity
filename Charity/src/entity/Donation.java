@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
  *
  * @author huaiern
  */
-public class Donation implements Serializable, Comparable<Donation>{
+public class Donation implements Serializable, Comparable<Donation>, Cloneable{
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private String id;
@@ -106,6 +106,15 @@ public class Donation implements Serializable, Comparable<Donation>{
     
     public void setIsDeleted(boolean isDeleted){
         this.isDeleted = isDeleted;
+    }
+    
+    @Override
+    public Donation clone() {
+        try {
+            return (Donation) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null; // Handle clone failure
+        }
     }
     
     @Override
