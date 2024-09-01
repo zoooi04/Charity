@@ -87,12 +87,14 @@ public class WeightedGraph<T extends Comparable<T>, N extends Comparable<N>> imp
             {
                 head = newVertex;
             } else {
+
                 Vertex<T, N> previous = head;
                 //use previous to move to the last vertex
                 while (temp != null) {
                     previous = temp;
                     temp = temp.nextVertex;//add the vertex as last in the list
                 }
+                previous.nextVertex = newVertex;
             }
             size++;
             return true;
@@ -122,8 +124,8 @@ public class WeightedGraph<T extends Comparable<T>, N extends Comparable<N>> imp
 
     @Override
     //Return ArrayList that stores T
-    public ArrayList<T> getAllVertexObjects() {
-        ArrayList<T> list = new ArrayList<>();
+    public ListInterface<T> getAllVertexObjects() {
+        ListInterface<T> list = new ArrayList<>();
         Vertex<T, N> temp = head;
         while (temp != null) {
             //use add method of ArrayList to add each vertexInfo
@@ -142,6 +144,7 @@ public class WeightedGraph<T extends Comparable<T>, N extends Comparable<N>> imp
         }
 
         Vertex<T, N> temp = head;
+
         for (int i = 0; i < pos; i++) {
             temp = temp.nextVertex;
         }
@@ -180,43 +183,89 @@ public class WeightedGraph<T extends Comparable<T>, N extends Comparable<N>> imp
         return false;
     }
 
+//    public ArrayList<Edge<T, N>> getEdges(T v) {
+//        ArrayList<Edge<T, N>> edges = new ArrayList<>();
+//        Vertex<T, N> vertex = head;
+//
+//        while (vertex != null) {
+//            if (vertex.vertexInfo.compareTo(v) == 0) {
+//                Edge<T, N> currentEdge = vertex.firstEdge;
+//                while (currentEdge != null) {
+//                    edges.add(currentEdge);
+//                    currentEdge = currentEdge.nextEdge;
+//                }
+//                return edges; // Found the vertex and collected all edges
+//            }
+//            vertex = vertex.nextVertex;
+//        }
+//
+//        return edges; // Return empty list if vertex is not found
+//    }
     @Override
     public boolean addUndirectedEdge(T source, T destination, N weight) {
         return addEdge(source, destination, weight) && addEdge(destination, source, weight);
     }
 
     @Override
-    public Edge removeEdge(T source, T destination) {
+    public boolean removeUndirectedEdge(T source, T destination) {
+        return removeEdge(source, destination) != null && removeEdge(destination, source) != null;
+    }
+
+    @Override
+    public Edge<T, N> removeEdge(T source, T destination) {
         Edge<T, N> removedEdge = null;
 
-        for (Vertex<T, N> sourceVertex = head; sourceVertex != null; sourceVertex = sourceVertex.nextVertex) {
-            if (sourceVertex.vertexInfo.compareTo(source) == 0) {
+        // Check if the edge exists
+        if (!hasEdge(source, destination)) {
+            return removedEdge;
+        }
 
-                if (sourceVertex.firstEdge.toVertex.vertexInfo.compareTo(destination) == 0) {
-                    removedEdge = sourceVertex.firstEdge;
-                    sourceVertex.firstEdge = sourceVertex.firstEdge.nextEdge;
+        Vertex<T, N> sourceVertex = head;
+        while (sourceVertex != null) {
+            // Find the source vertex
+            if (sourceVertex.vertexInfo.compareTo(source) == 0) {
+                Edge<T, N> currentEdge = sourceVertex.firstEdge;
+
+                // If the edge to remove is the first edge
+                if (currentEdge != null && currentEdge.toVertex.vertexInfo.compareTo(destination) == 0) {
+                    removedEdge = currentEdge;
+                    sourceVertex.firstEdge = currentEdge.nextEdge;
                 } else {
-                    for (Edge<T, N> currentEdge = sourceVertex.firstEdge; currentEdge != null; currentEdge = currentEdge.nextEdge) {
-                        if (currentEdge.nextEdge.toVertex.vertexInfo.compareTo(destination) == 0) {
-                            removedEdge = currentEdge.nextEdge;
-                            currentEdge.nextEdge = currentEdge.nextEdge.nextEdge;
+                    // Traverse the edges
+                    Edge<T, N> prevEdge = null;
+                    while (currentEdge != null) {
+                        if (currentEdge.toVertex.vertexInfo.compareTo(destination) == 0) {
+                            removedEdge = currentEdge;
+                            if (prevEdge != null) {
+                                prevEdge.nextEdge = currentEdge.nextEdge;
+                            } else {
+                                sourceVertex.firstEdge = currentEdge.nextEdge;
+                            }
+                            break;
                         }
-                    } // End of currentEdge loop
+                        prevEdge = currentEdge;
+                        currentEdge = currentEdge.nextEdge;
+                    }
                 }
 
-                sourceVertex.outdeg--;
-                removedEdge.toVertex.indeg--;
-                size--;
-                break;
+                // If we found and removed an edge, update the degree counts and size
+                if (removedEdge != null) {
+                    sourceVertex.outdeg--;
+                    removedEdge.toVertex.indeg--;
+                    size--;
+                }
+                break; // Exit the loop after processing the source vertex
             }
-        } // End of sourceVertex loop
+            sourceVertex = sourceVertex.nextVertex;
+        }
 
         return removedEdge;
     }
 
     @Override
-    //Check whether there is an edge
-    public boolean hasEdge(T source, T destination) {
+//Check whether there is an edge
+    public boolean hasEdge(T source, T destination
+    ) {
         //Graph is empty
         if (head == null) {
             return false;
@@ -271,11 +320,12 @@ public class WeightedGraph<T extends Comparable<T>, N extends Comparable<N>> imp
     }
 
     @Override
-    public ArrayList<T> getNeighbours(T v) {
+    public ListInterface<T> getNeighbours(T v
+    ) {
         if (!hasVertex(v)) {
             return null;
         }
-        ArrayList<T> list = new ArrayList<>();
+        ListInterface<T> list = new ArrayList<>();
         Vertex<T, N> temp = head;
         //loop to find vertex and create a reference to edge if found
         while (temp != null) {

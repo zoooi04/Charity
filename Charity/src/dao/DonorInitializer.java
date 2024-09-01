@@ -35,7 +35,8 @@ public class DonorInitializer {
         Donor donor4 = new Donor("AA2400004", Donor.Type.ORGANISATION, Donor.Category.PRIVATE, "Tan Jian Hui", 67, LocalDate.of(1957, 06, 20), Donor.Gender.OTHER, "0189997777");
         donorList.add(donor4);
         
-        
+        DAO<ListInterface<Donor>> dao = new DAO<>();
+        dao.saveToFile(donorList, "donor.dat");
         
         System.out.println("Done Initialize!");
         return donorList;

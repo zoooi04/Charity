@@ -34,6 +34,17 @@ public class Vertex<T extends Comparable<T>, N extends Comparable<N>> {
         nextVertex=next;
         firstEdge=null;
     }
+   
+    public T getLabel() {
+        return vertexInfo;
+    }
 
+    public Edge<T, N> getFirstEdge() {
+        return firstEdge;
+    }
+
+    public Vertex<T, N> getNextVertex() {
+        return nextVertex;
+    }
 
 }

@@ -6,6 +6,8 @@ package dao;
  */
 import adt.*;
 import entity.Event;
+import entity.Person.Gender;
+import entity.Volunteer;
 import java.io.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -59,11 +61,10 @@ public class EventDAO {
     // Method to save Event objects to a file
     public void saveToFile(MapInterface<String, Event> eventMap, String fileName) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
-            ArrayList<Event> eventArr = eventMap.values(); // Retrieve the list of values from the HashMap
+            ListInterface<Event> eventArr = eventMap.values(); // Retrieve the list of values from the HashMap
 
-            
-            for(int i = 0; i < eventArr.getNumberOfEntries();i++){
-                String line = formatEvent(eventArr.getEntry(i+1));
+            for (int i = 0; i < eventArr.getNumberOfEntries(); i++) {
+                String line = formatEvent(eventArr.getEntry(i + 1));
                 bw.write(line);
                 bw.newLine();
             }
@@ -85,7 +86,7 @@ public class EventDAO {
             System.out.println("Error writing to file: " + e.getMessage());
         }
     }
-*/
+     */
     // Helper method to format an Event object as a "|" delimited string
     private String formatEvent(Event event) {
         return String.join("|",
@@ -103,9 +104,84 @@ public class EventDAO {
                 String.valueOf(event.getIsDeleted())
         );
     }
-    
-    
-    
-    
-    
+
+    public MapInterface<String, Volunteer> retrieveVolunteers(String fileName) {
+        MapInterface<String, Volunteer> volunteersMap = new HashMap<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // Split the line based on the delimiter '|'
+                String[] parts = line.split("\\|");
+                String id = parts[0];
+                String name = parts[1];
+                int age = Integer.parseInt(parts[2]);
+                LocalDate birthday = LocalDate.parse(parts[3]);
+                Gender gender = Gender.valueOf(parts[4].toUpperCase());
+                String phoneNo = parts[5];
+
+                // Create a new Volunteer object
+                Volunteer volunteer = new Volunteer(id, name, age, birthday, gender, phoneNo);
+
+                // Add to the HashMap using the id as the key
+                volunteersMap.put(id, volunteer);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading volunteers from file: " + e.getMessage());
+        }
+
+        return volunteersMap;
+    }
+
+    public GraphInterface<String, Integer> createGraphOfAssignedVolunteersToEvent(String fileName) {
+        GraphInterface<String, Integer> graph = new WeightedGraph<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                //split line into components bassed on the delimiter '|'
+                String[] parts = line.split("\\|");
+                String eventID = parts[0];
+                String volunteerID = parts[1];
+                Integer availabilityUnit = Integer.parseInt(parts[2]);
+
+                //create a vertex of corresponding eventID
+                graph.addVertex(eventID);
+
+                //create a vertex of corresponding volunteerID
+                graph.addVertex(volunteerID);
+
+                // Add an edge between the event and the volunteer with the availability unit as the weight
+                graph.addUndirectedEdge(eventID, volunteerID, availabilityUnit);
+
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading eventVolunteers from file: " + e.getMessage());
+        }
+
+        return graph;
+    }
+
+    public void saveGraphToFile(GraphInterface<String, Integer> eventGraph, String filename) {
+     try(BufferedWriter writer = new BufferedWriter(new FileWriter(filename))){
+         ListInterface<String> allVertices = eventGraph.getAllVertexObjects();
+         
+         for(int i = 0 ; i < allVertices.getNumberOfEntries(); i++){
+             if(allVertices.getEntry(i+1).startsWith("E")){
+                 ListInterface <String> allNeighbours = eventGraph.getNeighbours(allVertices.getEntry(i+1));
+                 
+                 for(int j = 0; j < allNeighbours.getNumberOfEntries();j++){
+                     String output = allVertices.getEntry(i+1) + "|" + allNeighbours.getEntry(j+1) + "|" + eventGraph.getEdgeWeight(allVertices.getEntry(i+1), allNeighbours.getEntry(j+1));
+                     writer.write(output);
+                     writer.newLine();
+                 }
+                 
+             }
+         }
+     }catch(IOException e){
+         System.out.println("Error writing graph to file: "+ e.getMessage());
+     }
+        
+    }
+
 }

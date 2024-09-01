@@ -7,6 +7,7 @@ import java.io.Serializable;
  * @author huaiern & Ooi Choon Chong
  */
 public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
+
     private final int SIZE = 16;  // HashMap array size to reduce collision possibility
     private Node<K, V>[] table;  // HashMap array
     private int size;  // To keep track of the number of key-value pairs
@@ -48,7 +49,9 @@ public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
                     node.setValue(value);  // Update value if key exists
                     return;
                 }
-                if (node.next == null) break;
+                if (node.next == null) {
+                    break;
+                }
                 node = node.next;
             }
             node.next = new Node<>(key, value);  // Add new node if key doesn't exist
@@ -152,23 +155,22 @@ public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
 
     @Override
     public void putAll(MapInterface mapToCopy) {
-        
-        HashMap<K,V> anotherMap = (HashMap<K,V>) mapToCopy;
+
+        HashMap<K, V> anotherMap = (HashMap<K, V>) mapToCopy;
         //traverse the other map to copy
         for (int i = 0; i < anotherMap.table.length; i++) {
-            Node<K,V> node = anotherMap.table[i];
+            Node<K, V> node = anotherMap.table[i];
             //if current position not null
-            
+
             //traverse linked nodes
-            while(node != null){
+            while (node != null) {
                 this.put(node.getKey(), node.getValue());
                 node = node.next;
             }
-            
+
             //continue to the next position
         }
 
-        
     }
 
     @Override
@@ -191,7 +193,8 @@ public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
     }
 
     // Node as an inner class for encapsulation purpose
-    private class Node<K, V> implements NodeInterface<K, V>, Serializable{
+    private class Node<K, V> implements NodeInterface<K, V>, Serializable {
+
         private K key;
         private V value;
         private Node<K, V> next;
@@ -212,12 +215,12 @@ public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
         public void setValue(V value) {
             this.value = value;
         }
-        
+
         @Override
-        public boolean equals(Object obj){
+        public boolean equals(Object obj) {
             return this == obj;
         }
-        
+
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();

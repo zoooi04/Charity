@@ -1,4 +1,3 @@
-
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -20,11 +19,6 @@ import adt.WeightedGraph;
 import dao.DAO;
 import entity.Donor;
 import entity.Event;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -39,7 +33,8 @@ public class DonationMaintenance{
     private static final String FILENAME = "donationHashMap.dat";
     private static final Scanner scanner = new Scanner(System.in);
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    
+    private static DonorMaintenance donorM = new DonorMaintenance();
+
     //private static final String ID_COUNT_FILE = "donationIdCount.txt";
     
     
@@ -556,9 +551,8 @@ int quantity = -1;  // Initialize with an invalid value
         } while (choice != 0);
     }
     
-    /*
     public void report() {
-        GraphInterface<String> graph = new WeightedGraph<>();
+        GraphInterface<String,Donation> graph = new WeightedGraph<>();
         
         DonorMaintenance dm = new DonorMaintenance();
         EventMaintenance em = new EventMaintenance();
@@ -576,9 +570,6 @@ int quantity = -1;  // Initialize with an invalid value
         
         
     }
-    */
-    
-    public void report(){}
     
     public void displayAll(){
         SortedListInterface<Donation> sortedDonations = getDonationListSortedById();
@@ -594,6 +585,10 @@ int quantity = -1;  // Initialize with an invalid value
     // <editor-fold defaultstate="collapsed" desc="other support function">
     public void saveDonationList(){
         dao.saveToFile(donationMap,FILENAME);
+    }
+    
+    public static String getFileName(){
+        return FILENAME;
     }
     
     public String getNextId(){
@@ -682,10 +677,13 @@ int quantity = -1;  // Initialize with an invalid value
     }
     
     public static Donor getDonorById(String id){
-        //DonorMaintenance donorM = new DonorMaintenance();
-        //ListInterface<Donor> list = donorM.getDonorList();
-        //MapInterface<String,Donor> donorMap = donorM.toHashMap(list);
-        //return donorMap.get(id);
+        ListInterface<Donor> list = donorM.getDonorList();
+        for(int i = 1; i <= list.getNumberOfEntries(); i++){
+            if(list.getEntry(i).getId().equals(id)){
+                //found donor
+                return list.getEntry(i);
+            }
+        }
         return null;
     }
     
@@ -718,4 +716,3 @@ int quantity = -1;  // Initialize with an invalid value
     }
     // </editor-fold>
 }
-

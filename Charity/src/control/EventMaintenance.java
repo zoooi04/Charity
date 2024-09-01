@@ -9,24 +9,42 @@ import boundary.EventMaintenanceUI;
 import entity.*;
 import adt.*;
 import dao.EventDAO;
+import dao.DAO;
 import java.time.LocalDate;
+import java.util.Iterator;
 
 public class EventMaintenance {
 
     //private SortedListInterface<Event> events = new SortedLinkedList<>();
     private MapInterface<String, Event> eventsMap = new HashMap<>();
+    private GraphInterface<String, Integer> eventGraph = new WeightedGraph<>();
+    private MapInterface<String, Volunteer> volunteersMap = new HashMap<>();
+
+    private StackInterface<GraphInterface<String, Integer>> graphUndoStack = new LinkedStack<>();
+    private StackInterface<GraphInterface<String, Integer>> graphRedoStack = new LinkedStack<>();
+
+    //private DAO dao = new DAO();
     private EventDAO eventDAO = new EventDAO();
     private EventMaintenanceUI eventUI = new EventMaintenanceUI();
+
     private static final String FILENAME = "event.txt";
+    private static final String FILENAME2 = "eventVolunteer.txt";
+    private static final String FILENAME3 = "volunteer.txt";
+    private static final String FILENAME4 = "donationHashMap.dat";
+
+    private DonationMaintenance dm = new DonationMaintenance();
+    private DonorMaintenance donorm = new DonorMaintenance();
 
     public EventMaintenance() {
         eventsMap = eventDAO.retrieveFromFile(FILENAME);
+        eventGraph = eventDAO.createGraphOfAssignedVolunteersToEvent(FILENAME2);
+        volunteersMap = eventDAO.retrieveVolunteers(FILENAME3);
     }
 
     public void runEventMaintenance() {
         int ch = 0;
         do {
-            ch = eventUI.getChoice();
+            ch = eventUI.getChoice(graphUndoStack.isEmpty(), graphRedoStack.isEmpty());
             switch (ch) {
                 case 0:
                     MessageUI.displayExitToMainMenuMessage();
@@ -72,6 +90,22 @@ public class EventMaintenance {
                 case 6:
                     displayAllEvents();
                     break;
+                case 7:
+                    removeVolunteerFromEvent();
+                    break;
+                case 8:
+                    EventVolunteerListMenu();
+                    break;
+                case 9:
+                    //generate report
+
+                    break;
+                case 10:   //undo remove volunteer from event
+                    undoRemoveVolunteerFromEvent();
+                    break;
+                case 11:   //redo remove volunteer from event (add them back)
+                    redoRemoveVolunteerFromEvent();
+                    break;
 
                 default:
                     MessageUI.displayInvalidChoiceMessage();
@@ -80,22 +114,160 @@ public class EventMaintenance {
         } while (ch != 0);
     }
 
-    //calling add an event function
+    public void generateReport() {
+        int reportChoice = 0;
+
+        do {
+            reportChoice = eventUI.getReportChoice();
+            switch (reportChoice) {
+                case 1:
+                    handleEventPerformanceReport();
+                    break;
+                case 2:
+                    handleTopFiveDonorReport();
+                    break;
+                case 3:
+                    //test
+                    break;
+                case 0:
+                    MessageUI.displayExitToMainMenuMessage();
+                    break;
+                default:
+                    MessageUI.displayInvalidChoiceMessage();
+                    break;
+            }
+
+        } while (reportChoice != 0);
+
+    }
+
+    public void handleEventPerformanceReport() {
+        int choice = 0;
+
+        do {
+            choice = eventUI.getEventPerformanceReportChoice();
+            switch (choice) {
+                case 1:
+                    //specific event
+                    generateEventSpecificPerformanceReport();
+                    break;
+                case 2:
+                    break;
+                case 0:
+                    MessageUI.displayExitToMainMenuMessage();
+                    break;
+                default:
+                    MessageUI.displayInvalidChoiceMessage();
+                    break;
+            }
+        } while (choice != 0);
+    }
+
+    public void generateEventSpecificPerformanceReport() {
+        String id = eventUI.getEventID("");
+        Event event = eventsMap.get(id);
+        if (event != null) {
+            SortedListInterface<Donation> allDonations = dm.getDonationListSortedById();
+            ListInterface<Donor> allDonors = donorm.getDonorList();
+            
+            
+
+        } else {
+            MessageUI.displaySearchNotFoundMessage("Event " + id);
+        }
+
+    }
+
+    public void handleTopFiveDonorReport() {
+        int choice = 0;
+        do {
+            choice = eventUI.getTopFiveDonorReportChoice();
+            switch (choice) {
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 0:
+                    MessageUI.displayExitToMainMenuMessage();
+                    break;
+                default:
+                    MessageUI.displayInvalidChoiceMessage();
+                    break;
+            }
+
+        } while (choice != 0);
+    }
+
+    public void undoRemoveVolunteerFromEvent() {
+        if (!graphUndoStack.isEmpty()) {
+            GraphInterface<String, Integer> undoneGraph = graphUndoStack.pop();
+
+            graphRedoStack.push(deepCopyGraph(eventGraph));
+            eventGraph = undoneGraph;
+
+            eventDAO.saveGraphToFile(eventGraph, FILENAME2);
+            System.out.println("Action Undone. Volunteers have been readded back.");
+
+        } else {
+            System.out.println("Nothing to undo.");
+        }
+    }
+
+    public void redoRemoveVolunteerFromEvent() {
+        if (!graphRedoStack.isEmpty()) {
+            GraphInterface<String, Integer> redoneGraph = graphRedoStack.pop();
+
+            graphUndoStack.push(deepCopyGraph(eventGraph));
+
+            eventGraph = redoneGraph;
+
+            eventDAO.saveGraphToFile(eventGraph, FILENAME2);
+            System.out.println("Action Redone. Volunteers have been removed again.");
+        } else {
+            System.out.println("Nothing to redo.");
+        }
+    }
+
+    private GraphInterface<String, Integer> deepCopyGraph(GraphInterface<String, Integer> originalGraph) {
+        GraphInterface<String, Integer> copyGraph = new WeightedGraph<>();
+
+        ListInterface<String> allVertices = originalGraph.getAllVertexObjects();
+
+        for (int i = 0; i < allVertices.getNumberOfEntries(); i++) {
+            copyGraph.addVertex(allVertices.getEntry(i + 1));
+        }
+
+        for (int j = 0; j < allVertices.getNumberOfEntries(); j++) {
+
+            if (allVertices.getEntry(j + 1).startsWith("E")) {
+                ListInterface<String> neighbours = originalGraph.getNeighbours(allVertices.getEntry(j + 1));
+                for (int k = 0; k < neighbours.getNumberOfEntries(); k++) {
+
+                    copyGraph.addUndirectedEdge(allVertices.getEntry(j + 1), neighbours.getEntry(k + 1), originalGraph.getEdgeWeight(allVertices.getEntry(j + 1), neighbours.getEntry(k + 1)));
+                }
+            }
+        }
+
+        return copyGraph;
+    }
+
+    public void clearGraphUndoAndRedoStacks() {
+        graphUndoStack.clear();
+        graphRedoStack.clear();
+    }
+
     public void addEvent() {
         Event newEvent = eventUI.AddNewEventUI(generateEventID());
 
-        eventsMap.put(newEvent.getId(), newEvent);
-
-        System.out.println("\nEvent added successfully.\n");
-
-        /*
-        if (events.add(newEvent)) {
-            eventDAO.saveToFile(events, "event.txt");
+        if (newEvent != null) {
+            eventsMap.put(newEvent.getId(), newEvent);
             System.out.println("\nEvent added successfully.\n");
+            clearGraphUndoAndRedoStacks();
         } else {
-            MessageUI.displayInvalidAddMessage("event\n");
+            System.out.println("\nEvent creation was canceled.\n");
         }
-         */
     }
 
     //calling single delete function
@@ -113,6 +285,7 @@ public class EventMaintenance {
                 eventsMap.put(id, event);
                 eventDAO.saveToFile(eventsMap, "event.txt");
                 System.out.println("Event " + id + " deleted.\n");
+                clearGraphUndoAndRedoStacks();
             } else {
                 System.out.println("Event " + id + " was not deleted.\n");
             }
@@ -142,6 +315,7 @@ public class EventMaintenance {
                     eventsMap.put(id, event);
                     eventDAO.saveToFile(eventsMap, "event.txt");
                     System.out.println("Event " + id + " restored.\n");
+                    clearGraphUndoAndRedoStacks();
                 } else {
                     System.out.println("Event " + id + " was not restored.\n");
                 }
@@ -401,11 +575,10 @@ public class EventMaintenance {
             while (continueEditing) {
                 int choice = eventUI.getEditChoice(!undoStack.isEmpty(), !redoStack.isEmpty(), pastEvent);
                 Event originalEvent = new Event(event.getId(), event.getName(), event.getType(), event.getStartDate(), event.getEndDate(), event.getLocation(), event.getMinVolunteer(), event.getMaxVolunteer(), event.getCurrentVolunteer(), event.getCurrentAmount(), event.getGoalAmount(), event.getIsDeleted());
-                
 
                 switch (choice) {
                     case 1:
-                        event.setName(eventUI.inputEventName("new"));
+                        event.setName(eventUI.inputEditEventName());
                         break;
                     case 2:
                         event.setType(eventUI.getNewEventType());
@@ -415,38 +588,30 @@ public class EventMaintenance {
                         break;
 
                     case 4:
-                        event.setEndDate(eventUI.inputEndDate(event.getStartDate(), "new"));
+                        event.setEndDate(eventUI.inputEditEndDate(event.getStartDate()));
                         break;
                     case 5:
-                        event.setLocation(eventUI.inputLocation("new"));
+                        event.setLocation(eventUI.inputEditLocation());
                         break;
                     case 6:
-                        int[] volunteers = eventUI.inputNumVolunteer();
+                        int[] volunteers = eventUI.inputEditNumVolunteer();
                         event.setMinVolunteer(volunteers[0]);
                         event.setMaxVolunteer(volunteers[1]);
                         break;
                     case 7:
-                        event.setGoalAmount(eventUI.inputGoalAmount("new"));
+                        event.setGoalAmount(eventUI.inputEditGoalAmount());
                         break;
                     case 8:
                         if (!undoStack.isEmpty()) {
 
-                            
                             redoStack.push(event);
-                            
-                            // Save current state to redo stack
-                          //  Event addToUndo = new Event(event.getId(), event.getName(), event.getType(), event.getStartDate(), event.getEndDate(), event.getLocation(), event.getMinVolunteer(), event.getMaxVolunteer(), event.getCurrentVolunteer(), event.getCurrentAmount(), event.getGoalAmount(), event.getIsDeleted());
-                           // redoStack.push(addToUndo);
 
-                            // Pop the previous state from the undo stack
                             Event undoEvent = undoStack.pop();
 
-                            
                             // Replace the current event in the eventsMap
                             eventsMap.put(id, undoEvent);
 
                             // Update the current event reference
-                            //event = new Event(undoEvent.getId(), undoEvent.getName(), undoEvent.getType(), undoEvent.getStartDate(), undoEvent.getEndDate(), undoEvent.getLocation(), undoEvent.getMinVolunteer(), undoEvent.getMaxVolunteer(), undoEvent.getCurrentVolunteer(), undoEvent.getCurrentAmount(), undoEvent.getGoalAmount(), undoEvent.getIsDeleted());
                             event = undoEvent;
                             System.out.println("Undo successful. Current event details:");
 
@@ -470,7 +635,7 @@ public class EventMaintenance {
                             event = redoEvent;
                             System.out.println("Redo successful. Current event details:");
                         } else {
-                            System.out.println("No actions to undo.");
+                            System.out.println("No actions to redo.");
                         }
 
                         break;
@@ -485,7 +650,7 @@ public class EventMaintenance {
 
                 if (choice >= 1 && choice <= 7) {
                     undoStack.push(originalEvent);
-                    
+
                     redoStack.clear();
                     eventsMap.put(id, event);
                     System.out.println("Event updated. Updated event details:");
@@ -500,6 +665,429 @@ public class EventMaintenance {
             MessageUI.displaySearchNotFoundMessage("Event " + id);
         }
 
+    }
+
+    public void EventVolunteerListMenu() {
+        int choice = 0;
+        do {
+            choice = eventUI.getVolunteerListingChoice();
+
+            switch (choice) {
+                case 1:
+                    listAllEventsForVolunteer();
+                    break;
+                case 2:
+                    listAllEventsForMultipleVolunteer();
+                    break;
+                case 0:
+                    MessageUI.displayExitToMainMenuMessage();
+                    break;
+                default:
+                    MessageUI.displayInvalidChoiceMessage();
+                    break;
+            }
+        } while (choice != 0);
+    }
+
+    private SortedListInterface<Event> getEventsForVolunteer(String volunteerID) {
+        Volunteer volunteer = volunteersMap.get(volunteerID);
+        SortedListInterface<Event> allFoundEvents = new SortedLinkedList<>();
+
+        if (volunteer == null) {
+            MessageUI.displaySearchNotFoundMessage("Volunteer with the ID, " + volunteerID);
+            return allFoundEvents;  // Return empty list if volunteer not found
+        }
+
+        ListInterface<String> eventIDsForVolunteer = eventGraph.getNeighbours(volunteerID);
+
+        if (eventIDsForVolunteer != null) {
+            for (int i = 0; i < eventIDsForVolunteer.getNumberOfEntries(); i++) {
+                String eventID = eventIDsForVolunteer.getEntry(i + 1);
+                if (eventsMap.containsKey(eventID)) {
+                    if (!allFoundEvents.add(eventsMap.get(eventID))) {
+                        System.out.println("Unable to add event " + eventID + " to the sorted list.");
+                    }
+                } else {
+                    MessageUI.displaySearchNotFoundMessage("Event with the ID, " + eventID);
+                }
+            }
+        }
+
+        return allFoundEvents;
+    }
+
+    public void removeVolunteerFromEvent() {
+        String id = eventUI.getVolunteerID("");
+        Volunteer volunteer = volunteersMap.get(id);
+        if (volunteer == null) {
+            MessageUI.displaySearchNotFoundMessage("Volunteer with the ID, " + id);
+            return;
+        }
+
+        SortedListInterface<Event> allFoundEvents = getEventsForVolunteer(id);
+
+        if (!allFoundEvents.isEmpty()) {
+            SortedListInterface<Event> upcomingEvents = filterEventsAfterToday(allFoundEvents);
+
+            if (!upcomingEvents.isEmpty()) {
+                eventUI.printEventHeader(upcomingEvents.getNumberOfEntries() + " upcoming event(s) found: ");
+                eventUI.printAllEvents(getAllEvents(upcomingEvents));
+                // remove volunteer here...
+                SetInterface<String> desiredEventIDList = obtainDesiredEventIDList(upcomingEvents);
+
+                if (desiredEventIDList.isEmpty()) {
+                    System.out.println("No events chosen. Deletion cancelled.");
+                    return;
+                }
+
+                String combinedString = "";
+                char confirm = eventUI.getDeleteConfirmation();
+                if (confirm == 'Y') {
+                    graphUndoStack.push(deepCopyGraph(eventGraph));
+                    Iterator<String> eventIterator = desiredEventIDList.iterator();
+                    while (eventIterator.hasNext()) {
+                        String eventID = eventIterator.next();
+                        if (!eventGraph.removeUndirectedEdge(eventID, (String) id)) {
+                            System.out.println("Volunteer was not successfully deleted from Event " + eventID + ".");
+                        } else {
+                            //removed successfully, so need to reduce curr volunteer of event by 1
+                            Event event = eventsMap.get(eventID);
+                            event.setCurrentVolunteer(event.getCurrentVolunteer() - 1);
+                            combinedString += eventID;
+                            if (eventIterator.hasNext()) {
+                                combinedString += ", ";
+                            }
+                        }
+                    }
+
+                    //save back to text file...
+                    eventDAO.saveGraphToFile(eventGraph, FILENAME2);
+                    System.out.println("Volunteer " + id + " was successfully deleted from Event(s) " + combinedString);
+
+                } else {
+                    System.out.println("Deletion Cancelled.");
+                }
+
+            } else {
+                System.out.println("No upcoming events for the volunteer.");
+            }
+        } else {
+            System.out.println("The volunteer has not been assigned to any event.");
+        }
+    }
+
+    public SortedListInterface<Event> filterEventsAfterToday(SortedListInterface<Event> eventsList) {
+        SortedListInterface<Event> filteredEvents = new SortedLinkedList<>();
+        LocalDate today = LocalDate.now(); // e.g., 31/8
+        LocalDate tomorrow = today.plusDays(1); // e.g., 1/9
+
+        for (int i = 1; i <= eventsList.getNumberOfEntries(); i++) {
+            Event event = eventsList.getEntry(i);
+            LocalDate eventDate = event.getStartDate(); // Assuming Event class has getDate() method returning LocalDate
+            if (!eventDate.isBefore(tomorrow)) { // Check if eventDate is today or later
+                filteredEvents.add(event);
+            }
+        }
+
+        return filteredEvents;
+    }
+
+    public SetInterface<String> obtainDesiredEventIDList(SortedListInterface<Event> upcomingEvents) {
+        SetInterface<String> desiredEvents = new ArraySet<>();
+        StackInterface<String> undoStack = new LinkedStack<>();
+        StackInterface<String> redoStack = new LinkedStack<>();
+        String userInput = "";
+        int count = 0;
+        MapInterface<String, Event> selectedEventsMap = new HashMap<>();
+
+        // Populate the selectedEventsMap with upcoming events
+        for (int i = 0; i < upcomingEvents.getNumberOfEntries(); i++) {
+            selectedEventsMap.put(upcomingEvents.getEntry(i + 1).getId(), upcomingEvents.getEntry(i + 1));
+        }
+
+        do {
+            // Dynamically generate the prompt message
+            String promptMessage = (count + 1) + " (Type 'done' to stop";
+
+            if (!desiredEvents.isEmpty()) {
+                promptMessage += ", 'remove' to remove last added event";
+            }
+            if (!undoStack.isEmpty()) {
+                promptMessage += ", 'undo' to undo last action";
+            }
+            if (!redoStack.isEmpty()) {
+                promptMessage += ", 'redo' to redo last action";
+            }
+
+            promptMessage += ")";
+
+            userInput = eventUI.getEventIDForVolunteer(promptMessage);
+
+            if (userInput.equalsIgnoreCase("done")) {
+                System.out.println();
+                break;
+            }
+
+            if (userInput.equalsIgnoreCase("remove")) {
+                if (!desiredEvents.isEmpty()) {
+                    Iterator<String> iterator = desiredEvents.iterator();
+                    String lastAddedEvent = "";
+                    while (iterator.hasNext()) {
+                        lastAddedEvent = iterator.next(); // Get the last added event
+                    }
+
+                    if (desiredEvents.remove(lastAddedEvent)) {
+                        undoStack.push(lastAddedEvent); // Add to undo stack
+                        redoStack.clear(); // Clear redo stack as new action invalidates redo history
+                        System.out.println("Removed event with ID " + lastAddedEvent);
+                        count--;
+                    }
+
+                } else {
+                    System.out.println("No events to remove.");
+                }
+            } else if (userInput.equalsIgnoreCase("undo")) {
+                if (!undoStack.isEmpty()) {
+                    String undoneEvent = undoStack.pop();
+                    if (desiredEvents.add(undoneEvent)) {
+                        redoStack.push(undoneEvent); // Add to redo stack
+                        count++;
+                        System.out.println("Action Undone. The event " + undoneEvent + " has been readded");
+                    } else {
+                        System.out.println("Event with ID " + undoneEvent + " is already in the list.");
+                    }
+                } else {
+                    System.out.println("No actions to undo.");
+                }
+            } else if (userInput.equalsIgnoreCase("redo")) {
+                if (!redoStack.isEmpty()) {
+                    String redoneEvent = redoStack.pop();
+                    if (desiredEvents.remove(redoneEvent)) {
+                        undoStack.push(redoneEvent); // Add back to undo stack
+                        count++;
+                        System.out.println("Action Redone. The event " + redoneEvent + " has been removed");
+                    }
+
+                } else {
+                    System.out.println("No actions to redo.");
+                }
+            } else if (selectedEventsMap.containsKey(userInput)) {
+                if (desiredEvents.add(userInput)) {
+                    undoStack.clear(); // Clear the stack when a new event is added
+                    redoStack.clear(); // Clear redo stack as new action invalidates redo history
+                    count++;
+                    System.out.println("Added event with ID " + userInput);
+                } else {
+                    System.out.println("Event with ID " + userInput + " is already in the list.");
+                }
+            } else {
+                System.out.println("Event with ID " + userInput + " does not exist or is a past event.");
+            }
+
+            // Print the current state of chosen events
+            System.out.println("Current number of chosen events: " + desiredEvents.size());
+            if (!desiredEvents.isEmpty()) {
+                System.out.print("Current Chosen Events: ");
+                Iterator<String> itr = desiredEvents.iterator();
+                while (itr.hasNext()) {
+                    System.out.print(itr.next());
+                    if (itr.hasNext()) {
+                        System.out.print(", ");
+                    }
+                }
+            }
+            System.out.println("\n");
+        } while (!userInput.equalsIgnoreCase("done"));
+
+        return desiredEvents;
+    }
+
+    public void listAllEventsForVolunteer() {
+        String id = eventUI.getVolunteerID("");
+        SortedListInterface<Event> allFoundEvents = getEventsForVolunteer(id);
+
+        if (!allFoundEvents.isEmpty()) {
+            eventUI.printEventHeader(allFoundEvents.getNumberOfEntries() + " event(s) found: ");
+            eventUI.printAllEvents(getAllEvents(allFoundEvents));
+        }
+    }
+
+    //allowing flexible search up to any number of volunteers, then show the common events
+    public void listAllEventsForMultipleVolunteer() {
+        SetInterface<String> desiredVolunteerIDs = obtainDesiredVolunteerIDList();
+        ListInterface<SetInterface<String>> volunteerEventIDSets = getVolunteerEventIDSets(desiredVolunteerIDs);
+
+        if (volunteerEventIDSets.isEmpty()) {   //means the volunter id list is empty, so end operation
+            System.out.println("No volunteers listed. Exiting to menu.");
+        } else {
+            SortedListInterface<Event> allFoundEvents = new SortedLinkedList<>();
+            //SortedListInterface<Event> commonEvents = new SortedLinkedList<>();
+
+            SetInterface<String> CommonEventSet = volunteerEventIDSets.getEntry(1);
+            for (int i = 1; i <= volunteerEventIDSets.getNumberOfEntries(); i++) {
+                SetInterface<String> currentEventSet = volunteerEventIDSets.getEntry(i);
+
+                // For common events, perform intersection
+                CommonEventSet = CommonEventSet.intersection(currentEventSet);
+
+            }
+
+            Iterator<String> myItr = CommonEventSet.iterator();
+            while (myItr.hasNext()) {
+                String eventID = myItr.next();
+                if (eventsMap.containsKey(eventID)) {
+                    if (!allFoundEvents.add(eventsMap.get(eventID))) {
+                        System.out.println("Unable to add event " + eventID + " to the sorted list.");
+                    }
+                } else {
+                    MessageUI.displaySearchNotFoundMessage("Event with the ID, " + eventID);
+                }
+            }
+
+            String combinedStringOfVolunteerIDs = "";
+            Iterator<String> myItr2 = desiredVolunteerIDs.iterator();
+            while (myItr2.hasNext()) {
+                combinedStringOfVolunteerIDs += myItr2.next();
+                if (myItr2.hasNext()) {
+                    combinedStringOfVolunteerIDs += ", ";
+                }
+            }
+
+            if (allFoundEvents.isEmpty()) {
+                System.out.println("No common events found for the selected volunteers: " + combinedStringOfVolunteerIDs);
+            } else {
+
+                eventUI.printEventHeader(allFoundEvents.getNumberOfEntries() + " common event(s) found for " + combinedStringOfVolunteerIDs + ": ");
+                eventUI.printAllEvents(getAllEvents(allFoundEvents));
+            }
+
+        }
+
+    }
+
+    public ListInterface<SetInterface<String>> getVolunteerEventIDSets(SetInterface<String> desiredVolunteerIDs) {
+
+        ListInterface<SetInterface<String>> volunteerEventIDSets = new ArrayList<>();
+
+        if (!desiredVolunteerIDs.isEmpty()) {
+
+            Iterator itr = desiredVolunteerIDs.iterator();
+            while (itr.hasNext()) {
+                SetInterface<String> eventIDsForVolunteer = new ArraySet<>();
+                ListInterface<String> eventIDs = eventGraph.getNeighbours((String) itr.next());
+                if (eventIDs != null) {
+                    for (int j = 0; j < eventIDs.getNumberOfEntries(); j++) {
+                        eventIDsForVolunteer.add(eventIDs.getEntry(j + 1));
+                    }
+                }
+                volunteerEventIDSets.add(eventIDsForVolunteer);
+            }
+
+        }
+
+        return volunteerEventIDSets;
+    }
+
+    public SetInterface<String> obtainDesiredVolunteerIDList() {
+        SetInterface<String> desiredVolunteers = new ArraySet<>();
+        StackInterface<String> undoStack = new LinkedStack<>();
+        StackInterface<String> redoStack = new LinkedStack<>();
+        String userInput = "";
+        int count = 0;
+
+        do {
+            // Dynamically generate the prompt message
+            String promptMessage = (count + 1) + " (Type 'done' to stop";
+
+            if (!desiredVolunteers.isEmpty()) {
+                promptMessage += ", 'remove' to remove last added volunteer";
+            }
+            if (!undoStack.isEmpty()) {
+                promptMessage += ", 'undo' to undo last action";
+            }
+            if (!redoStack.isEmpty()) {
+                promptMessage += ", 'redo' to redo last action";
+            }
+
+            promptMessage += ")";
+
+            userInput = eventUI.getVolunteerID(promptMessage);
+
+            if (userInput.equalsIgnoreCase("done")) {
+                System.out.println();
+                break;
+            }
+
+            if (userInput.equalsIgnoreCase("remove")) {
+                if (!desiredVolunteers.isEmpty()) {
+                    Iterator<String> iterator = desiredVolunteers.iterator();
+                    String lastAddedVolunteer = "";
+                    while (iterator.hasNext()) {
+                        lastAddedVolunteer = iterator.next(); // Get the last added volunteer
+                    }
+
+                    if (desiredVolunteers.remove(lastAddedVolunteer)) {
+                        undoStack.push(lastAddedVolunteer); // Add to undo stack
+                        redoStack.clear(); // Clear redo stack as new action invalidates redo history
+                        count--;
+                        System.out.println("Removed volunteer with ID " + lastAddedVolunteer);
+                    }
+                } else {
+                    System.out.println("No volunteers to remove.");
+                }
+            } else if (userInput.equalsIgnoreCase("undo")) {
+                if (!undoStack.isEmpty()) {
+                    String undoneVolunteer = undoStack.pop();
+                    if (desiredVolunteers.add(undoneVolunteer)) {
+                        redoStack.push(undoneVolunteer); // Add to redo stack
+                        count++;
+                        System.out.println("Action Undone. The volunteer " + undoneVolunteer + " has been re-added.");
+                    } else {
+                        System.out.println("Volunteer with ID " + undoneVolunteer + " is already in the list.");
+                    }
+                } else {
+                    System.out.println("No actions to undo.");
+                }
+            } else if (userInput.equalsIgnoreCase("redo")) {
+                if (!redoStack.isEmpty()) {
+                    String redoneVolunteer = redoStack.pop();
+                    if (desiredVolunteers.remove(redoneVolunteer)) {
+                        undoStack.push(redoneVolunteer); // Add back to undo stack
+                        count++;
+                        System.out.println("Action Redone. The volunteer " + redoneVolunteer + " has been removed.");
+                    }
+                } else {
+                    System.out.println("No actions to redo.");
+                }
+            } else if (volunteersMap.containsKey(userInput)) {
+                if (desiredVolunteers.add(userInput)) {
+                    undoStack.clear(); // Clear the stack when a new volunteer is added
+                    redoStack.clear(); // Clear redo stack as new action invalidates redo history
+                    count++;
+                    System.out.println("Added volunteer with ID " + userInput);
+                } else {
+                    System.out.println("Volunteer with ID " + userInput + " is already in the list.");
+                }
+            } else {
+                System.out.println("Volunteer with ID " + userInput + " does not exist.");
+            }
+
+            // Print the current state of chosen volunteers
+            System.out.println("Current number of chosen volunteers: " + desiredVolunteers.size());
+            if (!desiredVolunteers.isEmpty()) {
+                System.out.print("Current Chosen Volunteers: ");
+                Iterator<String> itr = desiredVolunteers.iterator();
+                while (itr.hasNext()) {
+                    System.out.print(itr.next());
+                    if (itr.hasNext()) {
+                        System.out.print(", ");
+                    }
+                }
+            }
+            System.out.println("\n");
+        } while (!userInput.equalsIgnoreCase("done"));
+
+        return desiredVolunteers;
     }
 
     //calling display all event function
@@ -549,8 +1137,8 @@ public class EventMaintenance {
 
         return sortedEvents;
     }
-    
-    public MapInterface<String, Event> getEventMap(){
+
+    public MapInterface<String, Event> getEventMap() {
         return eventsMap;
     }
 
