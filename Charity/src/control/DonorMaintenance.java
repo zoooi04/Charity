@@ -111,19 +111,44 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
 
     // Remove a donor
     public boolean remove(ListInterface<Donor> newEntry) {
+        boolean searchNewDonor = true, deleteSelectedDonor = false;
+
         if (newEntry instanceof ArrayList<?>) {
             int[] position = {-1};
-            if (search(newEntry, position)) {
-                Object entry = newEntry.getEntry(position[0]);
-                if (entry instanceof Donor) {
-                    Donor paramDonor = (Donor) entry;
-                    paramDonor.setIsDeleted(true);
-                } else {
-                    return false;
+
+            if (lastSearchDonor != null) {
+                int choice = donorUI.getUpdateDonorConfirmation(lastSearchDonor.getId());
+                do {
+                    switch (choice) {
+                        case 0:
+                            return false;
+                        case 1:
+                            searchNewDonor = false;
+                            deleteSelectedDonor = true;
+                            break;
+                        case 2:
+                            break;
+                        default:
+                            break;
+                    }
+                } while (choice < 0 || choice > 2);
+            }
+
+            if (searchNewDonor) {
+                if (search(newEntry, position)) {
+                    deleteSelectedDonor = true;
                 }
+            }
+
+            if (deleteSelectedDonor) {
+                Donor paramDonor = lastSearchDonor;
+                paramDonor.setIsDeleted(true);
+
+                saveDonorList();
             } else {
                 return false;
             }
+
         } else {
             return false;
         }
@@ -788,7 +813,9 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                 donorMap.put(key, queue);
             }
             // Enqueue the donor into the existing or newly created queue
-            queue.enqueue(donor);
+            if (!donor.isIsDeleted()) {
+                queue.enqueue(donor);
+            }
         }
 
         return donorMap;
