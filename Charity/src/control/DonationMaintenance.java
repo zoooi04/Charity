@@ -4,6 +4,7 @@
  */
 package control;
 
+import adt.ArrayList;
 import adt.ArrayStack;
 import adt.GraphInterface;
 import dao.DonationInitializer;
@@ -17,7 +18,6 @@ import adt.LinkedList;
 import adt.ListInterface;
 import adt.SortedLinkedList;
 import adt.SortedListInterface;
-import adt.StackInterface;
 import adt.WeightedGraph;
 import dao.DAO;
 import entity.Donation.DonationType;
@@ -38,7 +38,6 @@ public class DonationMaintenance {
     private MapInterface<String, Donation> donationMap;
     private final DAO<MapInterface<String, Donation>> dao = new DAO<>();
     private static final String FILENAME = "donationHashMap.dat";
-    private static final Scanner scanner = new Scanner(System.in);
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DonorMaintenance donorM = new DonorMaintenance();
     //array stack for faster access to undo redo
@@ -73,7 +72,7 @@ public class DonationMaintenance {
                     Donation searchResult = searchById();
                     if (searchResult != null) {
                         System.out.println("\n" + searchResult.getDetails() + "\nPress to continue..");
-                        scanner.nextLine();
+                        donationUI.bufferLine();
                     } else {
                         System.out.println("\nNothing found..");
                     }
@@ -322,8 +321,7 @@ public class DonationMaintenance {
                     return;
                 case 1:
                     //Donor Id
-                    System.out.print("Enter donor Id: ");
-                    String id = scanner.nextLine();
+                    String id = donationUI.getDonorInputSimple();
 
                     donationUI.printDonationHeader();
                     for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
@@ -335,13 +333,12 @@ public class DonationMaintenance {
                     break;
                 case 2:
                     //Donor Name
-                    System.out.print("Enter donor name: ");
-                    String name = scanner.nextLine();
+                    String name = donationUI.getDonorNameSimple();
 
                     donationUI.printDonationHeader();
                     for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                         Donation donation = donationList.getEntry(i);
-                        if (donation.getDonor().getName().toUpperCase().equals(name.toUpperCase()) && !donation.getIsDeleted()) {
+                        if (donation.getDonor().getName().toUpperCase().contains(name.toUpperCase()) && !donation.getIsDeleted()) {
                             displayDonation(donation, false, false);
                         }
                     }
@@ -368,11 +365,7 @@ public class DonationMaintenance {
                     return;
                 case 1:
                     //Message Availability
-                    String message;
-                    do {
-                        System.out.print("Show donation with message? (Y/N): ");
-                        message = scanner.nextLine().trim().toUpperCase();
-                    } while (!message.equals("Y") && !message.equals("N"));
+                    String message = donationUI.getMessageFilterOption();
 
                     donationUI.printDonationHeader();
                     if (message.charAt(0) == 'Y') {
@@ -401,8 +394,7 @@ public class DonationMaintenance {
                                 break;
                             case 1:
                                 //Donor Id
-                                System.out.print("Enter event Id: ");
-                                String id = scanner.nextLine();
+                                String id = donationUI.getEventIdSimple();
 
                                 donationUI.printDonationHeader();
                                 for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
@@ -414,13 +406,12 @@ public class DonationMaintenance {
                                 break;
                             case 2:
                                 //Donor Name
-                                System.out.print("Enter event name: ");
-                                String name = scanner.nextLine();
+                                String name = donationUI.getEventNameSimple();
 
                                 donationUI.printDonationHeader();
                                 for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                                     Donation donation = donationList.getEntry(i);
-                                    if (donation.getEvent().getName().toUpperCase().equals(name.toUpperCase()) && !donation.getIsDeleted()) {
+                                    if (donation.getEvent().getName().toUpperCase().contains(name.toUpperCase()) && !donation.getIsDeleted()) {
                                         displayDonation(donation, false, false);
                                     }
                                 }
@@ -433,37 +424,9 @@ public class DonationMaintenance {
                     break;
                 case 3:
                     //Date
-                    LocalDate date1 = null;
-                    boolean isValid = false;
-                    while (!isValid) {
-                        System.out.print("Enter start date (dd/MM/yyyy): ");
-                        String dateStr1 = scanner.nextLine();
+                    LocalDate date1 = donationUI.getStartDate();
+                    LocalDate date2 = donationUI.getEndDate(date1);
 
-                        try {
-                            date1 = LocalDate.parse(dateStr1, formatter); // Try to parse the date
-                            isValid = true; // If parsing is successful, set the flag to true
-                        } catch (DateTimeParseException e) {
-                            System.out.println("Invalid date format. Please enter the date in dd/MM/yyyy format.");
-                        }
-                    }
-
-                    LocalDate date2 = null;
-                    isValid = false;
-                    while (!isValid) {
-                        System.out.print("Enter end date (dd/MM/yyyy): ");
-                        String dateStr2 = scanner.nextLine();
-
-                        try {
-                            date2 = LocalDate.parse(dateStr2, formatter); // Try to parse the date
-                            isValid = true; // If parsing is successful, set the flag to true
-                            if (date2.isBefore(date1)) {
-                                System.out.println("End date cannot be before Start date.");
-                                isValid = false;
-                            }
-                        } catch (DateTimeParseException e) {
-                            System.out.println("Invalid date format. Please enter the date in dd/MM/yyyy format.");
-                        }
-                    }
 
                     donationUI.printDonationHeader();
                     for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
@@ -637,25 +600,29 @@ public class DonationMaintenance {
         //get a copy of eventIdList
         ListInterface<String> topDonorEventIdList = ((LinkedList<String>) eventIdList).copyList();
         //previously sorted according to donations, now is donor
-        // Bubble sort events id based on their number of donor in ascending order        
-        n = topDonorEventIdList.getNumberOfEntries();
-        for (int i = 1; i <= n - 1; i++) {
-            for (int j = 1; j <= n - i; j++) {
-                // Get the totaldonor of the current and next event IDs
+        // Bubble sort events id based on their number of donor in descending order
+        int n1 = topDonorEventIdList.getNumberOfEntries();
+        for (int i = 1; i <= n1 - 1; i++) {
+            for (int j = 1; j <= n1 - i; j++) {
+                // Get the total donor of the current and next event IDs
                 String eventId = topDonorEventIdList.getEntry(j);
                 String eventId2 = topDonorEventIdList.getEntry(j + 1);
                 int totalDonor1 = eventDonorNoMap.get(eventId);
                 int totalDonor2 = eventDonorNoMap.get(eventId2);
 
-                // Swap if the first total donor is greater than the second
-                if (totalDonor1 > totalDonor2) {
+                // Swap if the first total donor is less than the second (descending order)
+                if (totalDonor1 < totalDonor2) {
                     // Replace entries based on position
-                    topDonorEventIdList.replace(j, eventId);
-                    topDonorEventIdList.replace(j + 1, eventId2);
+                    topDonorEventIdList.replace(j, eventId2);
+                    topDonorEventIdList.replace(j + 1, eventId);
                 }
             }
         }
 
+        
+        
+        
+        
         //Display report
         System.out.println();
         System.out.println();
@@ -665,7 +632,6 @@ public class DonationMaintenance {
         System.out.println(("-").repeat(60));
         System.out.println("Event with the Highest Number of Donation: ");
         //get top 3 from the list (last 3)
-
         for (int i = 0; i < 3; i++) {
             String eventId = eventIdList.getEntry(eventIdList.getNumberOfEntries() - i);
             Event event = getEventById(eventId);
@@ -673,25 +639,25 @@ public class DonationMaintenance {
 
         }
 
+        
+        System.out.println(("-").repeat(60));
+        System.out.println("Event with the Highest Number of Donor: ");
+        for (int i = 0; i < 3; i++) {
+            String eventId = topDonorEventIdList.getEntry(i + 1); // Adjust the index to start from the top of the sorted list
+            Event event = getEventById(eventId);
+            System.out.printf((i + 1) + ". %-36s\t(%d donors)\n", event.getName(), eventDonorNoMap.get(eventId));
+        }
+        
+        
         System.out.println(("-").repeat(60));
         //pop stack to get back the top 3 most highest;
         System.out.println("Event with the Largest Single Donation: ");
-
-//        for (int i = 0; i < highestDonationList.getNumberOfEntries();i++) {
-//           System.out.println(highestDonationList.getEntry(i+1));
-//        }
         for (int i = 0; i < 3; i++) {
             Donation donation = highestDonationList.getEntry(highestDonationList.getNumberOfEntries() - i);
             System.out.printf((i + 1) + ". %-36s\t(RM %.2f)\n", donation.getEvent().getName(), donation.getQuantity());
         }
 
-        System.out.println(("-").repeat(60));
-        System.out.println("Event with the Highest Number of Donor: ");
-        for (int i = 0; i < 3; i++) {
-            String eventId = topDonorEventIdList.getEntry(topDonorEventIdList.getNumberOfEntries() - i);
-            Event event = getEventById(eventId);
-            System.out.printf((i + 1) + ". %-36s\t(%d donors)\n", event.getName(), eventDonorNoMap.get(eventId));
-        }
+
         System.out.println(("=").repeat(60));
 
     }
@@ -704,16 +670,32 @@ public class DonationMaintenance {
         ListInterface<Donation> list = donationMap.values();
 
         // Initialize variables to calculate total amount, types, and highest donation
-        double totalDonationAmount = 0.0;
+        double totalCashAmount= 0.0;
+        double totalFoodAmount = 0.0;
+        double totalItemAmount = 0.0;
+        int cashCount = 0;
+        int foodCount = 0;
+        int itemCount = 0;
+        
+        
         int type1 = 0, type2 = 0, type3 = 0;
-        double totalFood = 0, totalItem = 0;
         double highest = 0;
         Donation highestDonation = null;
 
         // Loop through all donations to calculate totals and counts
         for (int i = 1; i <= list.getNumberOfEntries(); i++) {
             Donation donation = list.getEntry(i);
-            totalDonationAmount += donation.getQuantity();  // Sum total donation amount
+            if(donation.getType()==Donation.DonationType.CASH){
+                totalCashAmount+=donation.getQuantity();
+                cashCount++;
+            }else if(donation.getType() == Donation.DonationType.FOOD){
+                totalFoodAmount += donation.getQuantity();
+                foodCount++;
+            }else{
+                totalItemAmount += donation.getQuantity();
+                itemCount++;
+            }
+            
 
             // Count the number of each type of donation
             switch (donation.getType()) {
@@ -736,24 +718,28 @@ public class DonationMaintenance {
         }
 
         // Calculate average donation amount
-        double averageTotalAmount = totalDonationAmount / donationMap.size();
+        double averageTotalAmount = totalCashAmount / donationMap.size();
 
         // Determine the most popular donation type
         String popularType;
+        int highestPopularType = 0;
         if (type1 >= type2 && type1 >= type3) {
             popularType = "Cash";
+            highestPopularType = type1;
         } else if (type2 >= type1 && type2 >= type3) {
             popularType = "Food";
+            highestPopularType = type2;
         } else {
             popularType = "Item";
+            highestPopularType = type3;
         }
 
         // Get all event IDs from the graph
         ListInterface<String> idList = graph.getAllVertexObjects();
-        ListInterface<String> eventIdList = graph.getAllVertexObjects();
+        ListInterface<String> eventIdList = new ArrayList<>();
         for (int i = 1; i <= idList.getNumberOfEntries(); i++) {
             String id = idList.getEntry(i);
-            if (id.charAt(0) == 'A') {  // Assuming event IDs start with 'A'
+            if (id.charAt(0) == 'E') {  // Assuming event IDs start with 'E'
                 eventIdList.add(id);
             }
         }
@@ -768,19 +754,81 @@ public class DonationMaintenance {
         // Calculate the average number of donations per event
         int averageNoOfDonation = (int) Math.ceil(totalIndeg /= eventIdList.getNumberOfEntries());
 
+        
+        double totalAmount = 0.0;
+        for(int i = 1; i<=list.getNumberOfEntries();i++){
+            if(list.getEntry(i).getType()==Donation.DonationType.CASH){
+                totalAmount = totalAmount + list.getEntry(i).getQuantity();
+            }
+        }
+        double averageAmountPerEvent = totalAmount/eventIdList.getNumberOfEntries();
+        
+        //Calculate the total number of donor
+        ListInterface<String> entitiesId = graph.getAllVertexObjects();
+        int totalDonor = 0;
+        for(int i = 0; i < entitiesId.getNumberOfEntries(); i++){
+            if(entitiesId.getEntry(i+1).charAt(0)== 'A'){
+                totalDonor++;
+            }
+        }
+        
+        //average no of donations per donor
+        int averageNoOfDonationPerDonor = (int)Math.ceil(list.getNumberOfEntries() / totalDonor);
+        double averageAmountPerDonor = totalCashAmount/totalDonor;
+
+        MapInterface<String,Double> contriMap = new HashMap<>();
+        for(int i = 1; i <= idList.getNumberOfEntries();i++){
+            String id = idList.getEntry(i);
+            if (id.charAt(0) == 'A') {
+                for(int j = 1; j<= list.getNumberOfEntries();j++){
+                    Donation donation = list.getEntry(j);
+                    if(donation.getDonor().getId().equals(id)){
+                        if(!contriMap.containsKey(id)){
+                            contriMap.put(id,donation.getQuantity());
+                        }else{
+                            double oldQty = contriMap.get(id);
+                            contriMap.put(id,oldQty+donation.getQuantity());
+                        }
+                    }
+                }
+            }
+        }
+        
+        double highestContribution = 0.0;
+        Donor highestContributor=null;
+        ListInterface<String> contriList = contriMap.keySet();
+        for(int i = 1; i <= contriList.getNumberOfEntries(); i++){
+            String id = contriList.getEntry(i);
+            if(contriMap.get(id) > highestContribution){
+                highestContribution = contriMap.get(id);
+                highestContributor = getDonorById(id);
+            }
+        }
+        
         // Print out the summary report
         System.out.println();
         System.out.println();
-        System.out.println(("=").repeat(50));
-        System.out.println("Overall Summary Report:");
-        System.out.println(("-").repeat(50));
-        System.out.printf("%-40s: " + donationMap.size() + " donations\n", "Total number of donation");
-        System.out.printf("%-40s: RM %.2f\n", "Total donation amount (Cash)", totalDonationAmount);
-        System.out.printf("%-40s: %d donations\n", "Average number of donation ", averageNoOfDonation);
-        System.out.printf("%-40s: RM %.2f\n", "Average donation amount (Cash)", averageTotalAmount);
-        System.out.printf("%-40s: " + popularType + "\n", "Most popular donation type");
-        System.out.printf("%-40s: RM %.2f by %s\n", "Highest donation amount received ", highest, highestDonation.getDonor().getName());
-        System.out.println(("=").repeat(50));
+        System.out.println(("=").repeat(90));
+        System.out.println("Summary Report");
+        System.out.println(("-").repeat(90));
+        System.out.printf("%-50s: " + totalDonor + " donors \n", "Total number of donor ");
+        System.out.printf("%-50s: " + donationMap.size() + " donations\n", "Total number of donation ");
+        System.out.printf("%-50s: RM %.2f\n", "Total donation amount (Cash)", totalCashAmount);
+        System.out.printf("%-50s: %.1f kg\n", "Total donation amount (Food)", totalFoodAmount);
+        System.out.printf("%-50s: %.1f kg\n", "Total donation amount (Other Items)", totalItemAmount);
+        System.out.println(("-").repeat(90));
+        System.out.printf("%-50s: " + averageNoOfDonationPerDonor + " donation \n", "Average number of donation per donor ");
+        System.out.printf("%-50s: RM %.2f\n", "Average amount of donation per donor ",averageAmountPerDonor);
+        System.out.printf("%-50s: %d donations\n", "Average number of donation per Event", averageNoOfDonation);
+        System.out.printf("%-50s: RM %.2f \n", "Average amount of donation per Event", averageAmountPerEvent);
+        System.out.printf("%-50s: RM %.2f\n", "Average amount per donation (Cash)", totalCashAmount/cashCount);
+        System.out.printf("%-50s: %.2f kg\n", "Average amount per donation (Food)", totalFoodAmount/foodCount);
+        System.out.printf("%-50s: %.2f kg\n", "Average amount per donation (Other Items)", totalItemAmount/itemCount);
+        System.out.println(("-").repeat(90));
+        System.out.printf("%-50s: " + popularType + " ("+ highestPopularType + " donations)\n", "Most popular donation type");
+        System.out.printf("%-50s: RM %.2f (by %s)\n", "Highest donation amount received: ", highest, highestDonation.getDonor().getName());
+        System.out.printf("%-50s: %s (total of RM %.2f)\n", "Top contributor: ", highestContributor.getName(), highestContribution);
+        System.out.println(("=").repeat(90));
     }
 
     
@@ -834,13 +882,22 @@ public class DonationMaintenance {
             }
         }
 
+        int countHighest = 0;
+        int countHighestMonth = 1;
+        for(int i = 1; i <= donationCounts.getNumberOfEntries(); i++){
+            if(donationCounts.getEntry(i)>countHighest){
+                countHighest = donationCounts.getEntry(i);
+                countHighestMonth = i;
+            }
+        }
+        
         // Print the report
         System.out.println();
         System.out.println();
-        System.out.println(("=").repeat(80));
+        System.out.println(("=").repeat(70));
         System.out.println("Monthly Donation Performance Analysis:");
-        System.out.println(("-").repeat(80));
-        System.out.printf("%-20s%10s%20s%21s\n", "Month", "Donations", "Total Amount(RM)", "Proportion");
+        System.out.println(("-").repeat(70));
+        System.out.printf("%-20s%10s%20s%21s\n", "Month", "Donations", "Total Amount(RM)", "Proportion(%)");
 
         // List of month names for printing purposes
         String[] monthNames = {
@@ -851,7 +908,7 @@ public class DonationMaintenance {
         // Iterate through the months to print each row of the report
         for (int i = 0; i < 12; i++) {
             System.out.printf(
-                    "%-20s%10d%20.2f%20.2f%%\n",
+                    "%-20s%10d%20.2f%20.2f\n",
                     monthNames[i],
                     donationCounts.getEntry(i + 1),
                     totalAmounts.getEntry(i + 1),
@@ -859,9 +916,10 @@ public class DonationMaintenance {
             );
         }
 
-        System.out.println(("-").repeat(80));
+        System.out.println(("-").repeat(70));
         System.out.println("Peak donation month : " + Month.of(bestMonth));
-        System.out.println(("=").repeat(80));
+        System.out.println("Most active month   : " + Month.of(countHighestMonth) + " (" + countHighest + ")");
+        System.out.println(("=").repeat(70));
     }
 
     //list all donations
@@ -1048,6 +1106,7 @@ public class DonationMaintenance {
         ListInterface<Donation> list = donationMap.values();
         for (int i = 1; i <= list.getNumberOfEntries(); i++) {
             Donation donation = list.getEntry(i);
+            System.out.println(donation.getId());
             Event event = donation.getEvent();
             Donor donor = donation.getDonor();
 
