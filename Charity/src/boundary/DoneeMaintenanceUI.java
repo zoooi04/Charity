@@ -1,3 +1,8 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+
 package boundary;
 
 import entity.Donee;
@@ -7,6 +12,11 @@ import adt.ListHeap;
 import adt.Heap;
 import dao.DAO;
 import utility.MessageUI;
+
+/**
+ *
+ * @author BEH JING HEN
+ */
 
 public class DoneeMaintenanceUI {
     
@@ -27,6 +37,7 @@ public class DoneeMaintenanceUI {
         System.out.println("3. Add new donee");
         System.out.println("4. Remove donee");
         System.out.println("5. Update donee");
+        System.out.println("6. Summary Report");
         System.out.println("0. Exit");
         System.out.print("Enter your choice: ");
         return Integer.parseInt(scanner.nextLine());
@@ -34,7 +45,7 @@ public class DoneeMaintenanceUI {
     
     public void printDoneeHeader() {
         String outputStr = "";
-        outputStr += "\n" + "=".repeat(130) + "\n";
+        outputStr += "\n" + "=".repeat(150) + "\n";
         outputStr += String.format("%-30s%-5s%-13s%-10s%-15s%-22s%-15s%-12s%-15s",
                 "Name",
                 "Age",
@@ -45,7 +56,7 @@ public class DoneeMaintenanceUI {
                 "Status",
                 "Id",
                 "Type");
-        outputStr += "\n" + "=".repeat(130) + "\n";
+        outputStr += "\n" + "=".repeat(150) + "\n";
         System.out.print(outputStr);
     }
     
@@ -53,8 +64,8 @@ public class DoneeMaintenanceUI {
     public int getUpdateMenuChoice()  {
         System.out.println("\nUPDATE MENU");
         System.out.println("1. Update Donee Type");
-        System.out.println("99. Confirm");
-        System.out.println("0. Exit");
+        System.out.println("99. Confirm to end update");
+        System.out.println("0. Back");
         System.out.print("Enter your choice: ");
         return Integer.parseInt(scanner.nextLine());
     }
@@ -111,6 +122,15 @@ public class DoneeMaintenanceUI {
                 System.out.println("Invalid choice. Please select a valid option.");
                 return inputSearchCriteria(); // Recursively prompt again for valid input
         }
+    }
+    
+    public int showSummaryMenu(){
+        System.out.println("\nSummary Report Menu:");
+        System.out.println("1. Monthly Donee Registration Report");
+        System.out.println("2. Donee Distribution Report");
+        System.out.println("0. Back to Main Menu");
+        System.out.print("Enter your choice: ");
+        return Integer.parseInt(scanner.nextLine());
     }
     
     // </editor-fold>
@@ -202,6 +222,45 @@ public class DoneeMaintenanceUI {
             default:
                 throw new IllegalArgumentException("Invalid search criteria: " + searchCriteria);
         }
+    }
+    
+    public int[] inputMonthAndYear() {
+        int month = 0;
+        int year = 0;
+        
+        // Loop to ensure valid month input
+        while (true) {
+            try {
+                System.out.print("Enter month (1-12): ");
+                String monthInput = scanner.nextLine().trim();
+                month = Integer.parseInt(monthInput);
+
+                if (month < 1 || month > 12) {
+                    throw new NumberFormatException("Invalid month");
+                }
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid month (1-12).");
+            }
+        }
+
+        // Loop to ensure valid year input
+        while (true) {
+            try {
+                System.out.print("Enter year (e.g., 2024): ");
+                String yearInput = scanner.nextLine().trim();
+                year = Integer.parseInt(yearInput);
+
+                if (year < 1000 || year > 9999) {  // Example validation for a reasonable year range
+                    throw new NumberFormatException("Invalid year");
+                }
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid year.");
+            }
+        }
+
+        return new int[]{month, year};
     }
 
     // </editor-fold>
