@@ -389,7 +389,7 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
         System.out.print(outputStr);
     }
 
-    public void printDonorTop3ReportBody(Donation.DonationType type, ArrayList<Donor> donor, ArrayList<Integer> qty) {
+    public void printDonorTop3ReportBody(Donation.DonationType type, ArrayList<Donor> donor, ArrayList<Double> qty) {
         String outputStr = "";
         String typeStr = "";
         int count = 3;
@@ -403,7 +403,7 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
                 typeStr = "";
             }
             if (donor.getEntry(i) != null && qty.getEntry(i) != null) {
-                outputStr += String.format("%-16s%-30s%-12s%12s\n",
+                outputStr += String.format("%-16s%-30s%-12s%12.2f\n",
                         typeStr,
                         donor.getEntry(i).getName(),
                         donor.getEntry(i).getId(),
