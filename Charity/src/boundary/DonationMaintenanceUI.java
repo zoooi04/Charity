@@ -6,6 +6,8 @@ package boundary;
 
 import static control.DonationMaintenance.getDonorById;
 import static control.DonationMaintenance.getEventById;
+import control.DonorMaintenance;
+import control.EventMaintenance;
 import entity.Donation;
 import entity.Donation.DonationType;
 import entity.Donor;
@@ -186,6 +188,8 @@ public class DonationMaintenanceUI {
     }
 
     public Event getEventIdInput() {
+        EventMaintenance em = new EventMaintenance();
+        em.displayAllEvents();
         Event event = null;
         while (event == null) {
             System.out.print("Enter event ID:");
