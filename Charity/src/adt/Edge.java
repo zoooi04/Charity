@@ -11,18 +11,29 @@ package adt;
  * @param <N>
  */
 public class Edge<T extends Comparable<T>, N extends Comparable<N>> {
+
     //Edge nodes
-    Vertex<T,N> toVertex;   //Reference to adjacent vertex
+    Vertex<T, N> toVertex;   //Reference to adjacent vertex
     N weight;               //Weight of the edge
-    Edge<T,N> nextEdge;     //Reference to the next edge node
-    
-    public Edge(Vertex<T,N> destination, N w, Edge<T,N> a) {
+    Edge<T, N> nextEdge;     //Reference to the next edge node
+
+    public Edge(Vertex<T, N> destination, N w, Edge<T, N> a) {
         toVertex = destination;
         weight = w;
         nextEdge = a;
     }
-    
 
 
 
+    public Vertex<T, N> getToVertex() {
+        return toVertex;
+    }
+
+    public N getWeight() {
+        return weight;
+    }
+
+    public Edge<T, N> getNextEdge() {
+        return nextEdge;
+    }
 }

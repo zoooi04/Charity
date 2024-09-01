@@ -66,6 +66,8 @@ public interface GraphInterface<T extends Comparable<T>, N extends Comparable<N>
      * @return The removed edge, or null if no edge was found.
      */
     Edge<T, N> removeEdge(T source, T destination);
+    
+    boolean removeUndirectedEdge(T source, T destination);
 
     /**
      * Prints all edges in the graph.

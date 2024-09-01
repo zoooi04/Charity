@@ -207,37 +207,65 @@ public class WeightedGraph<T extends Comparable<T>, N extends Comparable<N>> imp
     }
 
     @Override
-    public Edge removeEdge(T source, T destination) {
+    public boolean removeUndirectedEdge(T source, T destination) {
+        return removeEdge(source, destination) != null && removeEdge(destination, source) != null;
+    }
+
+    @Override
+    public Edge<T, N> removeEdge(T source, T destination) {
         Edge<T, N> removedEdge = null;
 
-        for (Vertex<T, N> sourceVertex = head; sourceVertex != null; sourceVertex = sourceVertex.nextVertex) {
-            if (sourceVertex.vertexInfo.compareTo(source) == 0) {
+        // Check if the edge exists
+        if (!hasEdge(source, destination)) {
+            return removedEdge;
+        }
 
-                if (sourceVertex.firstEdge.toVertex.vertexInfo.compareTo(destination) == 0) {
-                    removedEdge = sourceVertex.firstEdge;
-                    sourceVertex.firstEdge = sourceVertex.firstEdge.nextEdge;
+        Vertex<T, N> sourceVertex = head;
+        while (sourceVertex != null) {
+            // Find the source vertex
+            if (sourceVertex.vertexInfo.compareTo(source) == 0) {
+                Edge<T, N> currentEdge = sourceVertex.firstEdge;
+
+                // If the edge to remove is the first edge
+                if (currentEdge != null && currentEdge.toVertex.vertexInfo.compareTo(destination) == 0) {
+                    removedEdge = currentEdge;
+                    sourceVertex.firstEdge = currentEdge.nextEdge;
                 } else {
-                    for (Edge<T, N> currentEdge = sourceVertex.firstEdge; currentEdge != null; currentEdge = currentEdge.nextEdge) {
-                        if (currentEdge.nextEdge.toVertex.vertexInfo.compareTo(destination) == 0) {
-                            removedEdge = currentEdge.nextEdge;
-                            currentEdge.nextEdge = currentEdge.nextEdge.nextEdge;
+                    // Traverse the edges
+                    Edge<T, N> prevEdge = null;
+                    while (currentEdge != null) {
+                        if (currentEdge.toVertex.vertexInfo.compareTo(destination) == 0) {
+                            removedEdge = currentEdge;
+                            if (prevEdge != null) {
+                                prevEdge.nextEdge = currentEdge.nextEdge;
+                            } else {
+                                sourceVertex.firstEdge = currentEdge.nextEdge;
+                            }
+                            break;
                         }
-                    } // End of currentEdge loop
+                        prevEdge = currentEdge;
+                        currentEdge = currentEdge.nextEdge;
+                    }
                 }
 
-                sourceVertex.outdeg--;
-                removedEdge.toVertex.indeg--;
-                size--;
-                break;
+                // If we found and removed an edge, update the degree counts and size
+                if (removedEdge != null) {
+                    sourceVertex.outdeg--;
+                    removedEdge.toVertex.indeg--;
+                    size--;
+                }
+                break; // Exit the loop after processing the source vertex
             }
-        } // End of sourceVertex loop
+            sourceVertex = sourceVertex.nextVertex;
+        }
 
         return removedEdge;
     }
 
     @Override
-    //Check whether there is an edge
-    public boolean hasEdge(T source, T destination) {
+//Check whether there is an edge
+    public boolean hasEdge(T source, T destination
+    ) {
         //Graph is empty
         if (head == null) {
             return false;
