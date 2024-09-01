@@ -2,7 +2,6 @@ package adt;
 
 /**
  * @author Ooi Choon Chong
- * @version 3.0
  */
 import java.io.Serializable;
 

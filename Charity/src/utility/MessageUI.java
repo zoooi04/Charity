@@ -2,7 +2,7 @@ package utility;
 
 /**
  *
- * @author Ooi Choon Chong
+ * @author All
  */
 public class MessageUI {
 
