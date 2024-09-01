@@ -841,7 +841,6 @@ public class DonationMaintenance {
             switch (op.getType()) {
                 case CREATE:
                     //delete the added item
-                    System.out.println("removing donation" + donation.getId());
                     if (donationMap.remove(donation.getId()) != null) {
                         success = true;
                         redo.push(op);
@@ -880,10 +879,7 @@ public class DonationMaintenance {
             switch (op.getType()) {
                 case CREATE:
                     //bring back the item
-                    System.out.println(donation.getId());
-                    System.out.println(donationMap.containsKey(donation.getId()));
                     donationMap.put(donation.getId(), donation);
-                    System.out.println("is deleted: " + donation.getIsDeleted());
                     success = true;
                     undo.push(op);
                     break;
