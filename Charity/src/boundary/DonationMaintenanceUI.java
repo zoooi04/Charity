@@ -191,9 +191,12 @@ public class DonationMaintenanceUI {
             System.out.print("Enter event ID:");
             String eventID = scanner.nextLine();
             event = getEventById(eventID);
-            if (event == null) {
-                System.out.println("Event does not exist!\nPlease re-enter a valid event ID.");
+            System.out.println(event.getStartDate() + " "+ LocalDate.now());
+            if(event.getStartDate().isAfter(LocalDate.now())){
+                event = null;
+                System.out.println("Event does not exist or haven't started!\nPlease re-enter a valid event ID.");
             }
+
         }
         return event;
     }
