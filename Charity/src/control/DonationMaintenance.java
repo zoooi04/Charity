@@ -20,6 +20,7 @@ import adt.SortedLinkedList;
 import adt.SortedListInterface;
 import adt.WeightedGraph;
 import dao.DAO;
+import dao.EventDAO;
 import entity.Donation.DonationType;
 import entity.Donor;
 import entity.Event;
@@ -28,6 +29,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeParseException;
+
 /**
  *
  * @author huaiern
@@ -40,6 +42,9 @@ public class DonationMaintenance {
     private static final String FILENAME = "donationHashMap.dat";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DonorMaintenance donorM = new DonorMaintenance();
+    private final EventDAO eventDao = new EventDAO();
+    private MapInterface<String, Event> eventMap = new HashMap<>();
+
     //array stack for faster access to undo redo
     private ArrayStack<Operation<Donation>> undo = new ArrayStack<>();
     private ArrayStack<Operation<Donation>> redo = new ArrayStack<>();
@@ -50,6 +55,7 @@ public class DonationMaintenance {
         if (donationMap == null) {
             donationMap = DonationInitializer.initializeDonation();
         }
+        eventMap = eventDao.retrieveFromFile("event.txt");
     }
 
     // <editor-fold defaultstate="collapsed" desc="Driver">
@@ -64,7 +70,7 @@ public class DonationMaintenance {
                 case 1:
                     //List all
                     donationUI.printDonationHeader();
-                    displayAll();
+                    donationUI.displayAll();
                     break;
                 case 2:
                     //Search
@@ -82,7 +88,7 @@ public class DonationMaintenance {
                     System.out.println();
                     if (create()) {
                         donationUI.printDonationHeader();
-                        displayAll();
+                        donationUI.displayAll();
                     }
                     break;
                 case 4:
@@ -90,7 +96,7 @@ public class DonationMaintenance {
                     System.out.println();
                     if (remove()) {
                         donationUI.printDonationHeader();
-                        displayAll();
+                        donationUI.displayAll();
                     }
                     break;
                 case 5:
@@ -157,6 +163,26 @@ public class DonationMaintenance {
         if (!donationMap.containsKey(donation.getId())) {
             donationMap.put(donation.getId(), donation);
             saveDonationList();
+            if (donation.getType() == Donation.DonationType.CASH) {
+                //if cash then update in event txt
+                ListInterface<Event> eventList = eventMap.values();
+                Event updatedEvent = null;
+                for (int i = 0; i < eventList.getNumberOfEntries(); i++) {
+                    Event eventRecord = eventList.getEntry(i + 1);
+                    if (eventRecord.getId().equals(event.getId())) {
+                        //if found then break out of for loop
+                        eventRecord.setCurrentAmount(eventRecord.getCurrentAmount() + quantity);
+                        updatedEvent = eventRecord;
+                        break;
+                    }
+                }
+
+                if (updatedEvent != null && eventMap.containsKey(updatedEvent.getId())) {
+                    eventMap.put(updatedEvent.getId(), updatedEvent);
+                    eventDao.saveToFile(eventMap, "event.txt");
+                }
+            }
+
             System.out.println("Successfully added");
             Operation op = new Operation(Operation.Type.CREATE, donation.clone());
             undo.push(op);
@@ -182,6 +208,27 @@ public class DonationMaintenance {
         if (donation != null && !donation.getIsDeleted()) {
             Donation oldDonation = donation.clone();
             donation.setIsDeleted(true);
+
+            if (donation.getType() == Donation.DonationType.CASH) {
+                //if cash then update in event txt
+                ListInterface<Event> eventList = eventMap.values();
+                Event updatedEvent = null;
+                for (int i = 0; i < eventList.getNumberOfEntries(); i++) {
+                    Event eventRecord = eventList.getEntry(i + 1);
+                    if (eventRecord.getId().equals(donation.getEvent().getId())) {
+                        //if found then break out of for loop
+                        eventRecord.setCurrentAmount(eventRecord.getCurrentAmount() - donation.getQuantity());
+                        updatedEvent = eventRecord;
+                        break;
+                    }
+                }
+
+                if (updatedEvent != null && eventMap.containsKey(updatedEvent.getId())) {
+                    eventMap.put(updatedEvent.getId(), updatedEvent);
+                    eventDao.saveToFile(eventMap, "event.txt");
+                }
+            }
+
             Operation op = new Operation(Operation.Type.DELETE, donation.clone(), oldDonation);
             undo.push(op);
             redo.clear();
@@ -212,7 +259,7 @@ public class DonationMaintenance {
                     redo.clear();
                     //display updated list
                     donationUI.printDonationHeader();
-                    displayAll();
+                    donationUI.displayAll();
                     System.out.println("\nSuccessfully updated");
                     updated = false;
                 }
@@ -223,7 +270,30 @@ public class DonationMaintenance {
                     case 1:
                         //quantity
                         Double quantity = donationUI.getQuantityInput();
+
+                        if (donation.getType() == Donation.DonationType.CASH) {
+                            //if cash then update in event txt
+                            ListInterface<Event> eventList = eventMap.values();
+                            Event updatedEvent = null;
+                            for (int i = 0; i < eventList.getNumberOfEntries(); i++) {
+                                Event eventRecord = eventList.getEntry(i + 1);
+                                if (eventRecord.getId().equals(donation.getEvent().getId())) {
+                                    //if found then break out of for loop
+                                    double newAmount = eventRecord.getCurrentAmount() - donation.getQuantity();
+                                    eventRecord.setCurrentAmount(newAmount + quantity);
+                                    updatedEvent = eventRecord;
+                                    break;
+                                }
+                            }
+
+                            if (updatedEvent != null && eventMap.containsKey(updatedEvent.getId())) {
+                                eventMap.put(updatedEvent.getId(), updatedEvent);
+                                eventDao.saveToFile(eventMap, "event.txt");
+                            }
+                        }
+
                         donation.setQuantity(quantity);
+
                         updated = true;
                         break;
                     case 2:
@@ -235,6 +305,44 @@ public class DonationMaintenance {
                     case 3:
                         //type
                         DonationType type = donationUI.getTypeInput();
+
+                        if (type == Donation.DonationType.CASH && donation.getType() != Donation.DonationType.CASH) {
+                            //if previously not cash want change to cash
+                            ListInterface<Event> eventList = eventMap.values();
+                            Event updatedEvent = null;
+                            for (int i = 0; i < eventList.getNumberOfEntries(); i++) {
+                                Event eventRecord = eventList.getEntry(i + 1);
+                                if (eventRecord.getId().equals(donation.getEvent().getId())) {
+                                    //if found then break out of for loop
+                                    eventRecord.setCurrentAmount(eventRecord.getCurrentAmount() + donation.getQuantity());
+                                    updatedEvent = eventRecord;
+                                    break;
+                                }
+                            }
+
+                            if (updatedEvent != null && eventMap.containsKey(updatedEvent.getId())) {
+                                eventMap.put(updatedEvent.getId(), updatedEvent);
+                                eventDao.saveToFile(eventMap, "event.txt");
+                            }
+                        } else if (type != Donation.DonationType.CASH && donation.getType() == Donation.DonationType.CASH) {
+                            //if previously is cash but want change to others
+                            ListInterface<Event> eventList = eventMap.values();
+                            Event updatedEvent = null;
+                            for (int i = 0; i < eventList.getNumberOfEntries(); i++) {
+                                Event eventRecord = eventList.getEntry(i + 1);
+                                if (eventRecord.getId().equals(donation.getEvent().getId())) {
+                                    //if found then break out of for loop
+                                    eventRecord.setCurrentAmount(eventRecord.getCurrentAmount() - donation.getQuantity());
+                                    updatedEvent = eventRecord;
+                                    break;
+                                }
+                            }
+
+                            if (updatedEvent != null && eventMap.containsKey(updatedEvent.getId())) {
+                                eventMap.put(updatedEvent.getId(), updatedEvent);
+                                eventDao.saveToFile(eventMap, "event.txt");
+                            }
+                        }
                         donation.setType(type);
                         updated = true;
                         break;
@@ -276,7 +384,7 @@ public class DonationMaintenance {
                     for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                         Donation donation = donationList.getEntry(i);
                         if (donation.getType().equals(Donation.DonationType.CASH) && !donation.getIsDeleted()) {
-                            displayDonation(donation, false, false);
+                            donationUI.displayDonation(donation, false, false);
                         }
                     }
                     break;
@@ -286,7 +394,8 @@ public class DonationMaintenance {
                     for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                         Donation donation = donationList.getEntry(i);
                         if (donation.getType().equals(Donation.DonationType.FOOD) && !donation.getIsDeleted()) {
-                            displayDonation(donation, false, false);
+                            donationUI.displayDonation(donation, false, false);
+
                         }
                     }
                     break;
@@ -296,7 +405,8 @@ public class DonationMaintenance {
                     for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                         Donation donation = donationList.getEntry(i);
                         if (donation.getType().equals(Donation.DonationType.ITEM) && !donation.getIsDeleted()) {
-                            displayDonation(donation, false, false);
+                            donationUI.displayDonation(donation, false, false);
+
                         }
                     }
                     break;
@@ -327,7 +437,8 @@ public class DonationMaintenance {
                     for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                         Donation donation = donationList.getEntry(i);
                         if (donation.getDonor().getId().equals(id) && !donation.getIsDeleted()) {
-                            displayDonation(donation, true, false);
+                            donationUI.displayDonation(donation, false, false);
+
                         }
                     }
                     break;
@@ -339,7 +450,8 @@ public class DonationMaintenance {
                     for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                         Donation donation = donationList.getEntry(i);
                         if (donation.getDonor().getName().toUpperCase().contains(name.toUpperCase()) && !donation.getIsDeleted()) {
-                            displayDonation(donation, false, false);
+                            donationUI.displayDonation(donation, false, false);
+
                         }
                     }
                     break;
@@ -372,14 +484,16 @@ public class DonationMaintenance {
                         for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                             Donation donation = donationList.getEntry(i);
                             if (!donation.getMessage().isBlank() && !donation.getIsDeleted()) {
-                                displayDonation(donation, false, false);
+                                donationUI.displayDonation(donation, false, false);
+
                             }
                         }
                     } else if (message.charAt(0) == 'N') {
                         for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                             Donation donation = donationList.getEntry(i);
                             if (donation.getMessage().isBlank() && !donation.getIsDeleted()) {
-                                displayDonation(donation, false, false);
+                                donationUI.displayDonation(donation, false, false);
+
                             }
                         }
                     }
@@ -400,7 +514,8 @@ public class DonationMaintenance {
                                 for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                                     Donation donation = donationList.getEntry(i);
                                     if (donation.getEvent().getId().equals(id) && !donation.getIsDeleted()) {
-                                        displayDonation(donation, true, true);
+                                        donationUI.displayDonation(donation, false, false);
+
                                     }
                                 }
                                 break;
@@ -412,7 +527,8 @@ public class DonationMaintenance {
                                 for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                                     Donation donation = donationList.getEntry(i);
                                     if (donation.getEvent().getName().toUpperCase().contains(name.toUpperCase()) && !donation.getIsDeleted()) {
-                                        displayDonation(donation, false, false);
+                                        donationUI.displayDonation(donation, false, false);
+
                                     }
                                 }
                                 break;
@@ -427,7 +543,6 @@ public class DonationMaintenance {
                     LocalDate date1 = donationUI.getStartDate();
                     LocalDate date2 = donationUI.getEndDate(date1);
 
-
                     donationUI.printDonationHeader();
                     for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
                         Donation donation = donationList.getEntry(i);
@@ -435,7 +550,8 @@ public class DonationMaintenance {
                                 && (donation.getDate().isBefore(date2) || donation.getDate().isEqual(date2))) {
 
                             if (!donation.getIsDeleted()) {
-                                displayDonation(donation, false, false);
+                                donationUI.displayDonation(donation, false, false);
+
                             }
 
                         }
@@ -463,6 +579,9 @@ public class DonationMaintenance {
                     break;
                 case 3:
                     monthlyDonationAnalysisReport();
+                    break;
+                case 4:
+                    top5OfEachType();
                     break;
                 default:
                     MessageUI.displayInvalidChoiceMessage();
@@ -619,10 +738,6 @@ public class DonationMaintenance {
             }
         }
 
-        
-        
-        
-        
         //Display report
         System.out.println();
         System.out.println();
@@ -639,7 +754,6 @@ public class DonationMaintenance {
 
         }
 
-        
         System.out.println(("-").repeat(60));
         System.out.println("Event with the Highest Number of Donor: ");
         for (int i = 0; i < 3; i++) {
@@ -647,8 +761,7 @@ public class DonationMaintenance {
             Event event = getEventById(eventId);
             System.out.printf((i + 1) + ". %-36s\t(%d donors)\n", event.getName(), eventDonorNoMap.get(eventId));
         }
-        
-        
+
         System.out.println(("-").repeat(60));
         //pop stack to get back the top 3 most highest;
         System.out.println("Event with the Largest Single Donation: ");
@@ -656,7 +769,6 @@ public class DonationMaintenance {
             Donation donation = highestDonationList.getEntry(highestDonationList.getNumberOfEntries() - i);
             System.out.printf((i + 1) + ". %-36s\t(RM %.2f)\n", donation.getEvent().getName(), donation.getQuantity());
         }
-
 
         System.out.println(("=").repeat(60));
 
@@ -670,14 +782,13 @@ public class DonationMaintenance {
         ListInterface<Donation> list = donationMap.values();
 
         // Initialize variables to calculate total amount, types, and highest donation
-        double totalCashAmount= 0.0;
+        double totalCashAmount = 0.0;
         double totalFoodAmount = 0.0;
         double totalItemAmount = 0.0;
         int cashCount = 0;
         int foodCount = 0;
         int itemCount = 0;
-        
-        
+
         int type1 = 0, type2 = 0, type3 = 0;
         double highest = 0;
         Donation highestDonation = null;
@@ -685,17 +796,16 @@ public class DonationMaintenance {
         // Loop through all donations to calculate totals and counts
         for (int i = 1; i <= list.getNumberOfEntries(); i++) {
             Donation donation = list.getEntry(i);
-            if(donation.getType()==Donation.DonationType.CASH){
-                totalCashAmount+=donation.getQuantity();
+            if (donation.getType() == Donation.DonationType.CASH) {
+                totalCashAmount += donation.getQuantity();
                 cashCount++;
-            }else if(donation.getType() == Donation.DonationType.FOOD){
+            } else if (donation.getType() == Donation.DonationType.FOOD) {
                 totalFoodAmount += donation.getQuantity();
                 foodCount++;
-            }else{
+            } else {
                 totalItemAmount += donation.getQuantity();
                 itemCount++;
             }
-            
 
             // Count the number of each type of donation
             switch (donation.getType()) {
@@ -754,57 +864,56 @@ public class DonationMaintenance {
         // Calculate the average number of donations per event
         int averageNoOfDonation = (int) Math.ceil(totalIndeg /= eventIdList.getNumberOfEntries());
 
-        
         double totalAmount = 0.0;
-        for(int i = 1; i<=list.getNumberOfEntries();i++){
-            if(list.getEntry(i).getType()==Donation.DonationType.CASH){
+        for (int i = 1; i <= list.getNumberOfEntries(); i++) {
+            if (list.getEntry(i).getType() == Donation.DonationType.CASH) {
                 totalAmount = totalAmount + list.getEntry(i).getQuantity();
             }
         }
-        double averageAmountPerEvent = totalAmount/eventIdList.getNumberOfEntries();
-        
+        double averageAmountPerEvent = totalAmount / eventIdList.getNumberOfEntries();
+
         //Calculate the total number of donor
         ListInterface<String> entitiesId = graph.getAllVertexObjects();
         int totalDonor = 0;
-        for(int i = 0; i < entitiesId.getNumberOfEntries(); i++){
-            if(entitiesId.getEntry(i+1).charAt(0)== 'A'){
+        for (int i = 0; i < entitiesId.getNumberOfEntries(); i++) {
+            if (entitiesId.getEntry(i + 1).charAt(0) == 'A') {
                 totalDonor++;
             }
         }
-        
-        //average no of donations per donor
-        int averageNoOfDonationPerDonor = (int)Math.ceil(list.getNumberOfEntries() / totalDonor);
-        double averageAmountPerDonor = totalCashAmount/totalDonor;
 
-        MapInterface<String,Double> contriMap = new HashMap<>();
-        for(int i = 1; i <= idList.getNumberOfEntries();i++){
+        //average no of donations per donor
+        int averageNoOfDonationPerDonor = (int) Math.ceil(list.getNumberOfEntries() / totalDonor);
+        double averageAmountPerDonor = totalCashAmount / totalDonor;
+
+        MapInterface<String, Double> contriMap = new HashMap<>();
+        for (int i = 1; i <= idList.getNumberOfEntries(); i++) {
             String id = idList.getEntry(i);
             if (id.charAt(0) == 'A') {
-                for(int j = 1; j<= list.getNumberOfEntries();j++){
+                for (int j = 1; j <= list.getNumberOfEntries(); j++) {
                     Donation donation = list.getEntry(j);
-                    if(donation.getDonor().getId().equals(id)){
-                        if(!contriMap.containsKey(id)){
-                            contriMap.put(id,donation.getQuantity());
-                        }else{
+                    if (donation.getDonor().getId().equals(id)) {
+                        if (!contriMap.containsKey(id)) {
+                            contriMap.put(id, donation.getQuantity());
+                        } else {
                             double oldQty = contriMap.get(id);
-                            contriMap.put(id,oldQty+donation.getQuantity());
+                            contriMap.put(id, oldQty + donation.getQuantity());
                         }
                     }
                 }
             }
         }
-        
+
         double highestContribution = 0.0;
-        Donor highestContributor=null;
+        Donor highestContributor = null;
         ListInterface<String> contriList = contriMap.keySet();
-        for(int i = 1; i <= contriList.getNumberOfEntries(); i++){
+        for (int i = 1; i <= contriList.getNumberOfEntries(); i++) {
             String id = contriList.getEntry(i);
-            if(contriMap.get(id) > highestContribution){
+            if (contriMap.get(id) > highestContribution) {
                 highestContribution = contriMap.get(id);
                 highestContributor = getDonorById(id);
             }
         }
-        
+
         // Print out the summary report
         System.out.println();
         System.out.println();
@@ -818,20 +927,19 @@ public class DonationMaintenance {
         System.out.printf("%-50s: %.1f kg\n", "Total donation amount (Other Items)", totalItemAmount);
         System.out.println(("-").repeat(90));
         System.out.printf("%-50s: " + averageNoOfDonationPerDonor + " donation \n", "Average number of donation per donor ");
-        System.out.printf("%-50s: RM %.2f\n", "Average amount of donation per donor ",averageAmountPerDonor);
+        System.out.printf("%-50s: RM %.2f\n", "Average amount of donation per donor ", averageAmountPerDonor);
         System.out.printf("%-50s: %d donations\n", "Average number of donation per Event", averageNoOfDonation);
         System.out.printf("%-50s: RM %.2f \n", "Average amount of donation per Event", averageAmountPerEvent);
-        System.out.printf("%-50s: RM %.2f\n", "Average amount per donation (Cash)", totalCashAmount/cashCount);
-        System.out.printf("%-50s: %.2f kg\n", "Average amount per donation (Food)", totalFoodAmount/foodCount);
-        System.out.printf("%-50s: %.2f kg\n", "Average amount per donation (Other Items)", totalItemAmount/itemCount);
+        System.out.printf("%-50s: RM %.2f\n", "Average amount per donation (Cash)", totalCashAmount / cashCount);
+        System.out.printf("%-50s: %.2f kg\n", "Average amount per donation (Food)", totalFoodAmount / foodCount);
+        System.out.printf("%-50s: %.2f kg\n", "Average amount per donation (Other Items)", totalItemAmount / itemCount);
         System.out.println(("-").repeat(90));
-        System.out.printf("%-50s: " + popularType + " ("+ highestPopularType + " donations)\n", "Most popular donation type");
+        System.out.printf("%-50s: " + popularType + " (" + highestPopularType + " donations)\n", "Most popular donation type");
         System.out.printf("%-50s: RM %.2f (by %s)\n", "Highest donation amount received: ", highest, highestDonation.getDonor().getName());
         System.out.printf("%-50s: %s (total of RM %.2f)\n", "Top contributor: ", highestContributor.getName(), highestContribution);
         System.out.println(("=").repeat(90));
     }
 
-    
     public void monthlyDonationAnalysisReport() {
         ListInterface<Donation> donationList = donationMap.values();
 
@@ -862,7 +970,7 @@ public class DonationMaintenance {
         // Calculate total donation amount and identify the peak month
         double total = 0;
         double highest = 0.0;
-        int bestMonth = 1;  
+        int bestMonth = 1;
 
         for (int i = 0; i < totalAmounts.getNumberOfEntries(); i++) {
             total += totalAmounts.getEntry(i + 1);  // Sum up total amounts
@@ -884,13 +992,13 @@ public class DonationMaintenance {
 
         int countHighest = 0;
         int countHighestMonth = 1;
-        for(int i = 1; i <= donationCounts.getNumberOfEntries(); i++){
-            if(donationCounts.getEntry(i)>countHighest){
+        for (int i = 1; i <= donationCounts.getNumberOfEntries(); i++) {
+            if (donationCounts.getEntry(i) > countHighest) {
                 countHighest = donationCounts.getEntry(i);
                 countHighestMonth = i;
             }
         }
-        
+
         // Print the report
         System.out.println();
         System.out.println();
@@ -922,15 +1030,102 @@ public class DonationMaintenance {
         System.out.println(("=").repeat(70));
     }
 
-    //list all donations
-    public void displayAll() {
-        SortedListInterface<Donation> sortedDonations = getDonationListSortedById();
-        for (int i = 1; i <= sortedDonations.getNumberOfEntries(); i++) {
-            Donation d = sortedDonations.getEntry(i);
-            if (!d.getIsDeleted()) {
-                displayDonation(d, false, false);
+    public void top5OfEachType() {
+        ListInterface<Donation> donationList = donationMap.values();
+
+        ListInterface<Donation> cashList = new LinkedList<>();
+        ListInterface<Donation> foodList = new LinkedList<>();
+        ListInterface<Donation> itemList = new LinkedList<>();
+
+        for (int i = 1; i <= donationList.getNumberOfEntries(); i++) {
+            Donation donation = donationList.getEntry(i);
+            switch (donation.getType()) {
+                case CASH:
+                    cashList.add(donation);
+                    break;
+                case FOOD:
+                    foodList.add(donation);
+                    break;
+                case ITEM:
+                    itemList.add(donation);
+                    break;
             }
         }
+
+        // Bubble sort  in descending order
+        for (int i = 1; i <= cashList.getNumberOfEntries() - 1; i++) {
+            for (int j = 1; j <= cashList.getNumberOfEntries() - i; j++) {
+                // Get the total donor of the current and next event IDs
+                Donation d1 = cashList.getEntry(j);
+                Donation d2 = cashList.getEntry(j + 1);
+                double d1Qty = d1.getQuantity();
+                double d2Qty = d2.getQuantity();
+
+                // Swap if the first total donor is less than the second (descending order)
+                if (d1Qty < d2Qty) {
+                    // Replace entries based on position
+                    cashList.replace(j, d2);
+                    cashList.replace(j + 1, d1);
+                }
+            }
+        }
+
+        // Bubble sort  in descending order
+        for (int i = 1; i <= foodList.getNumberOfEntries() - 1; i++) {
+            for (int j = 1; j <= foodList.getNumberOfEntries() - i; j++) {
+                // Get the total donor of the current and next event IDs
+                Donation d1 = foodList.getEntry(j);
+                Donation d2 = foodList.getEntry(j + 1);
+                double d1Qty = d1.getQuantity();
+                double d2Qty = d2.getQuantity();
+
+                // Swap if the first total donor is less than the second (descending order)
+                if (d1Qty < d2Qty) {
+                    // Replace entries based on position
+                    foodList.replace(j, d2);
+                    foodList.replace(j + 1, d1);
+                }
+            }
+        }
+
+        // Bubble sort  in descending order
+        for (int i = 1; i <= itemList.getNumberOfEntries() - 1; i++) {
+            for (int j = 1; j <= itemList.getNumberOfEntries() - i; j++) {
+                // Get the total donor of the current and next event IDs
+                Donation d1 = itemList.getEntry(j);
+                Donation d2 = itemList.getEntry(j + 1);
+                double d1Qty = d1.getQuantity();
+                double d2Qty = d2.getQuantity();
+
+                // Swap if the first total donor is less than the second (descending order)
+                if (d1Qty < d2Qty) {
+                    // Replace entries based on position
+                    foodList.replace(j, d2);
+                    foodList.replace(j + 1, d1);
+                }
+            }
+        }
+
+        int choice = 0;
+        do {
+            choice = donationUI.getTopTypeReportChoice();
+            switch (choice) {
+                case 0:
+                    return;
+                case 1:
+                    donationUI.printTop5Cash(cashList);
+                    break;
+                case 2:
+                    donationUI.printTop5Food(foodList);
+                    break;
+                case 3:
+                    donationUI.printTop5Item(itemList);
+                    break;
+                default:
+                    MessageUI.displayInvalidChoiceMessage();
+            }
+        } while (choice != 0);
+
     }
 
     public boolean undo() {
@@ -957,6 +1152,27 @@ public class DonationMaintenance {
                 case DELETE:
                     //bring back the item
                     donationMap.put(donation.getId(), (Donation) op.getPreviousData());
+
+                    if (donation.getType() == Donation.DonationType.CASH) {
+                        //if cash then update in event txt
+                        ListInterface<Event> eventList = eventMap.values();
+                        Event updatedEvent = null;
+                        for (int i = 0; i < eventList.getNumberOfEntries(); i++) {
+                            Event eventRecord = eventList.getEntry(i + 1);
+                            if (eventRecord.getId().equals(donation.getEvent().getId())) {
+                                //if found then break out of for loop
+                                eventRecord.setCurrentAmount(eventRecord.getCurrentAmount() + donation.getQuantity());
+                                updatedEvent = eventRecord;
+                                break;
+                            }
+                        }
+
+                        if (updatedEvent != null && eventMap.containsKey(updatedEvent.getId())) {
+                            eventMap.put(updatedEvent.getId(), updatedEvent);
+                            eventDao.saveToFile(eventMap, "event.txt");
+                        }
+                    }
+
                     success = true;
                     redo.push(op);
                     break;
@@ -994,6 +1210,25 @@ public class DonationMaintenance {
                 case DELETE:
                     //delete the added item
                     donationMap.put(donation.getId(), (Donation) op.getData());
+                    if (donation.getType() == Donation.DonationType.CASH) {
+                        //if cash then update in event txt
+                        ListInterface<Event> eventList = eventMap.values();
+                        Event updatedEvent = null;
+                        for (int i = 0; i < eventList.getNumberOfEntries(); i++) {
+                            Event eventRecord = eventList.getEntry(i + 1);
+                            if (eventRecord.getId().equals(donation.getEvent().getId())) {
+                                //if found then break out of for loop
+                                eventRecord.setCurrentAmount(eventRecord.getCurrentAmount() - donation.getQuantity());
+                                updatedEvent = eventRecord;
+                                break;
+                            }
+                        }
+
+                        if (updatedEvent != null && eventMap.containsKey(updatedEvent.getId())) {
+                            eventMap.put(updatedEvent.getId(), updatedEvent);
+                            eventDao.saveToFile(eventMap, "event.txt");
+                        }
+                    }
                     success = true;
                     undo.push(op);
                     break;
@@ -1009,9 +1244,8 @@ public class DonationMaintenance {
         return success;
     }
     // </editor-fold>
-    
+
     // <editor-fold defaultstate="collapsed" desc="other support function">
-    
     //save whole hashmap to file
     public void saveDonationList() {
         dao.saveToFile(donationMap, FILENAME);
@@ -1042,28 +1276,6 @@ public class DonationMaintenance {
         return newId;
     }
 
-    //display donations in lines
-    public void displayDonation(Donation d, boolean donorShowId, boolean eventShowId) {
-        String donorInfo = d.getDonor().getName();
-        if (donorShowId) {
-            donorInfo = d.getDonor().getId();
-        }
-
-        String eventInfo = d.getEvent().getName();
-        if (eventShowId) {
-            eventInfo = d.getEvent().getId();
-        }
-
-        System.out.printf("%-15s%-20.2f%-50s%-30s%-30s%-15s%-15s\n",
-                d.getId(),
-                d.getQuantity(),
-                truncate(d.getMessage(),35),
-                donorInfo,//no way to set donor yet
-                eventInfo,
-                d.getType(),
-                d.getDate().format(formatter));
-    }
-
     //get donor object by their id
     public static Donor getDonorById(String id) {
         ListInterface<Donor> list = donorM.getDonorList();
@@ -1084,7 +1296,6 @@ public class DonationMaintenance {
 
     }
 
-    
     //convert this donation map into sorted list
     public SortedListInterface<Donation> getDonationListSortedById() {
         SortedListInterface<Donation> sortedDonations = new SortedLinkedList<>();
@@ -1095,7 +1306,6 @@ public class DonationMaintenance {
         return sortedDonations;
     }
 
-    
     /*
         *   Convert Map values to Graph
         *   Using graph, map out the relationship of Donor and Event
@@ -1117,7 +1327,7 @@ public class DonationMaintenance {
         }
         return graph;
     }
-    
+
     public static String truncate(String text, int maxLength) {
         if (text == null) {
             return null;

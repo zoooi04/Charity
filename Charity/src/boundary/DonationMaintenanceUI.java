@@ -4,8 +4,12 @@
  */
 package boundary;
 
+import adt.ListInterface;
+import adt.SortedListInterface;
+import control.DonationMaintenance;
 import static control.DonationMaintenance.getDonorById;
 import static control.DonationMaintenance.getEventById;
+import static control.DonationMaintenance.truncate;
 import control.DonorMaintenance;
 import control.EventMaintenance;
 import entity.Donation;
@@ -28,7 +32,7 @@ public class DonationMaintenanceUI {
 
     // <editor-fold defaultstate="collapsed" desc="menu">
     public int getMenuChoice() {
-        System.out.println("\nMAIN MENU");
+        System.out.println("\nDONATION MANAGEMENT MENU");
         System.out.println("1. List all Donation");
         System.out.println("2. Search donation");
         System.out.println("3. Add Donation");
@@ -107,7 +111,7 @@ public class DonationMaintenanceUI {
         System.out.println("\nCHOOSE CRITERIA:");
         System.out.println("1. Message Availability");
         System.out.println("2. Event");
-        System.out.println("3. Date");
+        System.out.println("3. Date Range");
         System.out.println("0. Back");
         System.out.print("Enter choice: ");
         while (!scanner.hasNextInt()) {
@@ -141,6 +145,25 @@ public class DonationMaintenanceUI {
         System.out.println("1. Event Performance Top Chart");
         System.out.println("2. Summary Report");
         System.out.println("3. Monthly Donation Performance Analysis");
+        System.out.println("4. Top 5 Donations of Each Type");
+        System.out.println("0. Back");
+        System.out.print("Enter choice: ");
+        while (!scanner.hasNextInt()) {
+            System.out.println("Invalid input. Please enter a valid integer.");
+            scanner.next(); // Consume the invalid input  
+            System.out.print("Enter choice: ");
+        }
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+        return choice;
+    }
+    
+    
+    public int getTopTypeReportChoice(){
+        System.out.println("\nCHOOSE A TYPE:");
+        System.out.println("1. Cash");
+        System.out.println("2. Food");
+        System.out.println("3. Item");
         System.out.println("0. Back");
         System.out.print("Enter choice: ");
         while (!scanner.hasNextInt()) {
@@ -195,12 +218,15 @@ public class DonationMaintenanceUI {
             System.out.print("Enter event ID:");
             String eventID = scanner.nextLine();
             event = getEventById(eventID);
-            System.out.println(event.getStartDate() + " "+ LocalDate.now());
-            if(event.getStartDate().isAfter(LocalDate.now())){
-                event = null;
-                System.out.println("Event does not exist or haven't started!\nPlease re-enter a valid event ID.");
-            }
+            if(event!=null){
+                if (event.getStartDate().isAfter(LocalDate.now())) {
+                    event = null;
+                    System.out.println("Event have not started.\nPlease re-enter a valid event ID.");
+                }
+            }else{
+                System.out.println("Event does not exist. \nPlease re-enter a valid event ID.");
 
+            }
         }
         return event;
     }
@@ -254,7 +280,7 @@ public class DonationMaintenanceUI {
     }
 
     public String getDonationId(String additional) {
-        System.out.print("Enter donation ID " + additional + ": ");
+        System.out.print("Enter donation ID (DNTAxxxx)" + additional + ": ");
         String id = scanner.nextLine().toUpperCase().trim();
         return id;
     }
@@ -344,7 +370,7 @@ public class DonationMaintenanceUI {
     }
     
     public String getEventIdSimple(){
-        System.out.print("Enter event Id: ");
+        System.out.print("Enter event Id (Exxxxx): ");
         String id = scanner.nextLine();
         return id;
     }
@@ -372,7 +398,6 @@ public class DonationMaintenanceUI {
 
     public void printDonationHeader() {
         String outputStr = "";
-        outputStr += "\nList of Donation:\n";
         outputStr += "\n" + "=".repeat(200) + "\n";
         outputStr += String.format("%-15s%-20s%-50s%-30s%-30s%-15s%-15s",
                 "ID",
@@ -384,6 +409,103 @@ public class DonationMaintenanceUI {
                 "Date");
         outputStr += "\n" + "=".repeat(200) + "\n";
         System.out.print(outputStr);
+    }
+    
+    public void printTop5Cash(ListInterface<Donation> cashList){
+        System.out.println();
+        System.out.println();
+        System.out.println(("=").repeat(80));
+        System.out.println("Top 5 Cash Donation");
+        System.out.println(("-").repeat(80));
+        System.out.printf("   %-20s%-30s%-30s\n", "Amount(RM)", "Donor", "Event Name");
+        System.out.println(("-").repeat(80));
+
+        for (int i = 1; i <= 5; i++) {
+            Donation donation = cashList.getEntry(i);
+            System.out.printf(i + ". %-20.2f%-30s%-30s\n", donation.getQuantity(), donation.getDonor().getName(), donation.getEvent().getName());
+        }
+        System.out.println(("=").repeat(80));
+    }
+    
+    public void printTop5Food(ListInterface<Donation> foodList){
+        System.out.println(("=").repeat(80));
+        System.out.println("Top 5 Food Donation");
+        System.out.println(("-").repeat(80));
+        System.out.printf("%-20s%-30s%-30s\n", "Quantity(kg)", "Donor", "Event Name");
+        System.out.println(("-").repeat(80));
+
+        for (int i = 1; i <= 5; i++) {
+            Donation donation = foodList.getEntry(i);
+            System.out.printf(i + ". %-20.2f%-30s%-30s\n", donation.getQuantity(), donation.getDonor().getName(), donation.getEvent().getName());
+        }
+        System.out.println(("=").repeat(80));
+
+    }
+    
+    public void printTop5Item(ListInterface<Donation> itemList){
+        System.out.println(("=").repeat(80));
+        System.out.println("Top 5 Item Donation");
+        System.out.println(("-").repeat(80));
+        System.out.printf("%-20s%-30s%-30s\n", "Quantity(kg)", "Donor", "Event Name");
+        System.out.println(("-").repeat(80));
+
+        for (int i = 1; i <= 5; i++) {
+            Donation donation = itemList.getEntry(i);
+            System.out.printf(i + ". %-20.2f%-30s%-30s\n", donation.getQuantity(), donation.getDonor().getName(), donation.getEvent().getName());
+        }
+        System.out.println(("=").repeat(80));
+
+    }
+    
+    
+    //list all donations
+    public void displayAll() {
+        DonationMaintenance dm = new DonationMaintenance();
+        Scanner scanner = new Scanner(System.in);
+        SortedListInterface<Donation> sortedDonations = dm.getDonationListSortedById();
+        int recordsPerPage = 20;  // Number of records to display per page
+
+        for (int i = 1; i <= sortedDonations.getNumberOfEntries(); i++) {
+            Donation d = sortedDonations.getEntry(i);
+            if (!d.getIsDeleted()) {
+                displayDonation(d, false, false);
+            }
+
+            // Check if the current index is a multiple of recordsPerPage and prompt for the next page
+            if (i % recordsPerPage == 0) {
+                System.out.println("Press Enter to continue or '0' to exit...");
+                String input = scanner.nextLine();  // Wait for user input
+
+                if (input.equals("0")) {
+                    break;  // Exit the loop if the user inputs '0'
+                }
+                printDonationHeader();
+
+            }
+        }
+    }
+    
+    
+    //display donations in lines
+    public void displayDonation(Donation d, boolean donorShowId, boolean eventShowId) {
+        String donorInfo = d.getDonor().getName();
+        if (donorShowId) {
+            donorInfo = d.getDonor().getId();
+        }
+
+        String eventInfo = d.getEvent().getName();
+        if (eventShowId) {
+            eventInfo = d.getEvent().getId();
+        }
+
+        System.out.printf("%-15s%-20.2f%-50s%-30s%-30s%-15s%-15s\n",
+                d.getId(),
+                d.getQuantity(),
+                truncate(d.getMessage(), 35),
+                donorInfo,//no way to set donor yet
+                eventInfo,
+                d.getType(),
+                d.getDate().format(formatter));
     }
     // </editor-fold>
 
