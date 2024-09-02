@@ -18,8 +18,6 @@ public class DonorInitializer {
         
         System.out.println("Initializing... Please Wait");
         
-        
-        
         donor = new Donor("AA2400001", Donor.Type.INDIVIDUAL, Donor.Category.GOVERNMENT, "Ooi Choon Chong", 18, LocalDate.of(2006, 01, 01), Donor.Gender.MALE, "0123456789");
         donorList.add(donor);
         try{Thread.sleep(1100);}catch(InterruptedException e){};
@@ -64,7 +62,7 @@ public class DonorInitializer {
         donorList.add(donor);
         try{Thread.sleep(1100);}catch(InterruptedException e){};
         
-        donor = new Donor("AA2400012", Donor.Type.INDIVIDUAL, Donor.Category.PUBLIC, "John Lee", 66, LocalDate.of(1958, 12, 9), Donor.Gender.OTHER, "0129871234");
+        donor = new Donor("AA2400012", Donor.Type.INDIVIDUAL, Donor.Category.PUBLIC, "John Lim", 66, LocalDate.of(1958, 12, 9), Donor.Gender.OTHER, "0129871234");
         donorList.add(donor);
         try{Thread.sleep(1100);}catch(InterruptedException e){};
         
@@ -80,11 +78,11 @@ public class DonorInitializer {
         donorList.add(donor);
         try{Thread.sleep(1100);}catch(InterruptedException e){};
         
-        donor = new Donor("AA2400016", Donor.Type.INDIVIDUAL, Donor.Category.PRIVATE, "Kyle", 90, LocalDate.of(1934, 4, 22), Donor.Gender.FEMALE, "0184321987");
+        donor = new Donor("AA2400016", Donor.Type.INDIVIDUAL, Donor.Category.PRIVATE, "Kyle Lim", 90, LocalDate.of(1934, 4, 22), Donor.Gender.FEMALE, "0184321987");
         donorList.add(donor);
         try{Thread.sleep(1100);}catch(InterruptedException e){};
         
-        donor = new Donor("AA2400017", Donor.Type.INDIVIDUAL, Donor.Category.PUBLIC, "Mary", 26, LocalDate.of(1998, 5, 28), Donor.Gender.FEMALE, "0186789012");
+        donor = new Donor("AA2400017", Donor.Type.INDIVIDUAL, Donor.Category.PUBLIC, "Mary Anne", 26, LocalDate.of(1998, 5, 28), Donor.Gender.FEMALE, "0186789012");
         donorList.add(donor);
         try{Thread.sleep(1100);}catch(InterruptedException e){};
         
@@ -92,7 +90,7 @@ public class DonorInitializer {
         donorList.add(donor);
         try{Thread.sleep(1100);}catch(InterruptedException e){};
         
-        donor = new Donor("AA2400019", Donor.Type.ORGANISATION, Donor.Category.PUBLIC, "Kyle", 48, LocalDate.of(1976, 1, 24), Donor.Gender.FEMALE, "0187896543");
+        donor = new Donor("AA2400019", Donor.Type.ORGANISATION, Donor.Category.PUBLIC, "Kyle Tan", 48, LocalDate.of(1976, 1, 24), Donor.Gender.FEMALE, "0187896543");
         donorList.add(donor);
         try{Thread.sleep(1100);}catch(InterruptedException e){};
         
@@ -100,7 +98,7 @@ public class DonorInitializer {
         donorList.add(donor);
         try{Thread.sleep(1100);}catch(InterruptedException e){};
         
-        donor = new Donor("AA2400021", Donor.Type.INDIVIDUAL, Donor.Category.PUBLIC, "Kyle", 34, LocalDate.of(1990, 9, 30), Donor.Gender.FEMALE, "0187890123");
+        donor = new Donor("AA2400021", Donor.Type.INDIVIDUAL, Donor.Category.PUBLIC, "Kyle Chin", 34, LocalDate.of(1990, 9, 30), Donor.Gender.FEMALE, "0187890123");
         donorList.add(donor);
         try{Thread.sleep(1100);}catch(InterruptedException e){};
         donor = new Donor("AA2400022", Donor.Type.INDIVIDUAL, Donor.Category.PUBLIC, "Mei Lin", 34, LocalDate.of(1990, 9, 30), Donor.Gender.FEMALE, "0188394857");
