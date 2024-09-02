@@ -14,7 +14,7 @@ public class Donation implements Serializable, Comparable<Donation>{
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private String id;
-    private int quantity;
+    private double quantity;
     private String message;
     private Donor donor;
     private Event event;
@@ -33,7 +33,7 @@ public class Donation implements Serializable, Comparable<Donation>{
         
     }
     
-    public Donation(String id, int quantity, String message, Donor donor, Event event, DonationType type, LocalDate date){
+    public Donation(String id, double quantity, String message, Donor donor, Event event, DonationType type, LocalDate date){
         this.id = id;
         this.quantity = quantity;
         this.message = message;
@@ -48,7 +48,7 @@ public class Donation implements Serializable, Comparable<Donation>{
         return id;
     }
     
-    public int getQuantity(){
+    public double getQuantity(){
         return quantity;
     }
     
@@ -131,7 +131,7 @@ public class Donation implements Serializable, Comparable<Donation>{
                              Donation Details
                              =================
                              Donation ID: %s
-                             Quantity: %d
+                             Quantity: %.2f
                              Type: %s
                              Message: %s
                              Date: %s

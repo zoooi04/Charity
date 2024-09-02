@@ -353,7 +353,7 @@ public class DoneeMaintenance extends PersonMaintenance<Donee> {
             // Extract donee type, donation type, and amount from the record
             String doneeType = record.getDonee().getType().name();  // Assuming getType() returns an enum
             String donationType = record.getDonation().getType().name();  // Assuming getType() returns an enum
-            int amount = record.getDonation().getQuantity();  // Assuming getQuantity() returns the donation amount
+            double amount = record.getDonation().getQuantity();  // Assuming getQuantity() returns the donation amount
 
             // Update total amounts by donee type and donation type
             MapInterface<String, Integer> donationAmounts = totalAmountsByDoneeTypeAndDonation.get(doneeType);

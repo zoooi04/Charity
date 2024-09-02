@@ -389,7 +389,7 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
         System.out.print(outputStr);
     }
 
-    public void printDonorTop3ReportBody(Donation.DonationType type, ArrayList<Donor> donor, ArrayList<Integer> qty) {
+    public void printDonorTop3ReportBody(Donation.DonationType type, ArrayList<Donor> donor, ArrayList<Double> qty) {
         String outputStr = "";
         String typeStr = "";
         int count = 3;

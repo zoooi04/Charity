@@ -1,12 +1,11 @@
-
 package entity;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class Volunteer extends Person implements Serializable {    
-    
+public class Volunteer extends Person implements Serializable, Comparable {
+
     private String id;
 
     public Volunteer() {
@@ -25,13 +24,13 @@ public class Volunteer extends Person implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
-    
+
     @Override
     public boolean equals(Object o) {
-        if(this == o){ // check whether same instance
+        if (this == o) { // check whether same instance
             return true;
         }
-        if(o == null || getClass() != o.getClass()){ // check whether different class
+        if (o == null || getClass() != o.getClass()) { // check whether different class
             return false;
         }
         Volunteer volunteer = (Volunteer) o;
@@ -41,43 +40,30 @@ public class Volunteer extends Person implements Serializable {
     @Override
     public int hashCode() {
         // generate a hash code based on id
-        if(id != null){
+        if (id != null) {
             return id.hashCode();
-        }else{
+        } else {
             return 0;
         }
-        
+
     }
-    
+
     @Override
     public String toString() {
-        return String.format("%-10s | %-30s | %-10s | %-20s | %-10s | %-20s | %-30s",
-            id,
-            getName(),
-            getAge(),
-            getBirthday(),
-            getGender(),
-            getPhoneNo(),
-            getRegisterDate()
+        return String.format("%-10s | %-30s | %-10s | %-20s | %-10s | %-20s ",
+                id,
+                getName(),
+                getAge(),
+                getBirthday(),
+                getGender(),
+                getPhoneNo()
         );
     }
-    
-    
-//    @Override
-//    public String toString(){
-//        return String.format("%-10s%-30s%-10s%-20s%-10s%-20s%-30s%-20s", 
-//                id, this.name, this.age, this.birthday, this.gender, this.phoneNo, this.registerDate);
-//    }
 
-//    @Override
-//    public String toString() {
-//        return String.format("%-10s% %s", id,super.toString());
-//    }
-    
-//    @Override
-//    public String toString() {
-//        return String.format("%s%-10s%-20s", super.toString(), id, eventType);
-//    }
-    
+    @Override
+    public int compareTo(Object o) {
+        Volunteer otherVolunteer = (Volunteer) o;
+        return this.id.compareTo(otherVolunteer.id);
+    }
 
 }

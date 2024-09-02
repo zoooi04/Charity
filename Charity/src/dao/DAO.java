@@ -32,7 +32,7 @@ public class DAO<T> {
             entityList = (T) (oiStream.readObject());
             oiStream.close();
         } catch (FileNotFoundException ex) {
-            System.out.println("\nNo such file.");
+            System.out.println("\nNo such file " +fileName);
         } catch (IOException ex) {
             System.out.println("\nCannot read from file.");
         } catch (ClassNotFoundException ex) {

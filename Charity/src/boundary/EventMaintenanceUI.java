@@ -4,10 +4,13 @@ package boundary;
  *
  * @author AndrewPhengQiJinn
  */
+import entity.Donor;
 import entity.Volunteer;
 import entity.Event;
 import entity.Event_Volunteer;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
@@ -28,12 +31,15 @@ public class EventMaintenanceUI {
         System.out.println("[7] Remove an event from a volunteer");
         System.out.println("[8] List all events for a volunteer");
         System.out.println("[9] Generate report");
+        System.out.println("[10] Check availability hours of volunteers");
+        System.out.println("[11] Edit availability hours of volunteers");
+
         if (!emptyUndo) {
-            System.out.println("[10] Undo: Readding removed volunteers back to their initially assigned events");
+            System.out.println("[12] Undo: Readding removed volunteers back to their initially assigned events");
         }
 
         if (!emptyRedo) {
-            System.out.println("[11] Redo: Removing readded volunteers from their initially assigned events");
+            System.out.println("[13] Redo: Removing readded volunteers from their initially assigned events");
         }
         System.out.println("[0] Back to Main Menu");
         System.out.print("Your choice: ");
@@ -55,13 +61,13 @@ public class EventMaintenanceUI {
         System.out.println();
         return ch;
     }
-    
-    public int getReportChoice(){
+
+    public int getReportChoice() {
         System.out.println();
         System.out.println("------- Report -------");
         System.out.println("[1] Event Performance Report");
         System.out.println("[2] Top 5 Donors in Events Report");
-        System.out.println("[3] Event Contribution by Top Donors Report");
+        System.out.println("[3] Top 5 Events Report");
         System.out.println("[0] Back");
         System.out.print("Your choice: ");
         int ch = scanner.nextInt();
@@ -69,12 +75,12 @@ public class EventMaintenanceUI {
         System.out.println();
         return ch;
     }
-    
-    public int getEventPerformanceReportChoice(){
+
+    public int getTop5ReportChoice() {
         System.out.println();
-        System.out.println("------- Event Performance Report -------");
-        System.out.println("[1] Specific Event");
-        System.out.println("[2] Events Occuring in Monthly Range");
+        System.out.println("------- Top 5 Events Report -------");
+        System.out.println("[1] Specific Month Range");
+        System.out.println("[2] All Time");
         System.out.println("[0] Back");
         System.out.print("Your choice: ");
         int ch = scanner.nextInt();
@@ -82,13 +88,14 @@ public class EventMaintenanceUI {
         System.out.println();
         return ch;
     }
-    
-    public int getTopFiveDonorReportChoice(){
+
+    public int getTopFiveDonorReportChoice() {
         System.out.println();
         System.out.println("------- Top 5 Donors in Event Report -------");
         System.out.println("[1] Specific Event");
         System.out.println("[2] Across All Events in Monthly Range");
         System.out.println("[3] Across All Events in a Year");
+        System.out.println("[4] All Time");
         System.out.println("[0] Back");
         System.out.print("Your choice: ");
         int ch = scanner.nextInt();
@@ -96,8 +103,6 @@ public class EventMaintenanceUI {
         System.out.println();
         return ch;
     }
-    
-    
 
     public int getVolunteerListingChoice() {
         System.out.println();
@@ -220,6 +225,28 @@ public class EventMaintenanceUI {
 
     }
 
+    public void printVolunteerTableHeader() {
+        System.out.println("-".repeat(87));
+        System.out.printf("%-10s%-15s%-25s%-20s%-30s\n", "No.", "VolunteerID", "Name", "PhoneNumber", "AvailabilityHours");
+        System.out.printf("%-10s%-15s%-25s%-20s%-30s\n", "---", "-----------", "----", "-----------", "-----------------");
+    }
+
+    public void printVolunteerTableFooter() {
+        System.out.println("-".repeat(87));
+        System.out.println("\n\n\n");
+    }
+
+    public void printVolunteerTableHeaderLine(String eventID) {
+
+        System.out.println("\n\n\n");
+        System.out.println("Volunteer Availability of Event " + eventID);
+        System.out.println("-".repeat(87));
+    }
+
+    public void printVolunteerRecords(Volunteer volunteer, double availabilityHours, int count) {
+        System.out.printf("%2d%10s%-13s%-25s%-21s%-5s%-5.2f\n", count, "", volunteer.getId(), volunteer.getName(), volunteer.getPhoneNo(), "", availabilityHours);
+    }
+
     public void printEventDetails(Event event) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -250,6 +277,34 @@ public class EventMaintenanceUI {
 
     public String getVolunteerID(String additionaltext) {
         System.out.print("Please provide volunteerID of your desired volunteer " + additionaltext + ": ");
+        return scanner.nextLine().trim();
+    }
+
+    public int getAvailabilityHalfHours() {
+        int hours = -1;
+        boolean validInput = false;
+
+        while (!validInput) {
+            System.out.print("Enter availability half hours (must be an integer greater than 0): ");
+            try {
+                hours = Integer.parseInt(scanner.nextLine());
+
+                if (hours > 0) {
+                    validInput = true; // Valid input, exit loop
+                } else {
+                    System.out.println("Error: Half Hours must be greater than 0. Please try again.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Invalid input. Please enter a valid integer.");
+            }
+        }
+
+        return hours;
+    }
+
+    public String getUserChoice(String message) {
+        System.out.println(message);
+        System.out.print("Enter your choice: ");
         return scanner.nextLine().trim();
     }
 
@@ -499,6 +554,23 @@ public class EventMaintenanceUI {
         return startDate;
     }
 
+    public LocalDate getSearchStartDate() {
+        LocalDate startDate = null;
+        boolean valid = false;
+
+        while (!valid) {
+            try {
+                System.out.print("Enter event start date (dd/MM/yyyy): ");
+                startDate = LocalDate.parse(scanner.nextLine(), formatter);
+                valid = true; // If parse is successful, set valid to true
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please enter the date in dd/MM/yyyy format.");
+            }
+        }
+
+        return startDate;
+    }
+
     public LocalDate inputStartDate() {
         LocalDate startDate = null;
         boolean valid = false;
@@ -551,6 +623,29 @@ public class EventMaintenanceUI {
                 System.out.println("Invalid date format. Please try again.");
             }
         }
+        return endDate;
+    }
+
+    public LocalDate getSearchEndDate(LocalDate startDate) {
+        LocalDate endDate = null;
+        boolean valid = false;
+
+        while (!valid) {
+            try {
+                System.out.print("Enter event end date (dd/MM/yyyy): ");
+                endDate = LocalDate.parse(scanner.nextLine(), formatter);
+
+                // Check if endDate is before startDate
+                if (endDate.isBefore(startDate)) {
+                    System.out.println("End date cannot be before the start date. Please enter a valid end date.");
+                } else {
+                    valid = true; // End date is valid
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please enter the date in dd/MM/yyyy format.");
+            }
+        }
+
         return endDate;
     }
 
@@ -758,6 +853,254 @@ public class EventMaintenanceUI {
         }
 
         return goalAmount;
+    }
+
+    public LocalDate getMonthAndYearFromUser(String prompt) {
+        boolean isValidInput = false;
+        LocalDate date = null;
+
+        // Get the current date
+        LocalDate now = LocalDate.now();
+        // Create a formatter for the desired date format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yyyy");
+
+        while (!isValidInput) {
+            System.out.print(prompt);
+            String input = scanner.nextLine();
+
+            try {
+                // Parse the input string to a LocalDate, defaulting the day to the first of the month
+                date = LocalDate.parse(input + "/01", DateTimeFormatter.ofPattern("MM/yyyy/dd"));
+                date = date.withDayOfMonth(1); // Ensure it's the first day of the month
+
+                // Check if the input date is after the current date
+                if (date.isAfter(now.withDayOfMonth(1))) {
+                    System.out.println("The month cannot be in the future. Please enter a valid month/year.");
+                } else {
+                    isValidInput = true;
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid format. Please enter in MM/yyyy format.");
+            }
+        }
+
+        return date;
+    }
+
+    public LocalDate getEndMonthAndYearFromUser(LocalDate startDate) {
+        LocalDate endDate = null;
+        boolean isValidEndDate = false;
+
+        while (!isValidEndDate) {
+            endDate = getMonthAndYearFromUser("Enter end month/year (e.g., 01/2024): ");
+            if (endDate.isBefore(startDate)) {
+                System.out.println("End date cannot be before the start date. Please enter a valid date.");
+            } else {
+                isValidEndDate = true;
+            }
+        }
+
+        return endDate;
+    }
+
+    public int getYearFromUser(String prompt) {
+        int year = 0;
+        boolean isValidInput = false;
+        int currentYear = LocalDate.now().getYear();
+
+        while (!isValidInput) {
+            System.out.print(prompt);
+            String input = scanner.nextLine();
+
+            try {
+                year = Integer.parseInt(input);
+
+                if (year > currentYear) {
+                    System.out.println("You cannot enter a future year. Please enter a year up to " + currentYear + ".");
+                } else if (year <= 0) {
+                    System.out.println("Invalid year. Please enter a valid year.");
+                } else {
+                    isValidInput = true;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid year (e.g., 2023).");
+            }
+        }
+
+        return year;
+    }
+
+    public void generateReportHeader(String reportTitle) {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy h:mma");
+        String formattedDateTime = now.format(formatter);
+
+        System.out.printf("\n\n\n\n");
+        System.out.printf("%s%s%n", "", "=".repeat(91));
+        System.out.printf("%30s%s\n", "", reportTitle);
+        System.out.printf("%s%s%n", "", "=".repeat(91));
+        System.out.printf("%s%s%s\n", "", "Generated on: ", formattedDateTime);
+    }
+
+    public void generateReport2Header(String reportTitle) {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy h:mma");
+        String formattedDateTime = now.format(formatter);
+
+        System.out.printf("\n\n\n\n");
+        System.out.printf("%s%s%n", "", "=".repeat(118));
+        System.out.printf("%32s%s\n", "", reportTitle);
+        System.out.printf("%s%s%n", "", "=".repeat(118));
+        System.out.printf("%s%s%s\n", "", "Generated on: ", formattedDateTime);
+    }
+
+    public void generateReport3Header(String reportTitle) {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy h:mma");
+        String formattedDateTime = now.format(formatter);
+
+        System.out.printf("\n\n\n\n");
+        System.out.printf("%s%s%n", "", "=".repeat(181));
+        System.out.printf("%60s%s\n", "", reportTitle);
+        System.out.printf("%s%s%n", "", "=".repeat(181));
+        System.out.printf("%s%s%s\n", "", "Generated on: ", formattedDateTime);
+    }
+
+    public void generateReport2Body1(int count, String eventText) {
+        System.out.println("\nNumber of Events within duration: " + count);
+        System.out.println("Events within duration: " + eventText);
+        System.out.println("\nTop 5 Donors:");
+
+        System.out.println("-".repeat(118));
+        System.out.printf("%-8s%-15s%-18s%-15s%-20s%-20s%-30s\n", "Rank", "DonorID", "DonorName", "Phone Number", "TotalContr.(RM)", "EventsSupported", "Avg. Contr./Event(RM)");
+        System.out.printf("%-8s%-15s%-18s%-15s%-20s%-20s%-30s\n", "----", "-------", "---------", "------------", "---------------", "---------------", "---------------------");
+
+    }
+
+    public void generateReport2Body2(int count) {
+        System.out.println("\nNumber of Events within duration: " + count);
+        System.out.println("\nTop 5 Donors:");
+
+        System.out.println("-".repeat(118));
+        System.out.printf("%-8s%-15s%-18s%-15s%-20s%-20s%-30s\n", "Rank", "DonorID", "DonorName", "Phone Number", "TotalContr.(RM)", "EventsSupported", "Avg. Contr./Event(RM)");
+        System.out.printf("%-8s%-15s%-18s%-15s%-20s%-20s%-30s\n", "----", "-------", "---------", "------------", "---------------", "---------------", "---------------------");
+
+    }
+
+    //eventperformance report
+    public void generateReport3Body(int count) {
+        System.out.println("\nNumber of Events within duration: " + count);
+        System.out.println();
+        System.out.println("-".repeat(181));
+        System.out.printf("%-8s%-30s%-15s%-35s%-20s%-20s%-17s%-20s%-20s\n", "No.", "EventDuration", "EventID", "EventName", "TargetAmount(RM)", "AmountRaised(RM)", "TargetStatus", "PercentageAchieved", "ExcessAmount(RM)");
+        System.out.printf("%-8s%-30s%-15s%-35s%-20s%-20s%-17s%-20s%-20s\n", "---", "-------------", "-------", "---------", "----------------", "----------------", "------------", "------------------", "----------------");
+    }
+
+    public void generateReport3Footer(double totalTargetAmount, double totalAmountRaised, double totalExcessAmount, int achievedCount, int totalEventCount) {
+        System.out.printf("%-88s%-20s%-20s%-17s%-20s%-20s\n", "", "----------------", "----------------", "", "", "----------------");
+        System.out.printf("%3s%-5s%-30s%-15s%-35s%-6s%10.2f%-10s%10.2f%-4s%-20s%-8s%-16s%9.2f\n", "", "", "", "", "", "", totalTargetAmount, "", totalAmountRaised, "", "", "", "", totalExcessAmount);
+
+        System.out.println("-".repeat(181));
+        System.out.println("Target Achievement Rate: " + String.format("%.2f", (double) achievedCount / totalEventCount * 100) + "%");
+        System.out.printf("%s%s%n", "", "=".repeat(181));
+        System.out.println("\n\n\n\n");
+    }
+
+    public void generateReport4Footer() {
+        System.out.println("-".repeat(181));
+        System.out.println();
+        System.out.printf("%s%s%n", "", "=".repeat(181));
+        System.out.println("\n\n\n\n");
+    }
+
+    public void printEventDetailInEventPerformanceReport(Event event, int no) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        // Convert LocalDate to String
+        String startDateStr = event.getStartDate().format(formatter);
+        String endDateStr = event.getEndDate().format(formatter);
+
+        // Get the formatted duration string
+        String eventDuration = printEventDuration(startDateStr, endDateStr);
+
+        // Calculate the amount raised and excess amount
+        double amountRaised = event.getCurrentAmount();
+        double excessAmount = amountRaised - event.getGoalAmount();
+
+        // Determine the target status
+        String targetStatus = (amountRaised >= event.getGoalAmount()) ? "Achieved" : "Not Achieved";
+
+        // Calculate the percentage achieved
+        double percentageAchieved = (amountRaised / event.getGoalAmount()) * 100;
+
+        System.out.printf("%3d%-5s%-30s%-15s%-35s%-6s%10.2f%-10s%10.2f%-4s%-20s%-8s%7.2f%-9s%9.2f\n", no, "", eventDuration, event.getId(), event.getName(), "", event.getGoalAmount(), "", event.getCurrentAmount(), "", targetStatus, "", percentageAchieved, "", excessAmount);
+        //System.out.println("-".repeat(181));
+    }
+
+    public String printEventDuration(String start, String end) {
+        return (start + " - " + end);
+    }
+
+    public void printSingleEventDetailsInReport(Event event) {
+
+        String formattedStartDate = event.getStartDate().format(formatter);
+        String formattedEndDate = event.getEndDate().format(formatter);
+
+        System.out.println();
+        System.out.printf("%s%s%s%s\n", "", "------- Selected Event Details - ", event.getId(), " --------");
+        System.out.printf("%s%s%s\n", "", "Event Name: ", event.getName());
+        System.out.printf("%s%s%s\n", "", "Event Type: ", returnEventType(event.getType()));
+        System.out.printf("%s%s%s\n", "", "Duration: ", printEventDuration(formattedStartDate, formattedEndDate));
+        System.out.printf("%s%s%s\n", "", "Target Amount: RM", String.format("%.2f", event.getGoalAmount()));
+        System.out.printf("%s%s%s\n", "", "Achieved Amount: RM", String.format("%.2f", event.getCurrentAmount()));
+        System.out.printf("%s%s%s%s\n", "", "Percentage of Total Raised: ", String.format("%.2f", event.getCurrentAmount() / event.getGoalAmount() * 100), "%");
+        System.out.printf("%s%s\n", "", "------------------------------------------------");
+
+        System.out.println("\nTop 5 Donors for Event " + event.getId() + ":");
+
+        System.out.println("-".repeat(91));
+        System.out.printf("%-8s%-15s%-18s%-15s%-20s%-30s\n", "Rank", "DonorID", "DonorName", "Phone Number", "DonationAmount(RM)", "Contribution(%)");
+        System.out.printf("%-8s%-15s%-18s%-15s%-20s%-30s\n", "----", "-------", "--------", "------------", "------------------", "---------------");
+
+    }
+
+    public void PrintSingleEventDetailsReportFooter() {
+        System.out.println("-".repeat(91));
+        System.out.println();
+        System.out.printf("%s%s%n", "", "=".repeat(91));
+        System.out.println("\n\n\n\n");
+    }
+
+    public void PrintTopDonorMonthReportFooter() {
+        System.out.println("-".repeat(118));
+        System.out.println();
+        System.out.printf("%s%s%n", "", "=".repeat(118));
+        System.out.println("\n\n\n\n");
+    }
+
+    public void printSingleDonorDetailsInReport(Donor donor, double donationAmount, int num, double totalAmount) {
+        System.out.printf("%d%7s%-15s%-20s%-13s%8s%9.2f%13s%5.2f\n", num, "", donor.getId(), donor.getName(), donor.getPhoneNo(), "", donationAmount, "", donationAmount / totalAmount * 100);
+    }
+
+    public void printSingleDonorDetailsInReport2(Donor donor, double totalContr, int eventNum, double avgContr, int num) {
+        System.out.printf("%d%7s%-15s%-20s%-13s%6s%9.2f%17s%3d%18s%7.2f\n", num, "", donor.getId(), donor.getName(), donor.getPhoneNo(), "", totalContr, "", eventNum, "", avgContr);
+    }
+
+    public String returnEventType(String str) {
+        String returnStr = "";
+        switch (str) {
+            case "CS" -> {
+                returnStr = "Community Service";
+            }
+            case "Charity" -> {
+                returnStr = "Charity";
+            }
+            case "Fund" -> {
+                returnStr = "Fundraising";
+            }
+        }
+        return returnStr;
     }
 
     public void printEventHeader(String title) {

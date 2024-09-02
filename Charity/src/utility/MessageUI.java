@@ -29,7 +29,7 @@ public class MessageUI {
     }
     
     public static void displayExitToMainMenuMessage(){
-        System.out.println("\nExiting to main menu...\n");
+        System.out.println("\nExiting to previous menu...\n");
     }
     
     public static void displaySearchNotFoundMessage(String object){

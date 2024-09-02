@@ -644,13 +644,13 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                     break;
                 case 3:
                     // list top 3 donor contribution
-                    MapInterface<Donation.DonationType, MapInterface<Donor, Integer>> donorDonation = new HashMap<>();
+                    MapInterface<Donation.DonationType, MapInterface<Donor, Double>> donorDonation = new HashMap<>();
 
                     for (int i = 1; i <= donationArrList.getNumberOfEntries(); i++) {
                         Donation.DonationType type = donationArrList.getEntry(i).getType();
-                        Integer qty = donationArrList.getEntry(i).getQuantity();
+                        Double qty = donationArrList.getEntry(i).getQuantity();
                         Donor donor = donationArrList.getEntry(i).getDonor();
-                        Integer totalQty = 0;
+                        Double totalQty = 0.0;
 
                         if (donorDonation.containsKey(type)) {
                             if (donorDonation.get(type).containsKey(donor)) {
@@ -662,7 +662,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                             totalQty = qty;
                         }
 
-                        MapInterface<Donor, Integer> donorDonationDetail = new HashMap<>();
+                        MapInterface<Donor, Double> donorDonationDetail = new HashMap<>();
                         donorDonationDetail.put(donor, totalQty);
                         donorDonation.put(type, donorDonationDetail);
                     }
@@ -683,11 +683,11 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                             default:
                                 break;
                         }
-                        ListInterface<Integer> HighestQty = new ArrayList<>();
+                        ListInterface<Double> HighestQty = new ArrayList<>();
                         ListInterface<Donor> HighestDonor = new ArrayList<>();
                         for (int j = 1; j <= donorActiveOnceArrList.getNumberOfEntries(); j++) {
                             Donor donor = donorActiveOnceArrList.getEntry(j);
-                            Integer value = donorDonation.get(donationType).get(donor);
+                            Double value = donorDonation.get(donationType).get(donor);
 
                             if (value != null) {
                                 if (HighestQty.isEmpty() || value > HighestQty.getEntry(1)) {
@@ -706,7 +706,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                             }
                         }
 
-                        donorUI.printDonorTop3ReportBody(donationType, (ArrayList<Donor>) HighestDonor, (ArrayList<Integer>) HighestQty);
+                        donorUI.printDonorTop3ReportBody(donationType, (ArrayList<Donor>) HighestDonor, (ArrayList<Double>) HighestQty);
                         donorUI.printDonorReportSeperateLine(70);
                         HighestQty.clear();
                         HighestDonor.clear();
