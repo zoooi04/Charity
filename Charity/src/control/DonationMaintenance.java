@@ -32,7 +32,7 @@ import java.time.format.DateTimeParseException;
 
 /**
  *
- * @author huaiern
+ * @author Chew Huai Ern
  */
 public class DonationMaintenance {
 

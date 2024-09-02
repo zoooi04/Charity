@@ -6,7 +6,7 @@ package entity;
 
 /**
  *
- * @author huaiern
+ * @author Chew Huai Ern
  * @param <T>
  */
 public class Operation<T> {

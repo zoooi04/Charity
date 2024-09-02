@@ -24,7 +24,7 @@ import utility.MessageUI;
 
 /**
  *
- * @author huaiern
+ * @author Chew Huai Ern
  */
 public class DonationMaintenanceUI {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");

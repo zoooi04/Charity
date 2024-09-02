@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
  */
 /**
  *
- * @author huaiern
+ * @author Chew Huai Ern
  */
 public class DonationInitializer {
 

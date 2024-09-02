@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 
 /**
  *
- * @author huaiern
+ * @author Chew Huai Ern
  */
 public class Donation implements Serializable, Comparable<Donation>, Cloneable {
 
