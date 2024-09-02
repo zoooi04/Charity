@@ -69,7 +69,6 @@ public class DonationMaintenance {
                     break;
                 case 1:
                     //List all
-                    donationUI.printDonationHeader();
                     donationUI.displayAll();
                     break;
                 case 2:
@@ -87,16 +86,14 @@ public class DonationMaintenance {
                     //create
                     System.out.println();
                     if (create()) {
-                        donationUI.printDonationHeader();
-                        donationUI.displayAll();
+                        //too much record to displaay
                     }
                     break;
                 case 4:
                     //delete
                     System.out.println();
                     if (remove()) {
-                        donationUI.printDonationHeader();
-                        donationUI.displayAll();
+                        //too much to display
                     }
                     break;
                 case 5:
