@@ -87,6 +87,7 @@ public class DonationMaintenance {
                     System.out.println();
                     if (create()) {
                         //too much record to displaay
+                        donationUI.displayAll();
                     }
                     break;
                 case 4:
@@ -94,6 +95,7 @@ public class DonationMaintenance {
                     System.out.println();
                     if (remove()) {
                         //too much to display
+                        donationUI.displayAll();
                     }
                     break;
                 case 5:
