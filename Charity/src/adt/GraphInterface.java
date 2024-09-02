@@ -19,10 +19,10 @@ public interface GraphInterface<T extends Comparable<T>, N extends Comparable<N>
     
     /**
      * Adds a vertex to the graph.
-     * @param vertex The vertex to be added.
-     * @return True if the vertex was added successfully, false if it already exists.
+     * @param newVertex The vertex to be added.
+     * @return True if the newVertex was added successfully, false if it already exists.
      */
-    boolean addVertex(T vertex);
+    boolean addVertex(T newVertex);
 
     /**
      * Checks if a vertex exists in the graph.
