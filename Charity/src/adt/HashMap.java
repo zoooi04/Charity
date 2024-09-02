@@ -11,13 +11,11 @@ public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
     private final int SIZE = 16;  // HashMap array size to reduce collision possibility
     private Node<K, V>[] table;  // HashMap array
     private int size;  // To keep track of the number of key-value pairs
-//    private ArraySet<Entry> entries;
 
     // Constructor and initialize size
     public HashMap() {
         table = new Node[SIZE];
         size = 0;
-//        entries = new ArraySet<>();
     }
 
     @Override
@@ -57,14 +55,6 @@ public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
             node.next = new Node<>(key, value);  // Add new node if key doesn't exist
             size++;
         }
-        
-//        for (Entry entry : entries) {
-//            if (entry.getKey().equals(key)) {
-//                entry.setValue(value);
-//                return;
-//            }
-//        }
-//        entries.add(new Entry(key, value));
 
     }
 
@@ -201,11 +191,6 @@ public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
         return sb.toString();
     }
 
-//    // EntrySet
-//    public SetInterface<Entry> entrySet() {
-//        return entries;
-//    }
-
     // Node as an inner class for encapsulation purpose
     private class Node<K, V> implements NodeInterface<K, V>, Serializable {
 
@@ -250,27 +235,5 @@ public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
         }
     }
     
-//    // Enry Class
-//    private class Entry {
-//        K key;
-//        V value;
-//
-//        Entry(K key, V value) {
-//            this.key = key;
-//            this.value = value;
-//        }
-//
-//        public K getKey() {
-//            return key;
-//        }
-//
-//        public V getValue() {
-//            return value;
-//        }
-//
-//        public void setValue(V value) {
-//            this.value = value;
-//        }
-//    }
 
 }
