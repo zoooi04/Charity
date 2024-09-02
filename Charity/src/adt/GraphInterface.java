@@ -131,7 +131,16 @@ public interface GraphInterface<T extends Comparable<T>, N extends Comparable<N>
      */
     //ListInterface<T> dfs(T start);
 
+    /**
+     * Clears all vertices and edges from the graph, effectively resetting it to
+     * an empty state.
+     */
     void clear();
-    
+
+    /**
+     * Gets the number of vertices currently in the graph.
+     *
+     * @return The number of vertices in the graph.
+     */
     int getSize();
 }
