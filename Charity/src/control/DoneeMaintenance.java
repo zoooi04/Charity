@@ -10,8 +10,6 @@ import adt.HashMap;
 import adt.MapInterface;
 import adt.ArrayList;
 import adt.ListInterface;
-import adt.SortedLinkedList;
-import adt.SortedListInterface;
 import boundary.DoneeMaintenanceUI;
 import dao.DAO;
 import dao.DoneeInitializer;

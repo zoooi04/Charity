@@ -138,6 +138,7 @@ public class DoneeMaintenanceUI {
         System.out.println("\nSummary Report Menu:");
         System.out.println("1. Monthly Donee Registration Report");
         System.out.println("2. Donee Distribution Report");
+        System.out.println("3. Top 5 Donee Distribution");
         System.out.println("0. Back to Main Menu");
         System.out.print("Enter your choice: ");
         return Integer.parseInt(scanner.nextLine());
