@@ -4,8 +4,13 @@
  */
 package control;
 
+import boundary.DoneeMaintenanceUI;
+import boundary.DonorMaintenanceUI;
 import boundary.PersonMaintenanceUI;
+import entity.Donee;
+import entity.Donor;
 import entity.Person;
+import entity.Volunteer;
 import java.time.LocalDate;
 import utility.MessageUI;
 
@@ -14,7 +19,7 @@ import utility.MessageUI;
  * @author Ooi Choon Chong
  * @param <T>
  */
-public class PersonMaintenance<T extends Person & Comparable<T>>{
+public class PersonMaintenance<T extends Person & Comparable<T>> {
 
     protected final PersonMaintenanceUI personUI = new PersonMaintenanceUI();
 
@@ -58,7 +63,14 @@ public class PersonMaintenance<T extends Person & Comparable<T>>{
         if (newEntry instanceof Person) {
             int choice = -1;
             do {
-                System.out.println("\n" + newEntry.toString());
+                if (newEntry instanceof Donor) {
+                    DonorMaintenanceUI donorUI = new DonorMaintenanceUI();
+                    donorUI.printDonorHeader();
+                } else if (newEntry instanceof Donee) {
+                    DoneeMaintenanceUI doneeUI = new DoneeMaintenanceUI();
+                    doneeUI.printDoneeHeader();
+                }
+                System.out.println(newEntry.toString());
                 choice = personUI.getUpdateMenuChoice();
                 switch (choice) {
                     case 0:
