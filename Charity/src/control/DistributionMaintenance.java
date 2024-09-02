@@ -178,7 +178,8 @@ public class DistributionMaintenance {
         System.out.println("\n--------------------------------------------------------------------------------------------------------------");
 
     }
-
+    
+    //for maintenance use(can be ignore)
     public void restoreAllDonations() {
         int numberOfEntries = donations.size();  
         ArrayList<String> keys = donations.keySet();  
