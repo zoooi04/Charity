@@ -18,15 +18,22 @@ import utility.MessageUI;
  * @author BEH JING HEN
  */
 
+/**
+ * UI for managing Donee operations such as listing, searching, adding, and updating donees.
+ * Provides an interactive menu-driven interface for user interaction.
+ */
 public class DoneeMaintenanceUI {
     
     private PersonMaintenanceUI personUI = new PersonMaintenanceUI();
-    private final Scanner scanner = new Scanner(System.in);
-    private static final String ID_PREFIX = "DN24";
-    private ListHeap<Donee> doneeHeap = new Heap<>();
-    private final DAO<ListHeap<Donee>> dao = new DAO<>();
-    private static final String FILENAME = "donee.dat";
     
+    private static final String ID_PREFIX = "DN24"; // Prefix for generating Donee IDs
+    
+    private ListHeap<Donee> doneeHeap = new Heap<>(); // Heap structure for managing Donees
+    private final DAO<ListHeap<Donee>> dao = new DAO<>(); // Data Access Object for file operations
+    
+    private static final String FILENAME = "donee.dat"; // Filename for storing Donee data
+    
+    private final Scanner scanner = new Scanner(System.in);
     
     // <editor-fold defaultstate="collapsed" desc="menu">
     // Display main menu and get user's choice
@@ -43,6 +50,7 @@ public class DoneeMaintenanceUI {
         return Integer.parseInt(scanner.nextLine());
     }
     
+    // Prints the header for displaying Donee information in a formatted manner
     public void printDoneeHeader() {
         String outputStr = "";
         outputStr += "\n" + "=".repeat(150) + "\n";
@@ -60,7 +68,7 @@ public class DoneeMaintenanceUI {
         System.out.print(outputStr);
     }
     
-    // Get update menu choice from user
+    // Displays the update menu and returns the user's choice
     public int getUpdateMenuChoice()  {
         System.out.println("\nUPDATE MENU");
         System.out.println("1. Update Donee Type");
@@ -70,6 +78,7 @@ public class DoneeMaintenanceUI {
         return Integer.parseInt(scanner.nextLine());
     }
     
+    // Prompts the user to select a search option and returns the chosen option
     public int inputSearchOption() {
         System.out.println("\nSelect a search option:");
         System.out.println("1. Search by ID");
@@ -98,7 +107,7 @@ public class DoneeMaintenanceUI {
         return option;
     }
     
-        // Method to prompt the user to input the search criteria
+    // Prompts the user to input a search criterion and returns it as a string
     public String inputSearchCriteria() {
         System.out.println("Please choose a search criterion:");
         System.out.println("1. ID");
@@ -124,6 +133,7 @@ public class DoneeMaintenanceUI {
         }
     }
     
+    // Displays the summary report menu and returns the user's choice
     public int showSummaryMenu(){
         System.out.println("\nSummary Report Menu:");
         System.out.println("1. Monthly Donee Registration Report");
@@ -131,8 +141,7 @@ public class DoneeMaintenanceUI {
         System.out.println("0. Back to Main Menu");
         System.out.print("Enter your choice: ");
         return Integer.parseInt(scanner.nextLine());
-    }
-    
+    }    
     // </editor-fold>
     
     // <editor-fold defaultstate="collapsed" desc="input">
@@ -152,7 +161,7 @@ public class DoneeMaintenanceUI {
         donee.setType(inputDoneeType());
     }
 
-    // Get donee type from user
+    // Prompts the user to select the Donee type and returns it
     public Donee.Type inputDoneeType() {
         System.out.println("\n==========");
         System.out.println("Donee Type");
@@ -182,14 +191,17 @@ public class DoneeMaintenanceUI {
         return scanner.nextLine();
     }
     
+    // Prompts the user to input a Donee name using Person UI
     public String inputDoneeName() {
         return personUI.inputPersonName();
     }
-
+    
+    // Prompts the user to input a Donee phone number using Person UI
     public String inputDoneePhone() {
         return personUI.inputPersonPhoneNo();
     }
     
+    // Prompts the user to input the Donee's gender
     public Person.Gender inputDoneeGender() {
         Person.Gender inputGender = null;
 
@@ -224,6 +236,7 @@ public class DoneeMaintenanceUI {
         }
     }
     
+    // Prompts the user to input a valid month and year
     public int[] inputMonthAndYear() {
         int month = 0;
         int year = 0;

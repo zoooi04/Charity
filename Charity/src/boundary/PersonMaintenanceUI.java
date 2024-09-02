@@ -9,7 +9,15 @@ import java.util.regex.Pattern;
 import utility.MessageUI;
 
 /**
+ * The PersonMaintenanceUI class provides an interface for managing person details.
+ * It offers functionality to view, update, and input person details such as name, phone number,
+ * birthday, gender, and activation status. It also provides menu options for selecting various 
+ * update actions and validation for user inputs.
  *
+ * This class uses Scanner for user input and provides methods to handle input and output 
+ * operations related to Person objects. The inputs are validated to ensure they conform to expected formats
+ * and constraints.
+ * 
  * @author Ooi Choon Chong
  */
 public class PersonMaintenanceUI {
@@ -17,6 +25,11 @@ public class PersonMaintenanceUI {
     Scanner scanner = new Scanner(System.in);
 
     // <editor-fold defaultstate="collapsed" desc="menu">
+    /**
+     * Displays a menu for updating person details and prompts the user to choose an option.
+     * 
+     * @return The user's choice as an integer.
+     */
     public int getUpdateMenuChoice() {
         System.out.println("\nUPDATE MENU");
         System.out.println("1. Name");
@@ -34,10 +47,20 @@ public class PersonMaintenanceUI {
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="output">
+    /**
+     * Displays a list of all persons.
+     * 
+     * @param outputStr The formatted string containing person details to be displayed.
+     */
     public void listAllPerson(String outputStr) {
         System.out.println("\nList of Person:\n" + outputStr);
-    }
-
+    } 
+    
+    /**
+     * Prints detailed information of a given person.
+     * 
+     * @param person The Person object whose details are to be printed.
+     */
     public void printPersonDetails(Person person) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
@@ -52,7 +75,12 @@ public class PersonMaintenanceUI {
         System.out.println("Person phoneNo           : " + person.getPhoneNo());
         System.out.println("Person registration date : " + person.getRegisterDate().format(dateTimeFormatter));
     }
-
+    
+    /**
+     * Prints activation status of a person.
+     * 
+     * @param person The Person object whose activation status is to be printed.
+     */
     public void printPersonActivate(Person person) {
         if (person.isIsActive()) {
             System.out.println("This person is now Activated");
@@ -60,7 +88,10 @@ public class PersonMaintenanceUI {
             System.out.println("This person is now De-activated");
         }
     }
-
+    
+    /**
+     * Displays the menu for selecting gender.
+    */
     public void personGenderMenu() {
         System.out.println("\nSelection of Gender");
         System.out.println("1. Male");
@@ -71,6 +102,11 @@ public class PersonMaintenanceUI {
     // </editor-fold> 
 
     // <editor-fold defaultstate="collapsed" desc="input">
+    /**
+     * Prompts the user to input a person's name, ensuring it only contains alphabetic characters.
+     * 
+     * @return The inputted person name as a string.
+    */
     public String inputPersonName() {
         Pattern pattern = Pattern.compile("[A-Za-z]*");
         System.out.print("Enter person name: ");
@@ -80,8 +116,12 @@ public class PersonMaintenanceUI {
         }
         return scanner.nextLine();
     }
-
-    // can be automated, not really needed
+    
+    /**
+     * Prompts the user to input a person's age, ensuring it is a valid integer.(can be automated, not really needed)
+     * 
+     * @return The inputted age as an integer.
+     */
     public int inputPersonAge() {
         System.out.print("Enter person Age: ");
         while (!scanner.hasNextInt()) {
@@ -90,7 +130,12 @@ public class PersonMaintenanceUI {
         }
         return scanner.nextInt();
     }
-
+    
+    /**
+     * Prompts the user to input a person's birthday, validating year, month, and day.
+     * 
+     * @return The inputted birthday as a LocalDate object.
+    */
     public LocalDate inputPersonBirthday() {
         System.out.println("Enter person birthday:");
 
@@ -110,7 +155,13 @@ public class PersonMaintenanceUI {
         }
         return birthday;
     }
-
+    
+    /**
+    * Prompts the user to input a year for a person's birthday and validates the input.
+    * The year must be within the range of 120 years before the current year to the current year.
+    * 
+    * @return The valid year entered by the user.
+    */
     private int inputYear() {
         int minYear = LocalDate.now().getYear() - 120;
         int maxYear = LocalDate.now().getYear();
@@ -130,7 +181,14 @@ public class PersonMaintenanceUI {
         } while (year < minYear || year > maxYear);
         return year;
     }
-
+    
+    /**
+    * Prompts the user to input a month for a person's birthday and validates the input.
+    * The month must be between 1 and the current month if the year is the current year.
+    * 
+    * @param year The year for which the month is being entered.
+    * @return The valid month entered by the user.
+    */
     private int inputMonth(int year) {
         int month = 0;
         int maxMonth = 12;
@@ -160,7 +218,16 @@ public class PersonMaintenanceUI {
         } while (month < 1 || month > maxMonth);
         return month;
     }
-
+    
+    /**
+    * Prompts the user to input a day for a person's birthday and validates the input.
+    * The day must be between 1 and the maximum number of days in the month. Additionally,
+    * it must be less than or equal to the current day if the year and month are the current year and month.
+    * 
+    * @param year The year for which the day is being entered.
+    * @param month The month for which the day is being entered.
+    * @return The valid day entered by the user.
+    */
     private int inputDay(int year, int month) {
         int day = 1;
         YearMonth yearMonth = YearMonth.of(year, month);
@@ -190,7 +257,12 @@ public class PersonMaintenanceUI {
         } while (day < 1 || day > maxDays);
         return day;
     }
-
+    
+    /**
+     * Prompts the user to select a gender from a menu.
+     * 
+     * @return The selected Gender enum value.
+    */
     public Person.Gender inputPersonGender() {
         personGenderMenu();
         while (!scanner.hasNextInt()) {
@@ -209,7 +281,12 @@ public class PersonMaintenanceUI {
         }
         return null;
     }
-
+    
+    /**
+     * Prompts the user to input a person's phone number, ensuring it is 10 or 11 digits.
+     * 
+     * @return The inputted phone number as a string.
+    */
     public String inputPersonPhoneNo() {
         Pattern pattern = Pattern.compile("[0-9]{10,11}");
         System.out.print("Enter person phoneNo: ");
@@ -222,7 +299,12 @@ public class PersonMaintenanceUI {
         return scanner.nextLine();
     }
     // </editor-fold >
-
+    
+    /**
+     * Collects all details for a new Person from user input.
+     * 
+     * @return A new Person object with the inputted details.
+    */
     public Person inputPersonDetails() {
         String personName = inputPersonName();
         String personPhoneNo = inputPersonPhoneNo();

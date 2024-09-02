@@ -2,12 +2,20 @@
      * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
      * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
+
 package adt;
 
 /**
  *
- * @author HP
- * @param <T>
+ * @author BEH JING HEN
+ */
+
+
+/**
+ * ListHeap is a generic interface that defines the operations 
+ * for a max-heap structure.
+ * 
+ * @param <T> The type of elements stored in the heap, which must be comparable.
  */
 public interface ListHeap<T extends Comparable<T>> {
 

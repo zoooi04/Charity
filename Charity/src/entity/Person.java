@@ -10,11 +10,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- *
+ * Represents a person with various attributes such as name, age, birthday, gender, and phone number.
+ * This class implements Serializable to allow for the object's state to be converted into a byte stream,
+ * which can be useful for saving to files or transferring over networks.
+ * 
  * @author Ooi Choon Chong
  */
 public class Person implements Serializable { // Serialization is the process of converting an object's state into a byte stream, so it can be easily saved to a file
-
+    
+    // Enumeration for gender options
     public enum Gender {
         MALE,
         FEMALE,
@@ -33,7 +37,8 @@ public class Person implements Serializable { // Serialization is the process of
     public Person() {
 
     }
-
+    
+    // Parameterized constructor to initialize Person with specific details
     public Person(String name, int age, LocalDate birthday, Gender gender, String phoneNo) {
         this.name = name;
         this.age = age;
@@ -105,7 +110,12 @@ public class Person implements Serializable { // Serialization is the process of
     public void setIsDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
-
+    
+    /**
+     * Provides a formatted string representation of the Person object.
+     * 
+     * @return A string representation of the Person's details.
+     */
     @Override
     public String toString() {
         String activeStatus = "";
@@ -120,7 +130,12 @@ public class Person implements Serializable { // Serialization is the process of
         String birthDate = this.birthday.format(dateFormatter);
         return String.format("%-30s%-5s%-13s%-10s%-15s%-22s%-15s", this.name, this.age, birthDate, this.gender, this.phoneNo, regDate, activeStatus);
     }
-
+    
+    /**
+     * Computes a hash code for the Person object.
+     * 
+     * @return A hash code value for this object.
+     */
     @Override
     public int hashCode() {
         return super.hashCode();
