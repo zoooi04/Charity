@@ -144,7 +144,7 @@ public class DonationMaintenanceUI {
         System.out.println("\nREPORT:");
         System.out.println("1. Event Performance Top Chart");
         System.out.println("2. Summary Report");
-        System.out.println("3. Monthly Donation Performance Analysis");
+        System.out.println("3. Cash Donation Monthly Performance");
         System.out.println("4. Top 5 Donations of Each Type");
         System.out.println("0. Back");
         System.out.print("Enter choice: ");
@@ -428,10 +428,12 @@ public class DonationMaintenanceUI {
     }
     
     public void printTop5Food(ListInterface<Donation> foodList){
+        System.out.println();
+        System.out.println();
         System.out.println(("=").repeat(80));
         System.out.println("Top 5 Food Donation");
         System.out.println(("-").repeat(80));
-        System.out.printf("%-20s%-30s%-30s\n", "Quantity(kg)", "Donor", "Event Name");
+        System.out.printf("   %-20s%-30s%-30s\n", "Quantity(kg)", "Donor", "Event Name");
         System.out.println(("-").repeat(80));
 
         for (int i = 1; i <= 5; i++) {
@@ -443,10 +445,12 @@ public class DonationMaintenanceUI {
     }
     
     public void printTop5Item(ListInterface<Donation> itemList){
+        System.out.println();
+        System.out.println();
         System.out.println(("=").repeat(80));
         System.out.println("Top 5 Item Donation");
         System.out.println(("-").repeat(80));
-        System.out.printf("%-20s%-30s%-30s\n", "Quantity(kg)", "Donor", "Event Name");
+        System.out.printf("   %-20s%-30s%-30s\n", "Quantity(kg)", "Donor", "Event Name");
         System.out.println(("-").repeat(80));
 
         for (int i = 1; i <= 5; i++) {
@@ -484,9 +488,7 @@ public class DonationMaintenanceUI {
             }
             // Display the current page
             System.out.println("\nPage " + currentPage + " of " + totalPages);
-
-            
-            System.out.println("\nEnter page number to view (1 to " + totalPages + "), or '0' to exit:");
+            System.out.print("\nEnter page number to view (1 to " + totalPages + "), or '0' to exit:");
 
             String input = scanner.nextLine();  
 

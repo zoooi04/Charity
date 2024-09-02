@@ -677,6 +677,24 @@ static Donation donation249 = new Donation("DNTA0249", 1000, "Glad to support th
     static Donation donation599 = new Donation("DNTA0599", 25000, "Proud to contribute to this event.", DonationMaintenance.getDonorById("AA2400012"), DonationMaintenance.getEventById("E00022"), Donation.DonationType.CASH, DonationMaintenance.getEventById("E00022").getStartDate());
     static Donation donation600 = new Donation("DNTA0600", 24000, "Looking forward to supporting this cause.", DonationMaintenance.getDonorById("AA2400013"), DonationMaintenance.getEventById("E00023"), Donation.DonationType.CASH, DonationMaintenance.getEventById("E00023").getStartDate());
 
+    
+    static Donation donation601 = new Donation("DNTA0601", 100.00, "Looking forward to supporting this event.", DonationMaintenance.getDonorById("AA2400007"), DonationMaintenance.getEventById("E00017"), Donation.DonationType.FOOD, DonationMaintenance.getEventById("E00017").getStartDate());
+    static Donation donation602 = new Donation("DNTA0602", 200.00, "Excited to be involved in this cause.", DonationMaintenance.getDonorById("AA2400008"), DonationMaintenance.getEventById("E00018"), Donation.DonationType.FOOD, DonationMaintenance.getEventById("E00018").getStartDate());
+    static Donation donation603 = new Donation("DNTA0603", 240.00, "Proud to support this event.", DonationMaintenance.getDonorById("AA2400009"), DonationMaintenance.getEventById("E00019"), Donation.DonationType.FOOD, DonationMaintenance.getEventById("E00019").getStartDate());
+    static Donation donation604 = new Donation("DNTA0604", 270.00, "Looking forward to this initiative.", DonationMaintenance.getDonorById("AA2400010"), DonationMaintenance.getEventById("E00020"), Donation.DonationType.FOOD, DonationMaintenance.getEventById("E00020").getStartDate());
+    static Donation donation605 = new Donation("DNTA0605", 220.00, "Excited to support this cause.", DonationMaintenance.getDonorById("AA2400011"), DonationMaintenance.getEventById("E00021"), Donation.DonationType.FOOD, DonationMaintenance.getEventById("E00021").getStartDate());
+    static Donation donation606 = new Donation("DNTA0606", 300.00, "Proud to contribute to this event.", DonationMaintenance.getDonorById("AA2400012"), DonationMaintenance.getEventById("E00022"), Donation.DonationType.FOOD, DonationMaintenance.getEventById("E00022").getStartDate());
+    static Donation donation607 = new Donation("DNTA0607", 500.00, "Looking forward to supporting this cause.", DonationMaintenance.getDonorById("AA2400013"), DonationMaintenance.getEventById("E00023"), Donation.DonationType.FOOD, DonationMaintenance.getEventById("E00023").getStartDate());
+
+    static Donation donation608 = new Donation("DNTA0608", 101.60, "Looking forward to supporting this event.", DonationMaintenance.getDonorById("AA2400001"), DonationMaintenance.getEventById("E00017"), Donation.DonationType.ITEM, DonationMaintenance.getEventById("E00017").getStartDate());
+    static Donation donation609 = new Donation("DNTA0609", 240.20, "Excited to be involved in this cause.", DonationMaintenance.getDonorById("AA2400002"), DonationMaintenance.getEventById("E00018"), Donation.DonationType.ITEM, DonationMaintenance.getEventById("E00018").getStartDate());
+    static Donation donation610 = new Donation("DNTA0610", 242.50, "Proud to support this event.", DonationMaintenance.getDonorById("AA2400003"), DonationMaintenance.getEventById("E00019"), Donation.DonationType.ITEM, DonationMaintenance.getEventById("E00019").getStartDate());
+    static Donation donation611 = new Donation("DNTA0611", 373.30, "Looking forward to this initiative.", DonationMaintenance.getDonorById("AA2400004"), DonationMaintenance.getEventById("E00020"), Donation.DonationType.ITEM, DonationMaintenance.getEventById("E00020").getStartDate());
+    static Donation donation612 = new Donation("DNTA0612", 529.60, "Excited to support this cause.", DonationMaintenance.getDonorById("AA2400005"), DonationMaintenance.getEventById("E00021"), Donation.DonationType.ITEM, DonationMaintenance.getEventById("E00021").getStartDate());
+    static Donation donation613 = new Donation("DNTA0613", 723.80, "Proud to contribute to this event.", DonationMaintenance.getDonorById("AA2400006"), DonationMaintenance.getEventById("E00022"), Donation.DonationType.ITEM, DonationMaintenance.getEventById("E00022").getStartDate());
+    static Donation donation614 = new Donation("DNTA0614", 961.30, "Looking forward to supporting this cause.", DonationMaintenance.getDonorById("AA2400007"), DonationMaintenance.getEventById("E00023"), Donation.DonationType.ITEM, DonationMaintenance.getEventById("E00023").getStartDate());
+
+    
   
 //  Method to return a collection of with hard-coded entity values
     public static MapInterface<String, Donation> initializeDonation() {
@@ -1289,6 +1307,21 @@ static Donation donation249 = new Donation("DNTA0249", 1000, "Glad to support th
         donationMap.put(donation598.getId(), donation598);
         donationMap.put(donation599.getId(), donation599);
         donationMap.put(donation600.getId(), donation600);
+
+        donationMap.put(donation601.getId(), donation601);
+        donationMap.put(donation602.getId(), donation602);
+        donationMap.put(donation603.getId(), donation603);
+        donationMap.put(donation604.getId(), donation604);
+        donationMap.put(donation605.getId(), donation605);
+        donationMap.put(donation606.getId(), donation606);
+        donationMap.put(donation607.getId(), donation607);
+        donationMap.put(donation608.getId(), donation608);
+        donationMap.put(donation609.getId(), donation609);
+        donationMap.put(donation610.getId(), donation610);
+        donationMap.put(donation611.getId(), donation611);
+        donationMap.put(donation612.getId(), donation612);
+        donationMap.put(donation613.getId(), donation613);
+        donationMap.put(donation614.getId(), donation614);
 
         
         dao.saveToFile(donationMap, DonationMaintenance.getFileName());
