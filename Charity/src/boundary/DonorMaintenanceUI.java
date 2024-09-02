@@ -81,6 +81,25 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
         scanner.nextLine();  // consume the leftover newline character
         return choice;
     }
+    
+    public void getDeleteDonor(String id) {
+        System.out.println("\nDo you want to delete " + id + " ?");
+        System.out.println("1. Yes");
+        System.out.println("2. No");
+        System.out.println("0. Back");
+        System.out.print("Enter choice: ");
+    }
+
+    public int getDeleteDonorConfirmation(String id) {
+        getDeleteDonor(id);
+        while (!scanner.hasNextInt()) {
+            scanner.next();
+            getDeleteDonor(id);
+        }
+        int choice = scanner.nextInt();
+        scanner.nextLine();  // consume the leftover newline character
+        return choice;
+    }
 
     private void getDisplayMenu() {
         System.out.println("\nDISPLAY MENU");
@@ -161,6 +180,7 @@ public class DonorMaintenanceUI extends PersonMaintenanceUI {
         System.out.println("3. Phone Number");
         System.out.println("4. Registered Date");
         System.out.println("0. Back");
+        System.out.print("Enter Selection: ");
     }
 
     public int getDisplaySortMenuChoice(Donor.Type enumType, Donor.Category enumCategory) {

@@ -110,7 +110,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
             int[] position = {-1};
 
             if (lastSearchDonor != null) {
-                int choice = donorUI.getUpdateDonorConfirmation(lastSearchDonor.getId());
+                int choice = donorUI.getDeleteDonorConfirmation(lastSearchDonor.getId());
                 do {
                     switch (choice) {
                         case 0:
@@ -227,8 +227,7 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
         while (choice == 0) {
             switch (donorUI.getSearchMenuChoice()) {
                 case 0:
-                    choice = -1;
-                    break;
+                    return false;
                 case 1:
                     selectedDonorId = donorUI.inputDonorId().trim();
                     choice = -1;
@@ -654,7 +653,6 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                     ageActive[5] = participant;
                     ageInActive[5] = newEntry.getNumberOfEntries() - participant;
 
-                    System.out.println((z++) + "");
                     donorUI.printActiveDonorReportHeader();
                     donorUI.printActiveDonorReportBody(ageActive, ageInActive);
 
