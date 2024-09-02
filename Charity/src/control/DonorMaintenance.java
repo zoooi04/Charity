@@ -185,6 +185,8 @@ public class DonorMaintenance extends PersonMaintenance<Donor> {
                     if (super.update(updateDonor)) {
                         int choice;
                         do {
+                            donorUI.printDonorHeader();
+                            System.out.println(updateDonor.toString());
                             choice = donorUI.getUpdateMenuChoice();
                             switch (choice) {
                                 case 0:
