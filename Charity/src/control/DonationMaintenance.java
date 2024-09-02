@@ -928,8 +928,8 @@ public class DonationMaintenance {
         System.out.printf("%-50s: %d donations\n", "Average number of donation per Event", averageNoOfDonation);
         System.out.printf("%-50s: RM %.2f \n", "Average amount of donation per Event", averageAmountPerEvent);
         System.out.printf("%-50s: RM %.2f\n", "Average amount per donation (Cash)", totalCashAmount / cashCount);
-        System.out.printf("%-50s: %.2f kg\n", "Average amount per donation (Food)", totalFoodAmount / foodCount);
-        System.out.printf("%-50s: %.2f kg\n", "Average amount per donation (Other Items)", totalItemAmount / itemCount);
+        System.out.printf("%-50s: %.1f kg\n", "Average amount per donation (Food)", totalFoodAmount / foodCount);
+        System.out.printf("%-50s: %.1f kg\n", "Average amount per donation (Other Items)", totalItemAmount / itemCount);
         System.out.println(("-").repeat(90));
         System.out.printf("%-50s: " + popularType + " (" + highestPopularType + " donations)\n", "Most popular donation type");
         System.out.printf("%-50s: RM %.2f (by %s)\n", "Highest donation amount received: ", highest, highestDonation.getDonor().getName());
@@ -1000,7 +1000,7 @@ public class DonationMaintenance {
         System.out.println();
         System.out.println();
         System.out.println(("=").repeat(70));
-        System.out.println("Monthly Donation Performance Analysis:");
+        System.out.println("Cash Donation Monthly Performance:");
         System.out.println(("-").repeat(70));
         System.out.printf("%-20s%10s%20s%21s\n", "Month", "Donations", "Total Amount(RM)", "Proportion(%)");
 
@@ -1313,7 +1313,6 @@ public class DonationMaintenance {
         ListInterface<Donation> list = donationMap.values();
         for (int i = 1; i <= list.getNumberOfEntries(); i++) {
             Donation donation = list.getEntry(i);
-            System.out.println(donation.getId());
             Event event = donation.getEvent();
             Donor donor = donation.getDonor();
 
