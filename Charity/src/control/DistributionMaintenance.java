@@ -66,9 +66,16 @@ public class DistributionMaintenance {
             distributions = new ArrayList<>();
         }
     }
-
+    
+    /**
+     * This method is responsible for distributing a donation to a donee from the queue.
+     * It interacts with the user to select a donation, removes the donee from the queue,
+     * and creates a new distribution record.
+     * 
+     * @param doneeMaintenance Reference to the DoneeMaintenance class for queue operations.
+     */
     public void distributeDonation(DoneeMaintenance doneeMaintenance) {
-
+        
         // Display available donations
         System.out.println("Available Donations:");
         printAllDonations();
@@ -78,12 +85,14 @@ public class DistributionMaintenance {
 
         // Find the corresponding donation
         Donation selectedDonation = donations.get(donationId);
-
+        
+        // Check if donation is found
         if (selectedDonation == null) {
             System.out.println("Donation not found!");
             return;
         }
-
+        
+        // Proceed with distribution if the queue is not empty and a donee is successfully removed
         if (!queue.isEmpty() && doneeMaintenance.removeQueue(queue)) {
             // Get the removed Donee
             Donee removedDonee = queue.peekMaxValue(); 
@@ -104,7 +113,6 @@ public class DistributionMaintenance {
             // Save the updated donations back to the file
             saveDonations();
 
-
             // Save the updated queue
             saveQueue();
 
@@ -116,20 +124,28 @@ public class DistributionMaintenance {
             System.out.println("Failed to remove a Donee from the queue!");
         }
     }
-
+    
+    //Saves the current state of the donations HashMap to a file.
     public void saveDonations() {
         dao.saveToFile(donations, DONATION_FILENAME);
     }
     
+    //Saves the current state of the donee queue to a file.
     public void saveQueue(){
         queueDao.saveToFile(queue,QUEUE_FILENAME);
     }
     
+    //Saves a new distribution record and updates the distributions list.
     private void saveDistribution(Distribution distribution) {
         distributions.add(distribution);
         distributionDao.saveToFile(distributions, DISTRIBUTION_FILENAME);
     }
     
+    /**
+     * Requeues a donee by moving them from the doneeHeap to the active queue.
+     * 
+     * @param doneeMaintenance Reference to the DoneeMaintenance class for requeue operations.
+     */
     public void requeueDonee(DoneeMaintenance doneeMaintenance) {
         boolean success = doneeMaintenance.requeueDonee(doneeHeap, queue);
         saveQueue();
@@ -137,7 +153,8 @@ public class DistributionMaintenance {
             System.out.println("Failed to requeue Donee.");
         }
     }
-
+    
+    //Prints all distribution records currently in the system.
     public void printAllDistributions() {
         
         System.out.println("All Distributions:");
@@ -152,6 +169,7 @@ public class DistributionMaintenance {
         }
     }
     
+    //Prints the header for the distribution list display.
     public void printDistributionHeader(){
         System.out.println("--------------------------------------------------------------------------------------------------------------");
         System.out.printf("%15s %8s %16s %17s %15s %9s %12s",
@@ -177,6 +195,12 @@ public class DistributionMaintenance {
         System.out.println("All donations have been restored.");
     }
     
+     /**
+     * Generates a new unique Distribution ID based on the existing IDs in the system.
+     * The ID is formatted as "DISxxxxx" where xxxxx is a zero-padded number.
+     * 
+     * @return The newly generated Distribution ID.
+     */
     private String generateNewDistributionId() {
         int maxId = 0;
 
@@ -214,6 +238,11 @@ public class DistributionMaintenance {
         return distributions;
     }
     
+    /**
+    * Prints all donations that are not marked as deleted in a sorted order.
+    * The donations are displayed in a tabular format with columns for ID, quantity, message, donor, event, type, and date.
+    * Donations are first added to a SortedLinkedList to ensure they are printed in sorted order.
+    */
     public void printAllDonations() {
         System.out.println("All Donations:");
         System.out.println("========================================================================================================================================================================================================");

@@ -15,9 +15,12 @@ import java.time.LocalDate;
 import utility.MessageUI;
 
 /**
+ * Handles the maintenance operations for `Person` objects.
+ *
+ * @param <T> A type parameter that extends `Person` and implements
+ * `Comparable<T>`.
  *
  * @author Ooi Choon Chong
- * @param <T>
  */
 public class PersonMaintenance<T extends Person & Comparable<T>> {
 
@@ -27,6 +30,13 @@ public class PersonMaintenance<T extends Person & Comparable<T>> {
     }
 
     // <editor-fold defaultstate="collapsed" desc="CURD">
+    /**
+     * Creates a new person entry and updates the properties of the given
+     * `newEntry`.
+     *
+     * @param newEntry The `Person` object to be updated with new details.
+     * @return `true` if the creation was successful, `false` otherwise.
+     */
     public boolean create(T newEntry) {
         if (newEntry instanceof Person) {
             Person createdPerson = personUI.inputPersonDetails();
@@ -46,6 +56,12 @@ public class PersonMaintenance<T extends Person & Comparable<T>> {
         return true;
     }
 
+    /**
+     * Removes the given person entry.
+     *
+     * @param newEntry The `Person` object to be removed.
+     * @return `true` if the removal was successful, `false` otherwise.
+     */
     public boolean remove(T newEntry) {
         if (newEntry instanceof Person) {
         } else {
@@ -133,14 +149,27 @@ public class PersonMaintenance<T extends Person & Comparable<T>> {
         return false;
     }
 
+    /**
+     * Displays the details of the given person entry. This method is intended
+     * to be overridden in a subclass.
+     *
+     * @param newEntry The `Person` object to be displayed.
+     */
     public void display(T newEntry) {
         System.out.println("Person does not have display, use it in child class");
     }
 
+    /**
+     * Searches for a person entry based on the given search criteria. This
+     * method is intended to be overridden in a subclass.
+     *
+     * @param newEntry The `Person` object to be searched.
+     * @param newObject The search criteria object.
+     * @return `true` if the search was successful, `false` otherwise.
+     */
     public boolean search(T newEntry, T newObject) {
         System.out.println("Person does not have search, use it in child class");
         return true;
     }
-
     // </editor-fold>
 }
