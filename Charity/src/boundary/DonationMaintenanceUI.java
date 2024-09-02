@@ -458,29 +458,51 @@ public class DonationMaintenanceUI {
     }
     
     
-    //list all donations
+    //list all donations with pagination
     public void displayAll() {
         DonationMaintenance dm = new DonationMaintenance();
         Scanner scanner = new Scanner(System.in);
         SortedListInterface<Donation> sortedDonations = dm.getDonationListSortedById();
         int recordsPerPage = 20;  // Number of records to display per page
+        int totalRecords = sortedDonations.getNumberOfEntries();
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+        int currentPage=1;  // Start on the first page
 
-        for (int i = 1; i <= sortedDonations.getNumberOfEntries(); i++) {
-            Donation d = sortedDonations.getEntry(i);
-            if (!d.getIsDeleted()) {
-                displayDonation(d, false, false);
+        while (true) {
+            System.out.printf("\n\n");
+            // Calculate the start and end indices for the current page
+            int startIndex = (currentPage - 1)* recordsPerPage +1;
+            int endIndex = Math.min(currentPage*recordsPerPage, totalRecords);
+
+
+            printDonationHeader();
+            for (int i = startIndex; i<=endIndex; i++) {
+                Donation d = sortedDonations.getEntry(i);
+                if (!d.getIsDeleted()) {
+                    displayDonation(d, false, false);
+                }
+            }
+            // Display the current page
+            System.out.println("\nPage " + currentPage + " of " + totalPages);
+
+            
+            System.out.println("\nEnter page number to view (1 to " + totalPages + "), or '0' to exit:");
+
+            String input = scanner.nextLine();  
+
+            if (input.equals("0")) {
+                break;  
             }
 
-            // Check if the current index is a multiple of recordsPerPage and prompt for the next page
-            if (i % recordsPerPage == 0) {
-                System.out.println("Press Enter to continue or '0' to exit...");
-                String input = scanner.nextLine();  // Wait for user input
-
-                if (input.equals("0")) {
-                    break;  // Exit the loop if the user inputs '0'
+            try {
+                int pageSelection = Integer.parseInt(input);
+                if (pageSelection >= 1 && pageSelection <= totalPages) {
+                    currentPage = pageSelection;  // Set the new current page
+                } else {
+                    System.out.println("Invalid page number. Please enter a number between 1 and " + totalPages + ".");
                 }
-                printDonationHeader();
-
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid page number.");
             }
         }
     }
