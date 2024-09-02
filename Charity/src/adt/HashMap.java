@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author huaiern & Ooi Choon Chong
+ * @author Chew Huai Ern and Ooi Choon Chong
  */
 public class HashMap<K, V> implements MapInterface<K, V>, Serializable {
 

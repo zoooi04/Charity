@@ -6,7 +6,7 @@ package adt;
 
 /**
  *
- * @author Chew Huai Ern & Andrew
+ * @author Chew Huai Ern and Andrew Pheng Qi Jinn
  * @param <T>
  */
 public class Vertex<T extends Comparable<T>, N extends Comparable<N>> implements Comparable<Vertex<T,N>>{

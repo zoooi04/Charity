@@ -6,7 +6,7 @@ package adt;
 
 /**
  *
- * @author huaiern
+ * @author Chew Huai Ern and Andrew Pheng Qi Jinn
  * @param <T>
  * @param <N>
  */

@@ -3,7 +3,7 @@ package adt;
 import java.util.Iterator;
 
 /**
- * huaiern referenced from sample code and modified/enhanced
+ * Chew Huai Ern referenced from sample code and modified/enhanced
  *
  * @param <T>
  */
