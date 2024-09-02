@@ -3,7 +3,7 @@ package adt;
 
 /**
  *
- * @author huaiern
+ * @author Chew Huai Ern
  */
 public interface MapInterface<K,V> {
     //get value based on key given
